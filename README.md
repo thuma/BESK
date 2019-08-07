@@ -24,7 +24,7 @@ pip install -r requirements.txt
 * [Bottle](https://bottlepy.org/) - Python Web Framework
 * [Bootstrap](https://getbootstrap.com/) -  Responsive toolkit for HTML, CSS
 * [Sqlite3](https://www.sqlite.org) - SQLite database engine
-* [Requests](hhttps://3.python-requests.org/) - HTTP for Humans and Machines, alike.
+* [Requests](https://3.python-requests.org/) - HTTP for Humans and Machines, alike.
 
 ## Authors
 
