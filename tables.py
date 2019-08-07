@@ -11,11 +11,14 @@ tables = ['''
 '''
 CREATE TABLE IF NOT EXISTS kodstugor_datum (
   id INT PRIMARY KEY,
-  kodstugor_id INT INDEX,
+  kodstugor_id INT,
   datum TEXT,
   typ TEXT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id)
   ) WITHOUT ROWID; 
+''',
+'''
+CREATE INDEX kodstugor_datum_kodstugor_id ON kodstugor_datum(kodstugor_id);
 ''',
 '''
 CREATE TABLE IF NOT EXISTS deltagare (
@@ -79,7 +82,7 @@ CREATE TABLE IF NOT EXISTS sms_svar (
 '''
 CREATE TABLE IF NOT EXISTS utskick (
   id INT PRIMARY KEY,
-  kodstugor_id INT INDEX,
+  kodstugor_id INT,
   typ TEXT,
   rubrik TEXT,
   text TEXT,
@@ -89,6 +92,9 @@ CREATE TABLE IF NOT EXISTS utskick (
   ) WITHOUT ROWID;
 ''',
 '''
+CREATE INDEX utskick_kodstugor_id ON utskick(kodstugor_id);
+''',
+'''
 CREATE TABLE IF NOT EXISTS volontarer (
   id INT PRIMARY KEY,
   kodstugor_id INT,
@@ -96,9 +102,12 @@ CREATE TABLE IF NOT EXISTS volontarer (
   namn TEXT,
   telefon TEXT,
   password TEXT,
-  session TEXT INDEX,
+  session TEXT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id)
   ) WITHOUT ROWID;
+''',
+'''
+CREATE INDEX volontarer_session ON volontarer(session);
 ''',
 '''
 CREATE TABLE IF NOT EXISTS volontärer_plannering (
@@ -106,8 +115,11 @@ CREATE TABLE IF NOT EXISTS volontärer_plannering (
   datum TEXT,
   volontarer_id INT,
   status TEXT,
-  kodstugor_id INT INDEX,
+  kodstugor_id INT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id),
   FOREIGN KEY(volontarer_id) REFERENCES volontarer(id),
   ) WITHOUT ROWID;
+''',
+'''
+CREATE INDEX volontärer_plannering_kodstugor_id ON volontärer_plannering(kodstugor_id);
 ''']
