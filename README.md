@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 ## Authors
 
-* **Martin Harari Thuresson **
+* **Martin Harari Thuresson**
 
 ## License
 
