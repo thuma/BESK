@@ -30,4 +30,4 @@ def apply():
 def apply():
     return "Hello World!"
 
-run(host='localhost', port=8080)
+run(host='localhost', port=8080, reloader=True)

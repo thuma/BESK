@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS kick_svar (
   id INT PRIMARY KEY,
   deltagare_id INT,
   svar TEXT,
-  datum TEXT
+  datum TEXT,
   FOREIGN KEY(deltagare_id) REFERENCES deltagare(id)
   ) WITHOUT ROWID; 
 ''',
@@ -110,16 +110,16 @@ CREATE TABLE IF NOT EXISTS volontarer (
 CREATE INDEX IF NOT EXISTS volontarer_session ON volontarer(session);
 ''',
 '''
-CREATE TABLE IF NOT EXISTS volontärer_plannering (
+CREATE TABLE IF NOT EXISTS volontarer_plannering (
   id INT PRIMARY KEY,
   datum TEXT,
   volontarer_id INT,
   status TEXT,
   kodstugor_id INT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id),
-  FOREIGN KEY(volontarer_id) REFERENCES volontarer(id),
+  FOREIGN KEY(volontarer_id) REFERENCES volontarer(id)
   ) WITHOUT ROWID;
 ''',
 '''
-CREATE INDEX IF NOT EXISTS volontärer_plannering_kodstugor_id ON volontärer_plannering(kodstugor_id);
+CREATE INDEX IF NOT EXISTS volontärer_plannering_kodstugor_id ON volontarer_plannering(kodstugor_id);
 ''']
