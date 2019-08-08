@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS kodstugor_datum (
   ) WITHOUT ROWID; 
 ''',
 '''
-CREATE INDEX kodstugor_datum_kodstugor_id ON kodstugor_datum(kodstugor_id);
+CREATE INDEX IF NOT EXISTS kodstugor_datum_kodstugor_id ON kodstugor_datum(kodstugor_id);
 ''',
 '''
 CREATE TABLE IF NOT EXISTS deltagare (
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS utskick (
   ) WITHOUT ROWID;
 ''',
 '''
-CREATE INDEX utskick_kodstugor_id ON utskick(kodstugor_id);
+CREATE INDEX IF NOT EXISTS utskick_kodstugor_id ON utskick(kodstugor_id);
 ''',
 '''
 CREATE TABLE IF NOT EXISTS volontarer (
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS volontarer (
   ) WITHOUT ROWID;
 ''',
 '''
-CREATE INDEX volontarer_session ON volontarer(session);
+CREATE INDEX IF NOT EXISTS volontarer_session ON volontarer(session);
 ''',
 '''
 CREATE TABLE IF NOT EXISTS volontärer_plannering (
@@ -121,5 +121,5 @@ CREATE TABLE IF NOT EXISTS volontärer_plannering (
   ) WITHOUT ROWID;
 ''',
 '''
-CREATE INDEX volontärer_plannering_kodstugor_id ON volontärer_plannering(kodstugor_id);
+CREATE INDEX IF NOT EXISTS volontärer_plannering_kodstugor_id ON volontärer_plannering(kodstugor_id);
 ''']
