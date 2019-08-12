@@ -24,6 +24,11 @@ def admin_user(user, password):
     return ( user == config.get('general','admin_user') 
         and password == config.get('general','admin_password'))
 
+@get('/')
+@auth_basic(admin_user)
+def start():
+    return template("start.html")
+
 # Apply
 @get('/apply')
 def apply():
