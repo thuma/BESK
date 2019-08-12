@@ -106,4 +106,4 @@ def listall():
      """).fetchall();
     return template("listall.html", all=all)
 
-run(host='localhost', port=8080)
+run(host='localhost', port=9191)
