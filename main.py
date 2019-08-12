@@ -74,12 +74,58 @@ def apply():
     return template("apply_step2.html")
 
 @get('/kodstugor')
+@auth_basic(admin_user)
 def list_kodstugor():
-    return ""
+    all = cursor.execute("""
+        SELECT 
+            *
+        FROM kodstugor;
+     """).fetchall();
+    return template("kodstugor.html", all=all)
     
 @post('/kodstugor')
+@auth_basic(admin_user)
 def add_uppdate_kodstuga():
-    return ""
+    if request.forms.get("id"):
+        data = (
+            request.forms.get("namn"),
+            request.forms.get("sms_text"),
+            request.forms.get("epost_text"),
+            request.forms.get("epost_rubrik"),
+            request.forms.get("id")
+        )
+        cursor.execute("""
+            UPDATE kodstugor
+                SET
+                    namn = ?,
+                    sms_text = ?,
+                    epost_text = ?,
+                    epost_rubrik = ?
+                WHERE
+                    id = ?
+            """, data)
+        db.commit()
+    else:
+        data = (
+            request.forms.get("namn"),
+            request.forms.get("sms_text"),
+            request.forms.get("epost_text"),
+            request.forms.get("epost_rubrik")
+        )
+        cursor.execute("""
+            INSERT 
+                INTO kodstugor 
+                    (namn, sms_text, epost_text, epost_rubrik) 
+                VALUES 
+                    (?,?,?,?)
+            """, data)
+        db.commit()
+    all = cursor.execute("""
+        SELECT 
+            id, namn, sms_text,epost_rubrik, epost_text
+        FROM kodstugor;
+     """).fetchall();
+    return template("kodstugor.html", all=all)
 
 @get('/applied')
 @auth_basic(admin_user)
