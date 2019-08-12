@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS deltagare (
   kon TEXT,
   skola TEXT,
   foto TEXT,
-  framnummer TEXT,
+  frannummer TEXT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id)
   ); 
 ''',

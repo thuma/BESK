@@ -43,8 +43,8 @@ def apply():
         request.forms.getall("kon")[i],
         request.forms.getall("skola")[i]
         )
-        barnid.append(params[0])
         cursor.execute("INSERT INTO deltagare (kodstugor_id,fornamn,efternamn,kon,skola) VALUES (?,?,?,?,?)",params)
+        barnid.append(cursor.execute("SELECT last_insert_rowid()").fetchone()[0])
     db.commit()
     for i, value in enumerate(request.forms.getall("vuxen_efternamn")):
         params = (
@@ -53,19 +53,20 @@ def apply():
         request.forms.getall("email")[i],
         request.forms.getall("telefon")[i]
         )
-        vuxid.append(params[0])
         cursor.execute("INSERT INTO kontaktpersoner (fornamn,efternamn,epost,telefon) VALUES (?,?,?,?)",params)
+        vuxid.append(cursor.execute("SELECT last_insert_rowid()").fetchone()[0])
     db.commit()
     hittade = (request.forms.get("hittade"),)
     cursor.execute("INSERT INTO hittade (hittade) VALUES (?)",hittade)
     db.commit()
     for vid in vuxid:
-      for bid in vuxid:
+      for bid in barnid:
         cursor.execute("INSERT INTO kontaktpersoner_deltagare (kontaktpersoner_id, deltagare_id) VALUES (?,?)",(vid,bid))
     db.commit()
     for email in request.forms.getall("email"):
         send_email(email, "Tack för din intresseanmälan" , "Hej!\n\nVi har mottagit din intresseanmälan och kommer att återkomma när urvalet till kostugan är klart.\n\nMvh Kodcentrum")
     return template("apply_step2.html")
+
 # Confirm
 @post('/confirm')
 def apply():
@@ -75,5 +76,17 @@ def apply():
 @post('/login')
 def apply():
     return "Hello World!"
+
+# Login
+@get('/applied')
+def listall():
+    all = cursor.execute("""
+        SELECT * FROM deltagare
+        INNER JOIN kontaktpersoner_deltagare 
+            ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
+        INNER JOIN kontaktpersoner
+           ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id;
+     """).fetchall();
+    return template("listall.html", all=all)
 
 run(host='localhost', port=8080)

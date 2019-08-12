@@ -1,0 +1,12 @@
+% rebase('index.html')
+<h1 class="text-center">Intresseanmälda tlll kodstugor</h1>
+
+<table>
+% for one in all:
+    <tr>
+    % for col in one:
+        <td>{{col}}</td>
+    % end
+    </tr>
+% end
+</table>
