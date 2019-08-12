@@ -6,6 +6,7 @@ import sqlite3
 import tables
 import random
 import ConfigParser
+import phonenumbers
 config = ConfigParser.ConfigParser()
 config.read('../BESK.ini')
 
@@ -62,7 +63,7 @@ def apply():
         request.forms.getall("vuxen_fornamn")[i].decode('utf8'),
         request.forms.getall("vuxen_efternamn")[i].decode('utf8'),
         request.forms.getall("email")[i].decode('utf8'),
-        request.forms.getall("telefon")[i].decode('utf8')
+        phonenumbers.format_number(phonenumbers.parse(request.forms.getall("telefon")[i], "SE"), phonenumbers.PhoneNumberFormat.E164)
         )
         cursor.execute("INSERT INTO kontaktpersoner (fornamn,efternamn,epost,telefon) VALUES (?,?,?,?)",params)
         vuxid.append(cursor.execute("SELECT last_insert_rowid()").fetchone()[0])
