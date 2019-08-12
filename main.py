@@ -31,7 +31,8 @@ def apply():
       return template("apply.html",
         barn=int(request.query.get('barn')),
         vuxna=int(request.query.get('vuxna')),
-        kodstugor=[{"id":1,"namn":"Kodstuga1"},{"id":2,"namn":"Kodstuga2"}])
+        kodstugor = cursor.execute("""SELECT id, namn FROM kodstugor;""").fetchall()
+        )
     else:
       return template("apply_step1.html")
 
@@ -72,17 +73,14 @@ def apply():
         send_email(email, "Tack för din intresseanmälan" , "Hej!\n\nVi har mottagit din intresseanmälan och kommer att återkomma när urvalet till kostugan är klart.\n\nMvh Kodcentrum")
     return template("apply_step2.html")
 
-# Confirm
-@post('/confirm')
-def apply():
-    return "Hello World!"
+@get('/kodstugor')
+def list_kodstugor():
+    return ""
+    
+@post('/kodstugor')
+def add_uppdate_kodstuga():
+    return ""
 
-# Login
-@post('/login')
-def apply():
-    return "Hello World!"
-
-# Login
 @get('/applied')
 @auth_basic(admin_user)
 def listall():

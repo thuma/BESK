@@ -18,7 +18,7 @@
         <select class="form-control" name="kodstuga" id="kodstuga" required>
             <option value="">Välj kodstuga...</option>
 % for kodstuga in kodstugor:
-            <option value="{{kodstuga['id']}}">{{kodstuga['namn']}}</option>
+            <option value="{{kodstuga[0]}}">{{kodstuga[1]}}</option>
 % end
         </select>
     </div>
