@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from bottle import post, run, get, template, request
+from bottle import post, run, get, template, request, auth_basic
 import requests
 import sqlite3
 import tables
@@ -19,6 +19,11 @@ def send_email(to, subject, message):
    url = config.get('general','email_url')
    json_data = {"to":to,"subject":subject,"message":message,"key":config.get('general','email_key')}
    requests.post(url, json=json_data)
+
+def admin_user(user, password):
+    return ( user == config.get('general','admin_user') 
+        and password == config.get('general','admin_password'))
+
 # Apply
 @get('/apply')
 def apply():
@@ -79,9 +84,21 @@ def apply():
 
 # Login
 @get('/applied')
+@auth_basic(admin_user)
 def listall():
     all = cursor.execute("""
-        SELECT * FROM deltagare
+        SELECT 
+            deltagare.id,
+            deltagare.fornamn,
+            deltagare.efternamn,
+            deltagare.kon,
+            deltagare.skola,
+            kontaktpersoner.id,
+            kontaktpersoner.fornamn,
+            kontaktpersoner.efternamn,
+            kontaktpersoner.epost,
+            kontaktpersoner.telefon
+        FROM deltagare
         INNER JOIN kontaktpersoner_deltagare 
             ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
         INNER JOIN kontaktpersoner
