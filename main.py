@@ -43,26 +43,26 @@ def apply():
     vuxid = []
     for i, value in enumerate(request.forms.getall("barn_efternamn")):
         params = (
-        request.forms.get("kodstuga"),
-        request.forms.getall("barn_fornamn")[i],
-        request.forms.getall("barn_efternamn")[i],
-        request.forms.getall("kon")[i],
-        request.forms.getall("skola")[i]
+        request.forms.get("kodstuga").decode('utf8'),
+        request.forms.getall("barn_fornamn")[i].decode('utf8'),
+        request.forms.getall("barn_efternamn")[i].decode('utf8'),
+        request.forms.getall("kon")[i].decode('utf8'),
+        request.forms.getall("skola")[i].decode('utf8')
         )
         cursor.execute("INSERT INTO deltagare (kodstugor_id,fornamn,efternamn,kon,skola) VALUES (?,?,?,?,?)",params)
         barnid.append(cursor.execute("SELECT last_insert_rowid()").fetchone()[0])
     db.commit()
     for i, value in enumerate(request.forms.getall("vuxen_efternamn")):
         params = (
-        request.forms.getall("vuxen_fornamn")[i],
-        request.forms.getall("vuxen_efternamn")[i],
-        request.forms.getall("email")[i],
-        request.forms.getall("telefon")[i]
+        request.forms.getall("vuxen_fornamn")[i].decode('utf8'),
+        request.forms.getall("vuxen_efternamn")[i].decode('utf8'),
+        request.forms.getall("email")[i].decode('utf8'),
+        request.forms.getall("telefon")[i].decode('utf8')
         )
         cursor.execute("INSERT INTO kontaktpersoner (fornamn,efternamn,epost,telefon) VALUES (?,?,?,?)",params)
         vuxid.append(cursor.execute("SELECT last_insert_rowid()").fetchone()[0])
     db.commit()
-    hittade = (request.forms.get("hittade"),)
+    hittade = (request.forms.get("hittade").decode('utf8'),)
     cursor.execute("INSERT INTO hittade (hittade) VALUES (?)",hittade)
     db.commit()
     for vid in vuxid:
@@ -76,23 +76,31 @@ def apply():
 @get('/kodstugor')
 @auth_basic(admin_user)
 def list_kodstugor():
+    if request.query.get('id'):
+        id = int(request.query.get('id'))
+    else:
+        id = 0
     all = cursor.execute("""
         SELECT 
-            *
+            id,
+            namn,
+            sms_text,
+            epost_rubrik,
+            epost_text
         FROM kodstugor;
      """).fetchall();
-    return template("kodstugor.html", all=all)
+    return template("kodstugor.html", all=all, id=id)
     
 @post('/kodstugor')
 @auth_basic(admin_user)
 def add_uppdate_kodstuga():
     if request.forms.get("id"):
         data = (
-            request.forms.get("namn"),
-            request.forms.get("sms_text"),
-            request.forms.get("epost_text"),
-            request.forms.get("epost_rubrik"),
-            request.forms.get("id")
+            request.forms.get("namn").decode('utf8'),
+            request.forms.get("sms_text").decode('utf8'),
+            request.forms.get("epost_text").decode('utf8'),
+            request.forms.get("epost_rubrik").decode('utf8'),
+            request.forms.get("id").decode('utf8')
         )
         cursor.execute("""
             UPDATE kodstugor
@@ -107,10 +115,10 @@ def add_uppdate_kodstuga():
         db.commit()
     else:
         data = (
-            request.forms.get("namn"),
-            request.forms.get("sms_text"),
-            request.forms.get("epost_text"),
-            request.forms.get("epost_rubrik")
+            request.forms.get("namn").decode('utf8'),
+            request.forms.get("sms_text").decode('utf8'),
+            request.forms.get("epost_text").decode('utf8'),
+            request.forms.get("epost_rubrik").decode('utf8')
         )
         cursor.execute("""
             INSERT 
@@ -120,12 +128,20 @@ def add_uppdate_kodstuga():
                     (?,?,?,?)
             """, data)
         db.commit()
+    if request.query.get('id'):
+        id = int(request.query.get('id'))
+    else:
+        id = 0
     all = cursor.execute("""
         SELECT 
-            id, namn, sms_text,epost_rubrik, epost_text
+            id,
+            namn,
+            sms_text,
+            epost_rubrik,
+            epost_text
         FROM kodstugor;
      """).fetchall();
-    return template("kodstugor.html", all=all)
+    return template("kodstugor.html", all=all, id=id)
 
 @get('/applied')
 @auth_basic(admin_user)
