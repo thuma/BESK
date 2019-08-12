@@ -148,6 +148,7 @@ def add_uppdate_kodstuga():
 def listall():
     all = cursor.execute("""
         SELECT 
+            kodstugor.namn,
             deltagare.id,
             deltagare.fornamn,
             deltagare.efternamn,
@@ -162,7 +163,9 @@ def listall():
         INNER JOIN kontaktpersoner_deltagare 
             ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
         INNER JOIN kontaktpersoner
-           ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id;
+           ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id
+        INNER JOIN kodstugor
+           ON deltagare.kodstugor_id=kodstugor.id;
      """).fetchall();
     return template("listall.html", all=all)
 
