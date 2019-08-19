@@ -18,9 +18,9 @@
         <form method="post" action="/kodstugor">
         <td><input name="id" type="hidden" value="{{one[0]}}">{{one[0]}}</td>
         <td><input name="namn" type="text" required="" class="form-control"  value="{{one[1]}}" placeholder="Kodstuga GBG 7/1 - 3/6"></td>
-        <td><input name="sms_text" type="text" required="" class="form-control"  value="{{one[2]}}" placeholder="Kommer %namn% till kodstigan på onsdag? Svara ja eller nej på detta SMS."></td>
+        <td><textarea name="sms_text" required="" class="form-control" placeholder="Kommer %namn% till kodstigan på onsdag? Svara ja eller nej på detta SMS.">{{one[2]}}</textarea></td>
         <td><input name="epost_rubrik" type="text" required="" class="form-control"  value="{{one[3]}}" placeholder="Närvaro kodstuga"></td>
-        <td><input name="epost_text" type="text" required="" class="form-control"  value="{{one[4]}}" placeholder="Kommer %namn% till kodstigan på onsdag? %jalink% %nejlink%."></td>
+        <td><textarea  name="epost_text" type="text" required="" class="form-control" placeholder="Kommer %namn% till kodstigan på onsdag? %jalink% %nejlink%.">{{one[4]}}</textarea></td>
         <td><button type="submit" class="btn btn-primary">Spara</button></td>
         </form>
     </tr>
@@ -42,9 +42,9 @@
     <tr>
       <form method="post">
         <td colspan="2"><input name="namn" type="text" required="" class="form-control" placeholder="Kodstuga GBG 7/1 - 3/6"></td>
-        <td><input name="sms_text" type="text" required="" class="form-control" placeholder="Kommer %namn% till kodstigan på onsdag? Svara ja eller nej på detta SMS."></td>
+        <td><textarea name="sms_text" required="" class="form-control" placeholder="Kommer %namn% till kodstigan på onsdag? Svara ja eller nej på detta SMS."></textarea></td>
         <td><input name="epost_rubrik" type="text" required="" class="form-control" placeholder="Närvaro kodstuga"></td>
-        <td><input name="epost_text" type="text" required="" class="form-control" placeholder="Kommer %namn% till kodstigan på onsdag? %jalink% %nejlink%."></td>
+        <td><textarea name="epost_text" required="" class="form-control" placeholder="Kommer %namn% till kodstigan på onsdag? %jalink% %nejlink%."></textarea></td>
         <td><button type="submit" class="btn btn-primary">Lägg till</button></td>
       </form>
     </tr>
