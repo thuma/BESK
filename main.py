@@ -33,14 +33,7 @@ def start():
 # Apply
 @get('/apply')
 def apply():
-    if request.query.get('barn') and request.query.get('vuxna'):
-      return template("apply.html",
-        barn=int(request.query.get('barn')),
-        vuxna=int(request.query.get('vuxna')),
-        kodstugor = cursor.execute("""SELECT id, namn FROM kodstugor;""").fetchall()
-        )
-    else:
-      return template("apply_step1.html")
+    return template("apply.html", kodstugor = cursor.execute("""SELECT id, namn FROM kodstugor;""").fetchall())
 
 # Apply
 @post('/apply')
@@ -69,14 +62,32 @@ def apply():
         vuxid.append(cursor.execute("SELECT last_insert_rowid()").fetchone()[0])
     db.commit()
     hittade = (request.forms.get("hittade").decode('utf8'),)
-    cursor.execute("INSERT INTO hittade (hittade) VALUES (?)",hittade)
+    cursor.execute("INSERT INTO hittade (hittade) VALUES (?)", hittade)
     db.commit()
     for vid in vuxid:
       for bid in barnid:
         cursor.execute("INSERT INTO kontaktpersoner_deltagare (kontaktpersoner_id, deltagare_id) VALUES (?,?)",(vid,bid))
     db.commit()
+    
+    kodstugaid = request.forms.get("kodstuga").decode('utf8')
+    kodstuga = cursor.execute("""
+        SELECT namn
+        FROM kodstugor WHERE id = ?;
+     """,(kodstugaid,)).fetchall()[0][0].encode('utf8');
+    mailmessage = """Hej!
+
+Vi har mottagit din intresseanmälan till Kodstugan på %kodstuga%
+och återkommer till dig via mail så snart vi fördelat platserna. Det finns ett
+begränsat antal platser vilket innebär att ditt barn inte är garanterad en plats.
+Vi strävar efter en jämn fördelning mellan könen samt att samarbetsskolor har
+företräde men utgår annars efter en först till kvarn-princip.
+
+Med vänliga hälsningar,
+Kodcentrum
+info@kodcentrum.se""".replace("%kodstuga%",kodstuga)
+    mailsubject = "Tack för din intresseanmälan"
     for email in request.forms.getall("email"):
-        send_email(email, "Tack för din intresseanmälan" , "Hej!\n\nVi har mottagit din intresseanmälan och kommer att återkomma när urvalet till kostugan är klart.\n\nMvh Kodcentrum")
+        send_email(email, mailsubject, mailmessage)
     return template("apply_step2.html")
 
 @get('/kodstugor')
