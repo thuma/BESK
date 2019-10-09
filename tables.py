@@ -26,12 +26,13 @@ CREATE INDEX IF NOT EXISTS kodstugor_datum_kodstugor_id ON kodstugor_datum(kodst
 ''',
 '''
 CREATE TABLE IF NOT EXISTS deltagare (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   kodstugor_id INT,
   fornamn TEXT,
   efternamn TEXT,
   kon TEXT,
   skola TEXT,
+  klass TEXT,
   foto TEXT,
   frannummer TEXT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id)
@@ -39,7 +40,7 @@ CREATE TABLE IF NOT EXISTS deltagare (
 ''',
 '''
 CREATE TABLE IF NOT EXISTS kontaktpersoner (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   fornamn TEXT,
   efternamn TEXT,
   epost TEXT,

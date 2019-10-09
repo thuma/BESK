@@ -1,13 +1,142 @@
-% rebase('index.html')
-<div class="container">
-<h1>Administrera kodstugor</h1>
-<div class="card">
-    <div class="card-body">
-        <ul>
-            <li><a href="/kodstugor">Kodstugor</a></li>
-            <li><a href="/applied">Ansökningar</a></li>
-            <li><a href="/apply">Ansök</a></li>
-        </ul>
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <title>BESK - Kodcentrum</title>
+    <style>
+        label {
+            width: 100%
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="admin">
+		<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		  <a class="navbar-brand" href="#" v-on:click="page='BESK'">BESK</a>
+		  <div class="collapse navbar-collapse">
+			<ul class="navbar-nav">
+			  <li class="nav-item">
+				<a class="nav-link" href="#" v-on:click="page='Kodstugor'">Kodstugor</a>
+			  </li>
+			  <li class="nav-item">
+				<a class="nav-link" href="#" v-on:click="page='Ansökningar'">Ansökningar</a>
+			  </li>
+			</ul>
+		  </div>
+		</nav>
+	    <div v-if="page=='BESK'">
+			<h1 class="text-center">BESK</h1>
+			<p>Anmälan och hantering av närvaro.</p>
+        </div>
+	    <div v-if="page=='Kodstugor'">
+			<h1 class="text-center">Kodstugor</h1>
+			<table class="table">
+			  <thead>
+				<tr>
+				  <th scope="col">Namn</th>
+				  <th scope="col">SMS närvarofråga</th>
+				  <th scope="col">E-Post närvarofråga ämne</th>
+				  <th scope="col">E-post närvarofråga meddelande</th>
+				  <th scope="col">Redigera</th>
+				</tr>
+			  </thead>
+			  <tbody>
+				<tr v-for="kodstuga in kodstugor">
+					<td>{{kodstuga.namn}}</td>
+					<td>{{kodstuga.sms_text}}</td>
+					<td>{{kodstuga.epost_rubrik}}</td>
+					<td>{{kodstuga.epost_text}}</td>
+					<td><button v-if="!kodstuga.edit" class="btn btn-primary" v-on:click="kodstuga.edit=1">Redigera</button></td>
+				</tr>
+				<tr>
+				  <form method="post">
+					<td><input name="namn" type="text" required="" class="form-control" placeholder="Kodstuga GBG 7/1 - 3/6"></td>
+					<td><textarea name="sms_text" required="" class="form-control" placeholder="Kommer %namn% till kodstigan på onsdag? Svara ja eller nej på detta SMS."></textarea></td>
+					<td><input name="epost_rubrik" type="text" required="" class="form-control" placeholder="Närvaro kodstuga"></td>
+					<td><textarea name="epost_text" required="" class="form-control" placeholder="Kommer %namn% till kodstigan på onsdag? %jalink% %nejlink%."></textarea></td>
+					<td><button type="submit" class="btn btn-primary">Lägg till</button></td>
+				  </form>
+				</tr>
+			  </tbody>
+			</table>
+        </div>
+	    <div v-if="page=='Ansökningar'">
+			<h1 class="text-center">Intresseanmälda tlll kodstugor</h1>
+			<table class="table">
+				<thead>
+					<tr>
+						<th scope="col">Kodstuga</th>
+						<th scope="col">Förnamn</th>
+						<th scope="col">Efternamn</th>
+						<th scope="col">Kön</th>
+						<th scope="col">Skola</th>
+						<th scope="col">Klass</th>
+						<th scope="col">Målsman</th>
+						<th scope="col">Inbjudan</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="kid in kids">
+						<td>{{kid.kodstuga}}</td>
+						<td>{{kid.deltagare_efternamn}}</td>
+						<td>{{kid.deltagare_fornamn}}</td>
+						<td>{{kid.deltagare_kon}}</td>
+						<td>{{kid.deltagare_skola}}</td>
+						<td>{{kid.deltagare_klass}}</td>
+						<td>{{kid.kontaktperson_id.length}}</td>
+						<td><input type="checkbox"></td>
+					</tr>
+				</tbody>
+			</table>
+        </div>
     </div>
-</div>
-</div>
+    <script>
+        var admin = new Vue({
+            el: '#admin',
+            created: function() {
+                var main = this;
+                fetch('/applied').then(
+                    function(response) {
+                        response.json().then(function(data) {
+                            data.kids.forEach(function(kid) {
+                                main.kids.push(kid);
+                            });
+                        })
+                    });
+                fetch('/kodstugor').then(
+                    function(response) {
+                        response.json().then(function(data) {
+                            data.kodstugor.forEach(function(kodstuga) {
+                                kodstuga.edit = 0;
+                                main.kodstugor.push(kodstuga);
+                            });
+                        })
+                    });
+                fetch('/kontaktpersoner').then(
+                    function(response) {
+                        response.json().then(function(data) {
+                            data.kontaktpersoner.forEach(function(kontaktperson) {
+                                main.kontaktpersoner.push(kontaktperson);
+                            });
+                        })
+                    });
+            },
+            data: {
+                page: "BESK",
+                kids: [],
+                kodstugor: [],
+                kontaktpersoner: []
+            }
+        })
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+
+</html>
