@@ -100,46 +100,60 @@ def static_file(filename):
         return content_file.read()
 
 def apply(request, response):
-    barnid  = []
-    vuxid = []
+    data_to_db = {
+        "kids":[],
+        "adults":[]
+        }
     formdata = read_post_data(request)
     kodstugaid = formdata["kodstuga"][0]
     kodstuga = cursor.execute("""
         SELECT namn
         FROM kodstugor WHERE id = ?;
-     """,(kodstugaid,)).fetchall()[0][0];
-
+     """,(kodstugaid,)).fetchall()[0][0]
+   
     for i, value in enumerate(formdata["barn_efternamn"]):
-        params = (
-        uuid.uuid4().hex,
-        kodstugaid,
-        formdata["barn_fornamn"][i],
-        formdata["barn_efternamn"][i],
-        formdata["kon"][i],
-        formdata["klass"][i],
-        formdata["skola"][i]
+        data_to_db["kids"].append(
+            (
+            uuid.uuid4().hex,
+            kodstugaid,
+            formdata["barn_fornamn"][i],
+            formdata["barn_efternamn"][i],
+            formdata["kon"][i],
+            formdata["klass"][i],
+            formdata["skola"][i]
+            )
         )
-        cursor.execute("INSERT INTO deltagare (id,kodstugor_id,fornamn,efternamn,kon,klass,skola) VALUES (?,?,?,?,?,?,?)",params)
-        barnid.append(params[0])
-    db.commit()
+
     for i, value in enumerate(formdata["vuxen_efternamn"]):
-        params = (
-        uuid.uuid4().hex,
-        formdata["vuxen_fornamn"][i],
-        formdata["vuxen_efternamn"][i],
-        formdata["email"][i],
-        phonenumbers.format_number(phonenumbers.parse(formdata["telefon"][i], "SE"), phonenumbers.PhoneNumberFormat.E164)
+
+        phone_number= phonenumbers.parse(formdata["telefon"][i], "SE")
+        if not phonenumbers.is_valid_number(phone_number):
+            response('400 Bad Request', [('Content-Type', 'text/html')])
+            return bytes("Telefonummret är inte giltigt.",'utf-8')
+        data_to_db["adults"].append(
+            (
+            uuid.uuid4().hex,
+            formdata["vuxen_fornamn"][i],
+            formdata["vuxen_efternamn"][i],
+            formdata["email"][i],
+            phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
+            )
         )
-        cursor.execute("INSERT INTO kontaktpersoner (id,fornamn,efternamn,epost,telefon) VALUES (?,?,?,?,?)",params),
-        vuxid.append(params[0])
-    db.commit()
+
+    for adult in data_to_db["adults"]:
+        cursor.execute("INSERT INTO kontaktpersoner (id,fornamn,efternamn,epost,telefon) VALUES (?,?,?,?,?)",adult)
+    
+    for kid in data_to_db["kids"]:
+        cursor.execute("INSERT INTO deltagare (id,kodstugor_id,fornamn,efternamn,kon,klass,skola) VALUES (?,?,?,?,?,?,?)",kid)
+
+    for adult in data_to_db["adults"]:
+        for kid in data_to_db["kids"]:
+            cursor.execute("INSERT INTO kontaktpersoner_deltagare (kontaktpersoner_id, deltagare_id) VALUES (?,?)",(adult[0], kid[0]))
+
     hittade = (formdata["hittade"][0],)
     cursor.execute("INSERT INTO hittade (hittade) VALUES (?)", hittade)
     db.commit()
-    for vid in vuxid:
-      for bid in barnid:
-        cursor.execute("INSERT INTO kontaktpersoner_deltagare (kontaktpersoner_id, deltagare_id) VALUES (?,?)",(vid, bid))
-    db.commit()
+
     mailmessage = """Hej!
 
 Vi har mottagit din intresseanmälan till Kodstugan på %kodstuga%
