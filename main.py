@@ -28,13 +28,13 @@ for table in tables.tables:
 def application(request, response):
     if request['PATH_INFO'] == '/':
         response('200 OK', [('Content-Type', 'text/html')])
-        return [static_file('start.html')]
+        return [static_file('static/start.html')]
 
     elif request['PATH_INFO'] == '/apply':
         if request['REQUEST_METHOD'] == 'POST':
             return [apply(request, response)]         
         response('200 OK', [('Content-Type', 'text/html')])
-        return [static_file('apply.html')]
+        return [static_file('static/apply.html')]
 
     elif request['PATH_INFO'] == '/login':
         return [login(request, response)]
