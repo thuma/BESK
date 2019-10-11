@@ -18,6 +18,16 @@ You need to get the python modules in the requirements.txt file:
 pip install -r requirements.txt
 ```
 
+You need to set up a BESK.ini file:
+
+```
+[general]
+email_key=<key for email api>
+email_url=<url for email api>
+admin_user=<inital admin email>
+admin_password=<inital admin password>
+```
+
 ## Built With
 
 * [Python 3](https://www.python.org/) - Programming language.
