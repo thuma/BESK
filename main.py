@@ -3,17 +3,17 @@
 from gevent.pywsgi import WSGIServer
 from gevent import monkey, sleep
 monkey.patch_all()
-from urlparse import parse_qs
+from urllib.parse import parse_qs
 import requests
 import sqlite3
 import tables
 import random
-import ConfigParser
+import configparser
 import phonenumbers
 import json
 import uuid
 import base64
-config = ConfigParser.ConfigParser()
+config = configparser.RawConfigParser()
 config.read('../BESK.ini')
 
 verify='../freja.cert'
@@ -28,28 +28,30 @@ for table in tables.tables:
 def application(request, response):
     if request['PATH_INFO'] == '/':
         response('200 OK', [('Content-Type', 'text/html')])
-        return static_file('start.html')
+        return [static_file('start.html')]
 
     elif request['PATH_INFO'] == '/apply':
         if request['REQUEST_METHOD'] == 'POST':
-            return apply(request, response)         
+            return [apply(request, response)]         
         response('200 OK', [('Content-Type', 'text/html')])
-        return static_file('apply.html')
+        return [static_file('apply.html')]
 
     elif request['PATH_INFO'] == '/login':
-        return login(request, response)
+        return [login(request, response)]
 
     elif request['PATH_INFO'] == '/applied':
         response('200 OK', [('Content-Type', 'text/html')])
-        return applied()        
+        return [applied()]        
 
     elif request['PATH_INFO'] == '/kodstugor':
         response('200 OK', [('Content-Type', 'text/html')])
-        return kodstugor()
+        return [kodstugor()]
         
     elif request['PATH_INFO'] == '/kontaktpersoner':
+        if request['REQUEST_METHOD'] == 'POST':
+            return [add_uppdate_kodstuga(request, response)]      
         response('200 OK', [('Content-Type', 'text/html')])
-        return kontaktpersoner()      
+        return [kontaktpersoner()]     
 
     response('404 Not Found', [('Content-Type', 'text/html')])
     return [b'<h1>Not Found</h1>']
@@ -72,7 +74,7 @@ def login():
       thisstatus = result2.json()["status"]
       if not laststatus == thisstatus:
         laststatus = thisstatus
-        print thisstatus
+        print(thisstatus)
       if thisstatus in ("CANCELED","RP_CANCELED","EXPIRED","APPROVED","REJECTED"):
         break
   
@@ -82,40 +84,40 @@ def read_post_data(request):
     except:
         body_size = 0
     request_body = request['wsgi.input'].read(body_size)
-    return parse_qs(request_body)
+    return parse_qs(request_body.decode())
 
 def send_email(to, subject, message):
-   url = config.get('general','email_url')
-   json_data = {"to":to,"subject":subject,"message":message,"key":config.get('general','email_key')}
+   url = config['general']['email_url']
+   json_data = {"to":to,"subject":subject,"message":message,"key":config['general']['email_key']}
    requests.post(url, json=json_data)
 
 def admin_user(user, password):
-    return ( user == config.get('general','admin_user') 
-        and password == config.get('general','admin_password'))
+    return ( user == config['general']['admin_user']
+        and password == config['general']['admin_password'])
 
 def static_file(filename):
-    with open(filename, 'r') as content_file:
+    with open(filename, 'rb') as content_file:
         return content_file.read()
 
 def apply(request, response):
     barnid  = []
     vuxid = []
     formdata = read_post_data(request)
-    kodstugaid = formdata["kodstuga"][0].decode('utf8')
+    kodstugaid = formdata["kodstuga"][0]
     kodstuga = cursor.execute("""
         SELECT namn
         FROM kodstugor WHERE id = ?;
-     """,(kodstugaid,)).fetchall()[0][0].encode('utf8');
+     """,(kodstugaid,)).fetchall()[0][0];
 
     for i, value in enumerate(formdata["barn_efternamn"]):
         params = (
         uuid.uuid4().hex,
         kodstugaid,
-        formdata["barn_fornamn"][i].decode('utf8'),
-        formdata["barn_efternamn"][i].decode('utf8'),
-        formdata["kon"][i].decode('utf8'),
-        formdata["klass"][i].decode('utf8'),
-        formdata["skola"][i].decode('utf8')
+        formdata["barn_fornamn"][i],
+        formdata["barn_efternamn"][i],
+        formdata["kon"][i],
+        formdata["klass"][i],
+        formdata["skola"][i]
         )
         cursor.execute("INSERT INTO deltagare (id,kodstugor_id,fornamn,efternamn,kon,klass,skola) VALUES (?,?,?,?,?,?,?)",params)
         barnid.append(params[0])
@@ -123,15 +125,15 @@ def apply(request, response):
     for i, value in enumerate(formdata["vuxen_efternamn"]):
         params = (
         uuid.uuid4().hex,
-        formdata["vuxen_fornamn"][i].decode('utf8'),
-        formdata["vuxen_efternamn"][i].decode('utf8'),
-        formdata["email"][i].decode('utf8'),
+        formdata["vuxen_fornamn"][i],
+        formdata["vuxen_efternamn"][i],
+        formdata["email"][i],
         phonenumbers.format_number(phonenumbers.parse(formdata["telefon"][i], "SE"), phonenumbers.PhoneNumberFormat.E164)
         )
-        cursor.execute("INSERT INTO kontaktpersoner (id,fornamn,efternamn,epost,telefon) VALUES (?,?,?,?,?)",params)
+        cursor.execute("INSERT INTO kontaktpersoner (id,fornamn,efternamn,epost,telefon) VALUES (?,?,?,?,?)",params),
         vuxid.append(params[0])
     db.commit()
-    hittade = (formdata["hittade"][0].decode('utf8'),)
+    hittade = (formdata["hittade"][0],)
     cursor.execute("INSERT INTO hittade (hittade) VALUES (?)", hittade)
     db.commit()
     for vid in vuxid:
@@ -154,7 +156,7 @@ info@kodcentrum.se""".replace("%kodstuga%",kodstuga)
         send_email(email, mailsubject, mailmessage)
     
     response('200 OK', [('Content-Type', 'text/html')])
-    return "OK"
+    return b"OK"
 
 def kodstugor():
     all = cursor.execute("""
@@ -171,16 +173,17 @@ def kodstugor():
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return json.dumps({"kodstugor":map(to_headers, all.fetchall())})
+    return bytes(json.dumps({"kodstugor":list(map(to_headers, all.fetchall()))}),'utf-8')
     
-def add_uppdate_kodstuga():
-    if request.forms.get("id"):
+def add_uppdate_kodstuga(request, response):
+    post_data = read_post_data(request)
+    if post_data["id"]:
         data = (
-            request.forms.get("namn").decode('utf8'),
-            request.forms.get("sms_text").decode('utf8'),
-            request.forms.get("epost_text").decode('utf8'),
-            request.forms.get("epost_rubrik").decode('utf8'),
-            request.forms.get("id").decode('utf8')
+            post_data["namn"],
+            post_data["sms_text"],
+            post_data["epost_text"],
+            post_data["epost_rubrik"],
+            post_data["id"]
         )
         cursor.execute("""
             UPDATE kodstugor
@@ -195,10 +198,10 @@ def add_uppdate_kodstuga():
         db.commit()
     else:
         data = (
-            request.forms.get("namn").decode('utf8'),
-            request.forms.get("sms_text").decode('utf8'),
-            request.forms.get("epost_text").decode('utf8'),
-            request.forms.get("epost_rubrik").decode('utf8')
+            post_data["namn"],
+            post_data["sms_text"],
+            post_data["epost_text"],
+            post_data["epost_rubrik"],
         )
         cursor.execute("""
             INSERT 
@@ -220,8 +223,9 @@ def add_uppdate_kodstuga():
             epost_rubrik,
             epost_text
         FROM kodstugor;
-     """).fetchall();
-    return template("kodstugor.html", all=all, id=id)
+     """)
+    response('200 OK', [('Content-Type', 'text/html')])
+    return bytes(json.dumps({"kodstugor":list(map(to_headers, all.fetchall()))}),'utf-8')
 
 def kontaktpersoner():
     all = cursor.execute("""
@@ -239,7 +243,7 @@ def kontaktpersoner():
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return json.dumps({"kontaktpersoner":map(to_headers, all.fetchall())})
+    return bytes(json.dumps({"kontaktpersoner":list(map(to_headers, all.fetchall()))}),'utf-8')
 
 def applied():
     all = cursor.execute("""
@@ -270,7 +274,7 @@ def applied():
             	ut[col[0]] = ut[col[0]].split(',')
         return ut
 
-    return json.dumps({"kids":map(to_headers, all.fetchall())})
+    return bytes(json.dumps({"kids":list(map(to_headers, all.fetchall()))}),'utf-8')
 
 if __name__ == '__main__':
     print('Serving on 9191...')
