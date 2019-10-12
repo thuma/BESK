@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from managedata import db
+from tools import read_post_data
 import json
 
 def all():
@@ -18,17 +19,17 @@ def all():
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return bytes(json.dumps({"kodstugor":list(map(to_headers, all.fetchall()))}),'utf-8')
+    return json.dumps({"kodstugor":list(map(to_headers, all.fetchall()))})
     
 def add_or_uppdate(request, response):
     post_data = read_post_data(request)
-    if post_data["id"]:
+    if "id" in post_data:
         data = (
-            post_data["namn"],
-            post_data["sms_text"],
-            post_data["epost_text"],
-            post_data["epost_rubrik"],
-            post_data["id"]
+            post_data["namn"][0],
+            post_data["sms_text"][0],
+            post_data["epost_text"][0],
+            post_data["epost_rubrik"][0],
+            post_data["id"][0]
         )
         db.cursor.execute("""
             UPDATE kodstugor
@@ -40,13 +41,12 @@ def add_or_uppdate(request, response):
                 WHERE
                     id = ?
             """, data)
-        db.commit()
     else:
         data = (
-            post_data["namn"],
-            post_data["sms_text"],
-            post_data["epost_text"],
-            post_data["epost_rubrik"],
+            post_data["namn"][0],
+            post_data["sms_text"][0],
+            post_data["epost_text"][0],
+            post_data["epost_rubrik"][0],
         )
         db.cursor.execute("""
             INSERT 
@@ -55,19 +55,6 @@ def add_or_uppdate(request, response):
                 VALUES 
                     (?,?,?,?)
             """, data)
-        db.commit()
-    if request.query.get('id'):
-        id = int(request.query.get('id'))
-    else:
-        id = 0
-    all = db.cursor.execute("""
-        SELECT 
-            id,
-            namn,
-            sms_text,
-            epost_rubrik,
-            epost_text
-        FROM kodstugor;
-     """)
+    db.commit()
     response('200 OK', [('Content-Type', 'text/html')])
-    return json.dumps({"kodstugor":list(map(to_headers, all.fetchall()))})
+    return all()

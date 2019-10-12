@@ -54,6 +54,8 @@ def route(request, response):
         return applied.all()       
 
     elif request['PATH_INFO'] == '/kodstugor':
+        if request['REQUEST_METHOD'] == 'POST':
+            return kodstugor.add_or_uppdate(request, response) 
         response('200 OK', [('Content-Type', 'text/html')])
         return kodstugor.all()
         

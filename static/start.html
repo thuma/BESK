@@ -35,7 +35,7 @@
         </div>
 	    <div v-if="page=='Kodstugor'">
 			<h1 class="text-center">Kodstugor</h1>
-			<table class="table">
+			<table class="table" v-if="editkodstuga==''">
 			  <thead>
 				<tr>
 				  <th scope="col">Namn</th>
@@ -51,19 +51,61 @@
 					<td>{{kodstuga.sms_text}}</td>
 					<td>{{kodstuga.epost_rubrik}}</td>
 					<td>{{kodstuga.epost_text}}</td>
-					<td><button v-if="!kodstuga.edit" class="btn btn-primary" v-on:click="kodstuga.edit=1">Redigera</button></td>
-				</tr>
-				<tr>
-				  <form method="post">
-					<td><input name="namn" type="text" required="" class="form-control" placeholder="Kodstuga GBG 7/1 - 3/6"></td>
-					<td><textarea name="sms_text" required="" class="form-control" placeholder="Kommer %namn% till kodstigan på onsdag? Svara ja eller nej på detta SMS."></textarea></td>
-					<td><input name="epost_rubrik" type="text" required="" class="form-control" placeholder="Närvaro kodstuga"></td>
-					<td><textarea name="epost_text" required="" class="form-control" placeholder="Kommer %namn% till kodstigan på onsdag? %jalink% %nejlink%."></textarea></td>
-					<td><button type="submit" class="btn btn-primary">Lägg till</button></td>
-				  </form>
+					<td><button class="btn outline-btn-primary" v-on:click="editkodstuga=kodstuga">🖊</button>
+					</td>
 				</tr>
 			  </tbody>
 			</table>
+			<button 
+				class="btn btn-primary"
+				v-if="editkodstuga==''"
+				v-on:click="editkodstuga={'id':'','namn':'','sms_text':'','epost_rubrik':'','epost_text':''}"
+				>
+				Skapa ny
+			</button>
+			<div v-if="editkodstuga!==''">
+				<form method="post" @submit="check_send" action="/api/kodstugor">
+					<input name="id" v-if="editkodstuga.id!==''"v-bind:value="editkodstuga.id" type="hidden">
+					<div class="form-group">
+						<label>Namn på kodstuga</label>
+						<input
+							name="namn"
+							v-bind:value="editkodstuga.namn"
+							type="text"
+							required=""
+							class="form-control">
+					</div>
+					<div class="form-group">
+						<label>Namn på kodstuga</label>
+						<textarea
+							name="sms_text"
+							v-bind:value="editkodstuga.sms_text"
+							required=""
+							class="form-control"></textarea>
+					</div>
+					<div class="form-group">
+						<label>Namn på kodstuga</label>
+						<input 
+							name="epost_rubrik"
+							v-bind:value="editkodstuga.epost_rubrik"
+							type="text"
+							required=""
+							class="form-control">
+					</div>
+					<div class="form-group">
+						<label>Namn på kodstuga</label>
+						<textarea
+							name="epost_text"
+							v-bind:value="editkodstuga.epost_text"
+							required=""
+							class="form-control"></textarea>
+					</div>
+					<div class="form-group">
+						<button v-if="editkodstuga.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
+						<button v-else="" type="submit" class="btn btn-primary">Spara</button>
+					</div>
+				</form>
+			</div>
         </div>
 	    <div v-if="page=='Ansökningar'">
 			<h1 class="text-center">Intresseanmälda tlll kodstugor</h1>
@@ -98,6 +140,33 @@
     <script>
         var admin = new Vue({
             el: '#admin',
+            methods: {
+				check_send: function (theform){
+					next = this
+					theform.preventDefault();
+					form = theform.srcElement	
+					fetch(form.getAttribute("action"), {
+					method: 'POST',
+					credentials: 'same-origin',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						},
+					body: $(form).serialize()
+					}
+					).then(
+						function(response){
+						response.json(
+					).then(
+						function(data){
+							Object.keys(data).forEach(function(key){
+								next[key] = data[key];
+							})
+							next.editkodstuga=""
+						}
+					)
+					});
+				},
+			},
             created: function() {
                 var main = this;
                 fetch('/api/applied').then(
@@ -112,7 +181,6 @@
                     function(response) {
                         response.json().then(function(data) {
                             data.kodstugor.forEach(function(kodstuga) {
-                                kodstuga.edit = 0;
                                 main.kodstugor.push(kodstuga);
                             });
                         })
@@ -130,6 +198,7 @@
                 page: "BESK",
                 kids: [],
                 kodstugor: [],
+                editkodstuga: "",
                 kontaktpersoner: []
             }
         })
