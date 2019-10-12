@@ -34,6 +34,8 @@ def application(request, response):
     return to_array_bytes(route(request, response))
 
 def route(request, response):
+    if request['PATH_INFO'].startswith("/api"):
+        request['PATH_INFO'] = request['PATH_INFO'][4:]
     if request['PATH_INFO'] == '/':
         response('200 OK', [('Content-Type', 'text/html')])
         return static_file('static/start.html')

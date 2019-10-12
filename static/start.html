@@ -100,7 +100,7 @@
             el: '#admin',
             created: function() {
                 var main = this;
-                fetch('/applied').then(
+                fetch('/api/applied').then(
                     function(response) {
                         response.json().then(function(data) {
                             data.kids.forEach(function(kid) {
@@ -108,7 +108,7 @@
                             });
                         })
                     });
-                fetch('/kodstugor').then(
+                fetch('/api/kodstugor').then(
                     function(response) {
                         response.json().then(function(data) {
                             data.kodstugor.forEach(function(kodstuga) {
@@ -117,7 +117,7 @@
                             });
                         })
                     });
-                fetch('/kontaktpersoner').then(
+                fetch('/api/kontaktpersoner').then(
                     function(response) {
                         response.json().then(function(data) {
                             data.kontaktpersoner.forEach(function(kontaktperson) {
