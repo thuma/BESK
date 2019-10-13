@@ -10,7 +10,7 @@ import phonenumbers
 import json
 import uuid
 import base64
-from managedata import db, kodstugor, kontaktpersoner, applied
+from managedata import db, kodstugor, kontaktpersoner, applied, datum
 config = configparser.RawConfigParser()
 config.read('../BESK.ini')
 
@@ -58,6 +58,12 @@ def route(request, response):
             return kodstugor.add_or_uppdate(request, response) 
         response('200 OK', [('Content-Type', 'text/html')])
         return kodstugor.all()
+
+    elif request['PATH_INFO'] == '/datum':
+        if request['REQUEST_METHOD'] == 'POST':
+            return datum.set(request, response) 
+        response('200 OK', [('Content-Type', 'text/html')])
+        return datum.all()
         
     elif request['PATH_INFO'] == '/kontaktpersoner':
         if request['REQUEST_METHOD'] == 'POST':

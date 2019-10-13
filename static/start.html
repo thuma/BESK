@@ -16,157 +16,235 @@
 
 <body>
     <div class="container" id="admin">
-		<nav class="navbar navbar-expand-lg navbar-light bg-light">
-		  <a class="navbar-brand" href="#" v-on:click="page='BESK'">BESK</a>
-		  <div class="collapse navbar-collapse">
-			<ul class="navbar-nav">
-			  <li class="nav-item">
-				<a class="nav-link" href="#" v-on:click="page='Kodstugor'">Kodstugor</a>
-			  </li>
-			  <li class="nav-item">
-				<a class="nav-link" href="#" v-on:click="page='Ansökningar'">Ansökningar</a>
-			  </li>
-			</ul>
-		  </div>
-		</nav>
-	    <div v-if="page=='BESK'">
-			<h1 class="text-center">BESK</h1>
-			<p>Anmälan och hantering av närvaro.</p>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="#" v-on:click="page='BESK'">BESK</a>
+          <div class="collapse navbar-collapse">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="#" v-on:click="page='Kodstugor'">Kodstugor</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" v-on:click="page='Ansökningar'">Ansökningar</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" v-on:click="page='Datum'">Datum</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" v-on:click="page='Volontärer'">Volontärer</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" v-on:click="page='Utskick'">Utskick</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" v-on:click="page='Närvaro'">Närvaro</a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+        <div v-if="page=='BESK'">
+            <h1 class="text-center">BESK</h1>
+            <p>Anmälan och hantering av närvaro.</p>
         </div>
-	    <div v-if="page=='Kodstugor'">
-			<h1 class="text-center">Kodstugor</h1>
-			<table class="table" v-if="editkodstuga==''">
-			  <thead>
-				<tr>
-				  <th scope="col">Namn</th>
-				  <th scope="col">SMS närvarofråga</th>
-				  <th scope="col">E-Post närvarofråga ämne</th>
-				  <th scope="col">E-post närvarofråga meddelande</th>
-				  <th scope="col">Redigera</th>
-				</tr>
-			  </thead>
-			  <tbody>
-				<tr v-for="kodstuga in kodstugor">
-					<td>{{kodstuga.namn}}</td>
-					<td>{{kodstuga.sms_text}}</td>
-					<td>{{kodstuga.epost_rubrik}}</td>
-					<td>{{kodstuga.epost_text}}</td>
-					<td><button class="btn outline-btn-primary" v-on:click="editkodstuga=kodstuga">🖊</button>
-					</td>
-				</tr>
-			  </tbody>
-			</table>
-			<button 
-				class="btn btn-primary"
-				v-if="editkodstuga==''"
-				v-on:click="editkodstuga={'id':'','namn':'','sms_text':'','epost_rubrik':'','epost_text':''}"
-				>
-				Skapa ny
-			</button>
-			<div v-if="editkodstuga!==''">
-				<form method="post" @submit="check_send" action="/api/kodstugor">
-					<input name="id" v-if="editkodstuga.id!==''"v-bind:value="editkodstuga.id" type="hidden">
-					<div class="form-group">
-						<label>Namn på kodstuga</label>
-						<input
-							name="namn"
-							v-bind:value="editkodstuga.namn"
-							type="text"
-							required=""
-							class="form-control">
-					</div>
-					<div class="form-group">
-						<label>Namn på kodstuga</label>
-						<textarea
-							name="sms_text"
-							v-bind:value="editkodstuga.sms_text"
-							required=""
-							class="form-control"></textarea>
-					</div>
-					<div class="form-group">
-						<label>Namn på kodstuga</label>
-						<input 
-							name="epost_rubrik"
-							v-bind:value="editkodstuga.epost_rubrik"
-							type="text"
-							required=""
-							class="form-control">
-					</div>
-					<div class="form-group">
-						<label>Namn på kodstuga</label>
-						<textarea
-							name="epost_text"
-							v-bind:value="editkodstuga.epost_text"
-							required=""
-							class="form-control"></textarea>
-					</div>
-					<div class="form-group">
-						<button v-if="editkodstuga.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
-						<button v-else="" type="submit" class="btn btn-primary">Spara</button>
-					</div>
-				</form>
-			</div>
+        <div v-if="page=='Datum'">
+            <h1 class="text-center">Datum</h1>
+            <table class="table" v-if="edit==''">
+              <thead>
+                <tr>
+                  <th scope="col">Kodstuga</th>
+                  <th scope="col" colspan="11">Datum</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="kodstuga in kodstugor">
+                    <td>{{kodstuga.namn}}</td>
+                    <td v-for="date in get_dates(kodstuga.id)">{{date.datum}} <br>({{date.typ}})</td>
+                    <td><button class="btn outline-btn-primary"
+                        v-on:click="edit={'type':'date','data':kodstuga}">🖊</button>
+                    </td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-if="edit.type=='date'">
+                <form method="post" @submit="check_send" action="/api/datum">
+                    Datum för <b>{{edit.data.namn}}</b>
+                    <button class="btn btn-primary" type="button"
+                        v-on:click="kodstugor_datum[edit.data.id].pop()">-</button>
+                    <button 
+                        class="btn btn-primary"
+                        type="button" 
+                        v-on:click="kodstugor_datum[edit.data.id].push(next_date(kodstugor_datum[edit.data.id]))">+</button>
+                    <input type="hidden" name="kodstugor_id" v-bind:value="edit.data.id">
+                    <div class="row" v-for="date in kodstugor_datum[edit.data.id]">
+                        <div class="col-sm-2">
+                            <label>Datum</label>
+                        </div>
+                        <div class="col-sm-4">
+                            <input class="form-control" type="date" name="datum" v-model:value="date.datum">
+                        </div>
+                        <div class="col-sm-2">
+                            <label>Typ</label>
+                        </div>
+                        <div class="col-sm-4">
+                            <select name="typ" v-model="date.typ" class="form-control" >
+                                  <option value="kodstuga">Kodstuga</option>
+                                  <option value="lov">Lov</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Spara</button>
+                </form>
+            </div>
         </div>
-	    <div v-if="page=='Ansökningar'">
-			<h1 class="text-center">Intresseanmälda tlll kodstugor</h1>
-			<table class="table">
-				<thead>
-					<tr>
-						<th scope="col">Kodstuga</th>
-						<th scope="col">Förnamn</th>
-						<th scope="col">Efternamn</th>
-						<th scope="col">Kön</th>
-						<th scope="col">Skola</th>
-						<th scope="col">Klass</th>
-						<th scope="col">Målsman</th>
-						<th scope="col">Inbjudan</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr v-for="kid in kids">
-						<td>{{kid.kodstuga}}</td>
-						<td>{{kid.deltagare_efternamn}}</td>
-						<td>{{kid.deltagare_fornamn}}</td>
-						<td>{{kid.deltagare_kon}}</td>
-						<td>{{kid.deltagare_skola}}</td>
-						<td>{{kid.deltagare_klass}}</td>
-						<td>{{kid.kontaktperson_id.length}}</td>
-						<td><input type="checkbox"></td>
-					</tr>
-				</tbody>
-			</table>
+        <div v-if="page=='Kodstugor'">
+            <h1 class="text-center">Kodstugor</h1>
+            <table class="table" v-if="edit==''">
+              <thead>
+                <tr>
+                  <th scope="col">Namn</th>
+                  <th scope="col">SMS närvarofråga</th>
+                  <th scope="col">E-Post närvarofråga ämne</th>
+                  <th scope="col">E-post närvarofråga meddelande</th>
+                  <th scope="col">Redigera</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="kodstuga in kodstugor">
+                    <td>{{kodstuga.namn}}</td>
+                    <td>{{kodstuga.sms_text}}</td>
+                    <td>{{kodstuga.epost_rubrik}}</td>
+                    <td>{{kodstuga.epost_text}}</td>
+                    <td><button class="btn outline-btn-primary"
+                        v-on:click="edit={'type':'kodstuga','data':kodstuga}">🖊</button>
+                    </td>
+                </tr>
+              </tbody>
+            </table>
+            <button 
+                class="btn btn-primary"
+                v-if="edit==''"
+                v-on:click="edit={'type':'kodstuga','data':{'id':'','namn':'','sms_text':'','epost_rubrik':'','epost_text':''}}"
+                >
+                Skapa ny
+            </button>
+            <div v-if="edit.type=='kodstuga'">
+                <form method="post" @submit="check_send" action="/api/kodstugor">
+                    <input name="id" v-if="edit.data.id!==''"v-bind:value="edit.data.id" type="hidden">
+                    <div class="form-group">
+                        <label>Namn på kodstuga</label>
+                        <input
+                            name="namn"
+                            v-bind:value="edit.data.namn"
+                            type="text"
+                            required=""
+                            class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Namn på kodstuga</label>
+                        <textarea
+                            name="sms_text"
+                            v-bind:value="edit.data.sms_text"
+                            required=""
+                            class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Namn på kodstuga</label>
+                        <input 
+                            name="epost_rubrik"
+                            v-bind:value="edit.data.epost_rubrik"
+                            type="text"
+                            required=""
+                            class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Namn på kodstuga</label>
+                        <textarea
+                            name="epost_text"
+                            v-bind:value="edit.data.epost_text"
+                            required=""
+                            class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
+                        <button v-else="" type="submit" class="btn btn-primary">Spara</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div v-if="page=='Ansökningar'">
+            <h1 class="text-center">Intresseanmälda tlll kodstugor</h1>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Kodstuga</th>
+                        <th scope="col">Förnamn</th>
+                        <th scope="col">Efternamn</th>
+                        <th scope="col">Kön</th>
+                        <th scope="col">Skola</th>
+                        <th scope="col">Klass</th>
+                        <th scope="col">Målsman</th>
+                        <th scope="col">Inbjudan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="kid in kids">
+                        <td>{{kid.kodstuga}}</td>
+                        <td>{{kid.deltagare_efternamn}}</td>
+                        <td>{{kid.deltagare_fornamn}}</td>
+                        <td>{{kid.deltagare_kon}}</td>
+                        <td>{{kid.deltagare_skola}}</td>
+                        <td>{{kid.deltagare_klass}}</td>
+                        <td>{{kid.kontaktperson_id.length}}</td>
+                        <td><input type="checkbox"></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
     <script>
         var admin = new Vue({
             el: '#admin',
             methods: {
-				check_send: function (theform){
-					next = this
-					theform.preventDefault();
-					form = theform.srcElement	
-					fetch(form.getAttribute("action"), {
-					method: 'POST',
-					credentials: 'same-origin',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-						},
-					body: $(form).serialize()
-					}
-					).then(
-						function(response){
-						response.json(
-					).then(
-						function(data){
-							Object.keys(data).forEach(function(key){
-								next[key] = data[key];
-							})
-							next.editkodstuga=""
-						}
-					)
-					});
-				},
-			},
+                get_dates: function(id){
+                    if(!this.kodstugor_datum[id]){
+                      this.$set(this.kodstugor_datum, id, []);
+                    }
+                    return this.kodstugor_datum[id]
+                },
+                next_date: function(list){
+                    if(list.slice(-1)[0]){
+                        var current_last_date = new Date(list.slice(-1)[0].datum);
+                        var new_date = new Date(current_last_date.setDate(current_last_date.getDate() + 7));
+                        return {'datum':new_date.toISOString().substring(0,10),'typ':'kodstuga'}
+                    } else {
+                        return {'datum':'','typ':'kodstuga'}
+                    }
+                },
+                check_send: function (theform){
+                    next = this
+                    theform.preventDefault();
+                    form = theform.srcElement   
+                    fetch(form.getAttribute("action"), {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                    body: $(form).serialize()
+                    }
+                    ).then(
+                        function(response){
+                        response.json(
+                    ).then(
+                        function(data){
+                            Object.keys(data).forEach(function(key){
+                                next[key] = data[key];
+                            })
+                            next.edit=""
+                        }
+                    )
+                    });
+                },
+            },
             created: function() {
                 var main = this;
                 fetch('/api/applied').then(
@@ -185,6 +263,12 @@
                             });
                         })
                     });
+                fetch('/api/datum').then(
+                    function(response) {
+                        response.json().then(function(data) {
+                            main.kodstugor_datum = data.kodstugor_datum
+                        })
+                    });
                 fetch('/api/kontaktpersoner').then(
                     function(response) {
                         response.json().then(function(data) {
@@ -198,7 +282,8 @@
                 page: "BESK",
                 kids: [],
                 kodstugor: [],
-                editkodstuga: "",
+                kodstugor_datum: {},
+                edit: "",
                 kontaktpersoner: []
             }
         })

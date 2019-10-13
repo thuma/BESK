@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS deltagande (
   ); 
 ''',
 '''
-CREATE TABLE IF NOT EXISTS kick_svar (
+CREATE TABLE IF NOT EXISTS klick_svar (
   id INTEGER PRIMARY KEY,
   deltagare_id INT,
   svar TEXT,
