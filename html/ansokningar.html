@@ -1,0 +1,27 @@
+<h1 class="text-center">Intresseanmälda tlll kodstugor</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Kodstuga</th>
+            <th scope="col">Förnamn</th>
+            <th scope="col">Efternamn</th>
+            <th scope="col">Kön</th>
+            <th scope="col">Skola</th>
+            <th scope="col">Klass</th>
+            <th scope="col">Målsman</th>
+            <th scope="col">Inbjudan</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="kid in kids">
+            <td>{{kid.kodstuga}}</td>
+            <td>{{kid.deltagare_efternamn}}</td>
+            <td>{{kid.deltagare_fornamn}}</td>
+            <td>{{kid.deltagare_kon}}</td>
+            <td>{{kid.deltagare_skola}}</td>
+            <td>{{kid.deltagare_klass}}</td>
+            <td>{{kid.kontaktperson_id.length}}</td>
+            <td><input type="checkbox"></td>
+        </tr>
+    </tbody>
+</table>

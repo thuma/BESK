@@ -6,9 +6,7 @@ monkey.patch_all()
 import requests
 import random
 import configparser
-import phonenumbers
 import json
-import uuid
 import base64
 from managedata import db, kodstugor, kontaktpersoner, applied, datum
 config = configparser.RawConfigParser()
@@ -39,6 +37,10 @@ def route(request, response):
     if request['PATH_INFO'] == '/':
         response('200 OK', [('Content-Type', 'text/html')])
         return static_file('static/start.html')
+    
+    if request['PATH_INFO'] == '/index.js':
+        response('200 OK', [('Content-Type', 'text/html')])
+        return static_file('static/index.js')
 
     elif request['PATH_INFO'] == '/apply':
         if request['REQUEST_METHOD'] == 'POST':
@@ -79,8 +81,17 @@ def admin_user(user, password):
         and password == config['general']['admin_password'])
 
 def static_file(filename):
-    with open(filename, 'rb') as content_file:
-        return content_file.read()
+    with open(filename, 'r') as content_file:
+        imports = content_file.read().split("?>")
+        out = ""
+        for one_import in imports:
+            file = one_import.split("<?")
+            if len(file) == 2:
+                with open("html/"+file[1], 'r') as importfile:
+                    out+=file[0]+importfile.read()
+            else:
+                out+=file[0]
+        return out.encode('utf-8')
 
 if __name__ == '__main__':
     print('Serving on 9191...')

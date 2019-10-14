@@ -1,0 +1,73 @@
+<h1 class="text-center">Kodstugor</h1>
+<table class="table" v-if="edit==''">
+  <thead>
+    <tr>
+      <th scope="col">Namn</th>
+      <th scope="col">SMS närvarofråga</th>
+      <th scope="col">E-Post närvarofråga ämne</th>
+      <th scope="col">E-post närvarofråga meddelande</th>
+      <th scope="col">Redigera</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="kodstuga in kodstugor">
+        <td>{{kodstuga.namn}}</td>
+        <td>{{kodstuga.sms_text}}</td>
+        <td>{{kodstuga.epost_rubrik}}</td>
+        <td>{{kodstuga.epost_text}}</td>
+        <td><button class="btn outline-btn-primary"
+            v-on:click="edit={'type':'kodstuga','data':kodstuga}">🖊</button>
+        </td>
+    </tr>
+  </tbody>
+</table>
+<button 
+    class="btn btn-primary"
+    v-if="edit==''"
+    v-on:click="edit={'type':'kodstuga','data':{'id':'','namn':'','sms_text':'','epost_rubrik':'','epost_text':''}}"
+    >
+    Skapa ny
+</button>
+<div v-if="edit.type=='kodstuga'">
+    <form method="post" @submit="check_send" action="/api/kodstugor">
+        <input name="id" v-if="edit.data.id!==''"v-bind:value="edit.data.id" type="hidden">
+        <div class="form-group">
+            <label>Namn på kodstuga</label>
+            <input
+                name="namn"
+                v-bind:value="edit.data.namn"
+                type="text"
+                required=""
+                class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Namn på kodstuga</label>
+            <textarea
+                name="sms_text"
+                v-bind:value="edit.data.sms_text"
+                required=""
+                class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Namn på kodstuga</label>
+            <input 
+                name="epost_rubrik"
+                v-bind:value="edit.data.epost_rubrik"
+                type="text"
+                required=""
+                class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Namn på kodstuga</label>
+            <textarea
+                name="epost_text"
+                v-bind:value="edit.data.epost_text"
+                required=""
+                class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
+            <button v-else="" type="submit" class="btn btn-primary">Spara</button>
+        </div>
+    </form>
+</div>

@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from managedata import db
-from tools import send_email
+from tools import send_email, read_post_data
+import uuid
 import json
+import phonenumbers
 
 def new(request, response):
     data_to_db = {
@@ -75,7 +77,7 @@ info@kodcentrum.se""".replace("%kodstuga%",kodstuga)
         send_email(email, mailsubject, mailmessage)
     
     response('200 OK', [('Content-Type', 'text/html')])
-    return b"OK"
+    return json.dumps({"applied":data_to_db})
 
 def all():
     all = db.cursor.execute("""

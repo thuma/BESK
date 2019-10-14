@@ -1,0 +1,48 @@
+<h1 class="text-center">Datum</h1>
+<table class="table" v-if="edit==''">
+  <thead>
+    <tr>
+      <th scope="col">Kodstuga</th>
+      <th scope="col" colspan="11">Datum</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="kodstuga in kodstugor">
+        <td>{{kodstuga.namn}}</td>
+        <td v-for="date in get_dates(kodstuga.id)">{{date.datum}} <br>({{date.typ}})</td>
+        <td><button class="btn outline-btn-primary"
+            v-on:click="edit={'type':'date','data':kodstuga}">🖊</button>
+        </td>
+    </tr>
+  </tbody>
+</table>
+<div v-if="edit.type=='date'">
+    <form method="post" @submit="check_send" action="/api/datum">
+        Datum för <b>{{edit.data.namn}}</b>
+        <button class="btn btn-primary" type="button"
+            v-on:click="kodstugor_datum[edit.data.id].pop()">-</button>
+        <button 
+            class="btn btn-primary"
+            type="button" 
+            v-on:click="kodstugor_datum[edit.data.id].push(next_date(kodstugor_datum[edit.data.id]))">+</button>
+        <input type="hidden" name="kodstugor_id" v-bind:value="edit.data.id">
+        <div class="row" v-for="date in kodstugor_datum[edit.data.id]">
+            <div class="col-sm-2">
+                <label>Datum</label>
+            </div>
+            <div class="col-sm-4">
+                <input class="form-control" type="date" name="datum" v-model:value="date.datum">
+            </div>
+            <div class="col-sm-2">
+                <label>Typ</label>
+            </div>
+            <div class="col-sm-4">
+                <select name="typ" v-model="date.typ" class="form-control" >
+                      <option value="kodstuga">Kodstuga</option>
+                      <option value="lov">Lov</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Spara</button>
+    </form>
+</div>
