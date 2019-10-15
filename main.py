@@ -12,9 +12,6 @@ from managedata import db, kodstugor, kontaktpersoner, applied, datum
 config = configparser.RawConfigParser()
 config.read('../BESK.ini')
 
-verify='../freja.cert'
-cert='../BESK.cert'
-
 def generator():
      yield "string"
 
