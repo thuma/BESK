@@ -33,6 +33,7 @@ def get_session_token(request):
 def start(request, response):
     session = get_session_token(request)
     if not session:
+        session_token = uuid.uuid4().hex
         response(
             "302 Found",
             [
