@@ -131,7 +131,7 @@ CREATE INDEX IF NOT EXISTS volontärer_plannering_kodstugor_id ON volontarer_pla
 '''
 CREATE TABLE IF NOT EXISTS auth (
   sessionid PRIMARY KEY,
-  email TEXT,
+  user_data TEXT,
   vailid INT
   );
 ''',

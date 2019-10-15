@@ -6,7 +6,7 @@ import requests
 import configparser
 import uuid
 from managedata import db
-from tools import read_get_data
+from tools import read_get_data, url_encode
 config = configparser.RawConfigParser()
 config.read('../BESK.ini')
 logedin = {}
@@ -36,7 +36,7 @@ def start(request, response):
             "302 Found",
             [
                 ("Set-Cookie", "session_token="+session_token+"; HttpOnly"), # TODO add Secure
-                ("Location","https://slack.com/oauth/authorize?scope=identity.basic%20identity.email&client_id=476744412819.789508806369")
+                ("Location","https://slack.com/oauth/authorize?scope=identity.basic%20identity.email&client_id=476744412819.789508806369&redirect_uri="+url_encode(config['slack']['redirect_uri']))
             ]
         )
         return "Login"
@@ -44,7 +44,7 @@ def start(request, response):
         response(
             "302 Found",
             [
-                ("Location","https://slack.com/oauth/authorize?scope=identity.basic%20identity.email&client_id=476744412819.789508806369")
+                ("Location","https://slack.com/oauth/authorize?scope=identity.basic%20identity.email&client_id=476744412819.789508806369&redirect_uri="+url_encode(config['slack']['redirect_uri']))
             ]
         )
         return "Login"
