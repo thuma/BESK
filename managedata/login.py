@@ -15,8 +15,6 @@ cert='../BESK.cert'
 
 def get_login_status(request):
     session = get_session_token(request)
-    print(session)
-    print(logedin)
     if session and session in logedin:
         return {"user":logedin[session]}
     else:
@@ -60,9 +58,9 @@ def validate(request, response):
             params = {
                 "client_id":config['slack']['client_id'],
                 "client_secret":config['slack']['client_secret'],
-                "code":code}
+                "code":code,
+                "redirect_uri":config['slack']['redirect_uri']}
             )
-
         userdata = requests.get(
             "https://slack.com/api/users.identity",
             params = {"token":accesstoken.json()["access_token"]}
@@ -77,7 +75,6 @@ def validate(request, response):
         )
         return "Login"
     except Exception as e:
-        print(e)
         return start(request, response)
 
 def auth(email):

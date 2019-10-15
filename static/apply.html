@@ -31,7 +31,7 @@
 					<label>Mitt barn är ny till programmering och är intresserad av denna kodstuga
 						<select class="form-control" name="kodstuga" required>
 							<option value="">Välj kodstuga...</option>
-							<option value="1">1</option>
+							<option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
 						</select>
 					</label>
 				</div>
@@ -139,6 +139,16 @@
 	<script>
 	var applyform = new Vue({
 	  el: '#applyform',
+	  created: function(){
+	  	var main = this
+	  	fetch('/api/kodstugor').then(
+           	function(response) {
+                response.json().then(
+                	function(data) {
+                    	main.kodstugor = data.kodstugor;
+                    });
+                });
+	  },
 	  methods: {
 		check_send: function (){
 			fetch('/apply', {
@@ -154,7 +164,8 @@
 	  },
 	  data: {
 		kids: 1,
-		adults: 1
+		adults: 1,
+		kodstugor: []
 	  }
 	})
 	</script>

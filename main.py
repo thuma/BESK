@@ -33,7 +33,6 @@ def route(request, response):
         return static_file('static/apply.html')
     else:
         request["BESK_login"] = login.get_login_status(request)
-        print(request["BESK_login"])
     if request['PATH_INFO'].startswith("/api"):
         request['PATH_INFO'] = request['PATH_INFO'][4:]
 
