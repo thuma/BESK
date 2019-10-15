@@ -127,4 +127,12 @@ CREATE TABLE IF NOT EXISTS volontarer_plannering (
 ''',
 '''
 CREATE INDEX IF NOT EXISTS volontärer_plannering_kodstugor_id ON volontarer_plannering(kodstugor_id);
-''']
+''',
+'''
+CREATE TABLE IF NOT EXISTS auth (
+  sessionid PRIMARY KEY,
+  email TEXT,
+  vailid INT
+  );
+''',
+]

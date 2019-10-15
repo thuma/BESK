@@ -5,12 +5,9 @@ from gevent import monkey, sleep
 monkey.patch_all()
 import requests
 import random
-import configparser
 import json
 import base64
-from managedata import db, kodstugor, kontaktpersoner, applied, datum
-config = configparser.RawConfigParser()
-config.read('../BESK.ini')
+from managedata import db, kodstugor, kontaktpersoner, applied, datum, login
 
 def generator():
      yield "string"
@@ -29,6 +26,14 @@ def application(request, response):
     return to_array_bytes(route(request, response))
 
 def route(request, response):
+    if request['PATH_INFO'] == '/apply':
+        if request['REQUEST_METHOD'] == 'POST':
+            return applied.new(request, response)         
+        response('200 OK', [('Content-Type', 'text/html')])
+        return static_file('static/apply.html')
+    else:
+        return login.handle(request, response)
+
     if request['PATH_INFO'].startswith("/api"):
         request['PATH_INFO'] = request['PATH_INFO'][4:]
     if request['PATH_INFO'] == '/':
@@ -38,12 +43,6 @@ def route(request, response):
     if request['PATH_INFO'] == '/index.js':
         response('200 OK', [('Content-Type', 'text/html')])
         return static_file('static/index.js')
-
-    elif request['PATH_INFO'] == '/apply':
-        if request['REQUEST_METHOD'] == 'POST':
-            return applied.new(request, response)         
-        response('200 OK', [('Content-Type', 'text/html')])
-        return static_file('static/apply.html')
 
     elif request['PATH_INFO'] == '/login':
         return login(request, response)
@@ -72,10 +71,6 @@ def route(request, response):
 
     response('404 Not Found', [('Content-Type', 'text/html')])
     return '<h1>Not Found</h1>'
-
-def admin_user(user, password):
-    return ( user == config['general']['admin_user']
-        and password == config['general']['admin_password'])
 
 def static_file(filename):
     with open(filename, 'r') as content_file:

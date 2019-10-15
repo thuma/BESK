@@ -13,7 +13,10 @@ def read_post_data(request):
     except:
         body_size = 0
     request_body = request['wsgi.input'].read(body_size)
-    return parse_qs(request_body.decode(),keep_blank_values=True)
+    return parse_qs(request_body.decode(), keep_blank_values=True)
+
+def read_get_data(request):
+    return parse_qs(request['QUERY_STRING'], keep_blank_values=True)
 
 def send_email(to, subject, message):
    url = config['general']['email_url']
