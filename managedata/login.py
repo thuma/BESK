@@ -13,6 +13,15 @@ logedin = {}
 verify='../freja.cert'
 cert='../BESK.cert'
 
+def get_login_status(request):
+    session = get_session_token(request)
+    print(session)
+    print(logedin)
+    if session and session in logedin:
+        return {"user":logedin[session]}
+    else:
+        return {"user":False}
+
 def get_session_token(request):
     for cookie in request['HTTP_COOKIE'].split(";"):
         (key, data) = cookie.split("=")
@@ -20,7 +29,7 @@ def get_session_token(request):
             return data
     return False
 
-def handle(request, response):
+def start(request, response):
     session = get_session_token(request)
     if not session:
         response(
@@ -31,16 +40,7 @@ def handle(request, response):
             ]
         )
         return "Login"
-    elif session and request['PATH_INFO'] == '/login':
-        query_data = read_get_data(request)
-        validated = validate(query_data["code"][0])
-        response(
-            "200 OK",
-            [('Content-Type', 'text/html')]
-        )
-        logedin[session] = validated
-        return json.dumps(validated)
-    elif session not in logedin:
+    else:
         response(
             "302 Found",
             [
@@ -48,27 +48,35 @@ def handle(request, response):
             ]
         )
         return "Login"
-    else:
+
+def validate(request, response):
+    try:
+        query_data = read_get_data(request)
+        code = query_data["code"][0]
+        accesstoken = requests.get(
+            "https://slack.com/api/oauth.access",
+            params = {
+                "client_id":config['slack']['client_id'],
+                "client_secret":config['slack']['client_secret'],
+                "code":code}
+            )
+
+        userdata = requests.get(
+            "https://slack.com/api/users.identity",
+            params = {"token":accesstoken.json()["access_token"]}
+            )
+        session = get_session_token(request)
+        logedin[session] = userdata.json()
         response(
-            "200 OK",
-            [('Content-Type', 'text/html')]
+            "302 Found",
+            [
+                ("Location","/")
+            ]
         )
-        return json.dumps(logedin[session])
-
-def validate(code):
-    accesstoken = requests.get(
-        "https://slack.com/api/oauth.access",
-        params = {
-            "client_id":config['slack']['client_id'],
-            "client_secret":config['slack']['client_secret'],
-            "code":code}
-        )
-
-    userdata = requests.get(
-        "https://slack.com/api/users.identity",
-        params = {"token":accesstoken.json()["access_token"]}
-        )
-    return userdata.json()
+        return "Login"
+    except Exception as e:
+        print(e)
+        return start(request, response)
 
 def auth(email):
     data = {

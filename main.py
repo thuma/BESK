@@ -32,11 +32,14 @@ def route(request, response):
         response('200 OK', [('Content-Type', 'text/html')])
         return static_file('static/apply.html')
     else:
-        return login.handle(request, response)
-
+        request["BESK_login"] = login.get_login_status(request)
+        print(request["BESK_login"])
     if request['PATH_INFO'].startswith("/api"):
         request['PATH_INFO'] = request['PATH_INFO'][4:]
+
     if request['PATH_INFO'] == '/':
+        if request["BESK_login"]["user"] == False:
+            return login.start(request, response)
         response('200 OK', [('Content-Type', 'text/html')])
         return static_file('static/start.html')
     
@@ -45,7 +48,7 @@ def route(request, response):
         return static_file('static/index.js')
 
     elif request['PATH_INFO'] == '/login':
-        return login(request, response)
+        return login.validate(request, response)
 
     elif request['PATH_INFO'] == '/applied':
         response('200 OK', [('Content-Type', 'text/html')])
