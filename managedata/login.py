@@ -23,10 +23,11 @@ def get_login_status(request):
         return {"user":False}
 
 def get_session_token(request):
-    for cookie in request['HTTP_COOKIE'].split(";"):
-        (key, data) = cookie.split("=")
-        if key == "session_token":
-            return data
+    if 'HTTP_COOKIE' in request:
+        for cookie in request['HTTP_COOKIE'].split(";"):
+            (key, data) = cookie.split("=")
+            if key == "session_token":
+                return data
     return False
 
 def start(request, response):
