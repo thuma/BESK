@@ -26,7 +26,7 @@
             <td>{{new Date(kid.deltagare_datum*1000).toISOString().split('T')[0]}}</td>
             <td>
                 <label v-if="kid.deltagare_status=='ansökt'">
-                    <input name="invite" value="kid.deltagare_id" type="checkbox">Bjud in
+                    <input name="invite" v-bind:value="kid.deltagare_id" type="checkbox">Bjud in
                 </label>
                 <label v-else="">
                     {{kid.deltagare_status}}

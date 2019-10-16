@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gevent.pywsgi import WSGIServer
-from gevent import monkey, sleep
+from gevent import monkey, sleep, spawn
 monkey.patch_all()
 import requests
 import random
 import json
 import base64
-from managedata import db, kodstugor, kontaktpersoner, applied, datum, login
+from managedata import db, kodstugor, kontaktpersoner, applied, datum, login, invite
 
 def generator():
      yield "string"
@@ -31,27 +31,37 @@ def route(request, response):
             return applied.new(request, response)         
         response('200 OK', [('Content-Type', 'text/html')])
         return static_file('static/apply.html')
+    elif request['PATH_INFO'] == '/reply':     
+        return invite.reply(request, response)
     else:
         request["BESK_login"] = login.get_login_status(request)
-    if request['PATH_INFO'].startswith("/api"):
-        request['PATH_INFO'] = request['PATH_INFO'][4:]
 
     if request['PATH_INFO'] == '/':
         if request["BESK_login"]["user"] == False:
             return login.start(request, response)
         response('200 OK', [('Content-Type', 'text/html')])
         return static_file('static/start.html')
+
+    if request['PATH_INFO'] == '/login':
+        return login.validate(request, response)
+
+    if request["BESK_login"]["user"] == False:
+        response('403 Forbidden', [('Content-Type', 'text/html')])
+        return "You need to login at https://besk.kodcentrum.se/"
     
     if request['PATH_INFO'] == '/index.js':
         response('200 OK', [('Content-Type', 'text/html')])
         return static_file('static/index.js')
 
-    elif request['PATH_INFO'] == '/login':
-        return login.validate(request, response)
+    if request['PATH_INFO'].startswith("/api"):
+        request['PATH_INFO'] = request['PATH_INFO'][4:]
 
-    elif request['PATH_INFO'] == '/applied':
+    if request['PATH_INFO'] == '/applied':
         response('200 OK', [('Content-Type', 'text/html')])
         return applied.all()       
+
+    elif request['PATH_INFO'] == '/invite':
+        return invite.new(request, response)
 
     elif request['PATH_INFO'] == '/kodstugor':
         if request['REQUEST_METHOD'] == 'POST':
@@ -88,5 +98,6 @@ def static_file(filename):
         return out.encode('utf-8')
 
 if __name__ == '__main__':
+    spawn(invite.send_invites)
     print('Serving on 9191...')
     WSGIServer(('127.0.0.1', 9191), application).serve_forever()
