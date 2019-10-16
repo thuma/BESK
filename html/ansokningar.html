@@ -1,4 +1,5 @@
 <h1 class="text-center">Intresseanmälda tlll kodstugor</h1>
+<form method="POST" action="/api/invite" @submit="check_send">
 <table class="table">
     <thead>
         <tr>
@@ -10,7 +11,7 @@
             <th scope="col">Klass</th>
             <th scope="col">Målsman</th>
             <th scope="col">Ansökte</th>
-            <th scope="col">Inbjudan</th>
+            <th scope="col">Status</th>
         </tr>
     </thead>
     <tbody>
@@ -23,7 +24,16 @@
             <td>{{kid.deltagare_klass}}</td>
             <td>{{kid.kontaktperson_id.length}}</td>
             <td>{{new Date(kid.deltagare_datum*1000).toISOString().split('T')[0]}}</td>
-            <td><input type="checkbox"></td>
+            <td>
+                <label v-if="kid.deltagare_status=='ansökt'">
+                    <input name="invite" value="kid.deltagare_id" type="checkbox">Bjud in
+                </label>
+                <label v-else="">
+                    {{kid.deltagare_status}}
+                </label>
+            </td>
         </tr>
     </tbody>
 </table>
+<button type="submit" class="btn btn-primary">Skicka inbjudan</button>
+</form>
