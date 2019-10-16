@@ -9,6 +9,7 @@
             <th scope="col">Skola</th>
             <th scope="col">Klass</th>
             <th scope="col">Målsman</th>
+            <th scope="col">Ansökte</th>
             <th scope="col">Inbjudan</th>
         </tr>
     </thead>
@@ -21,6 +22,7 @@
             <td>{{kid.deltagare_skola}}</td>
             <td>{{kid.deltagare_klass}}</td>
             <td>{{kid.kontaktperson_id.length}}</td>
+            <td>{{new Date(kid.deltagare_datum*1000).toISOString().split('T')[0]}}</td>
             <td><input type="checkbox"></td>
         </tr>
     </tbody>

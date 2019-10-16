@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS deltagare (
   skola TEXT,
   klass TEXT,
   foto TEXT,
+  datum INTEGER,
+  status TEXT,
   frannummer TEXT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id)
   ); 
