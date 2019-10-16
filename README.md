@@ -1,4 +1,6 @@
 # BESK - Kodcentrum - Attendance system
+<img src="https://github.com/thuma/BESK/blob/master/static/img/BESK.png" alt="BESK">
+<img src="https://github.com/thuma/BESK/blob/master/static/img/kodcentrum-logo.svg" alt="kodcentrum">
 
 Handle applications for and attendance on the Kodcentrum kodstugor.
 
