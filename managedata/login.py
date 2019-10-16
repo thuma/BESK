@@ -5,6 +5,7 @@ import base64
 import requests
 import configparser
 import uuid
+from time import time
 from managedata import db
 from tools import read_get_data, url_encode
 config = configparser.RawConfigParser()
@@ -13,12 +14,28 @@ logedin = {}
 verify='../freja.cert'
 cert='../BESK.cert'
 
+def set_auth(session_id, userdata):
+    user_serial_data = json.dumps(userdata)
+    expire = int(time()) + (3600 * 12)
+    db.cursor.execute('''
+        INSERT INTO auth(session_id, user_data, vailid) 
+        VALUES(?,?,?)
+        ON CONFLICT(session_id) 
+        DO UPDATE SET user_data=?, vailid=?;''',
+        (session_id,user_serial_data,expire,user_serial_data,expire))
+    db.commit()
+
+def get_auth(session_id):
+    now = int(time())
+    result = db.cursor.execute('''SELECT user_data FROM auth WHERE session_id=? AND vailid > ?;''', (session_id, now))
+    try:
+        return json.loads(result.fetchall()[0][0])
+    except:
+        return False
+
 def get_login_status(request):
     session = get_session_token(request)
-    if session and session in logedin:
-        return {"user":logedin[session]}
-    else:
-        return {"user":False}
+    return {"user":get_auth(session)}
 
 def get_session_token(request):
     if 'HTTP_COOKIE' in request:
@@ -66,7 +83,7 @@ def validate(request, response):
             params = {"token":accesstoken.json()["access_token"]}
             )
         session = get_session_token(request)
-        logedin[session] = userdata.json()
+        set_auth(session, userdata.json())
         response(
             "302 Found",
             [

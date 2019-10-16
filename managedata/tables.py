@@ -132,9 +132,15 @@ CREATE INDEX IF NOT EXISTS volontärer_plannering_kodstugor_id ON volontarer_pla
 ''',
 '''
 CREATE TABLE IF NOT EXISTS auth (
-  sessionid PRIMARY KEY,
+  session_id PRIMARY KEY,
   user_data TEXT,
   vailid INT
   );
 ''',
+'''
+CREATE TABLE IF NOT EXISTS keyvalue (
+  key PRIMARY KEY,
+  value TEXT
+  );
+'''
 ]

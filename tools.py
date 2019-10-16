@@ -3,6 +3,7 @@
 from urllib.parse import parse_qs, quote
 import configparser
 import requests
+from managedata import db
 
 config = configparser.RawConfigParser()
 config.read('../BESK.ini')
@@ -25,3 +26,19 @@ def send_email(to, subject, message):
 
 def url_encode(text):
 	return quote(text, safe='')
+
+def set_value(key, value):
+	db.cursor.execute('''
+		INSERT INTO key_value(key, value) 
+		VALUES(?,?)
+  		ON CONFLICT(key) 
+  		DO UPDATE SET value=?;''',
+  		(key,value,value))
+	db.commit()
+
+def get_value(key):
+	result = db.cursor.execute('''SELECT value FROM key_value WHERE key=?;''', (key,))
+	try:
+		return result.fetchall()[0][0]
+	except:
+		return ""
