@@ -1,5 +1,5 @@
 # BESK - Kodcentrum - Attendance system
-<img heigth=src="https://github.com/thuma/BESK/blob/master/static/img/BESK.png" height="64" alt="BESK">
+<img src="https://github.com/thuma/BESK/blob/master/static/img/BESK.png" height="64" alt="BESK">
 <img src="https://github.com/thuma/BESK/blob/master/static/img/kodcentrum-logo.svg" height="64" alt="kodcentrum">
 
 Handle applications for and attendance on the Kodcentrum kodstugor.
