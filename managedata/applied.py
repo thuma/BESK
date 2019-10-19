@@ -140,7 +140,7 @@ def all():
         INNER JOIN kodstugor
            ON deltagare.kodstugor_id=kodstugor.id
         GROUP BY deltagare.id
-        ORDER BY deltagare.datum;
+        ORDER BY kodstugor.id, deltagare.datum;
      """)
     def to_headers(row):
         ut = {}
