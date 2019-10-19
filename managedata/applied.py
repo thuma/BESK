@@ -6,6 +6,7 @@ import uuid
 import json
 import phonenumbers
 import time
+from gevent import spawn
 
 def new(request, response):
     data_to_db = {
@@ -112,7 +113,7 @@ Kodcentrum
 info@kodcentrum.se""".replace("%kodstuga%",kodstuga)
     mailsubject = "Tack för din intresseanmälan"
     for email in formdata["email"]:
-        send_email(email, mailsubject, mailmessage)
+        spawn(send_email, email, mailsubject, mailmessage)
     
     response('200 OK', [('Content-Type', 'text/html')])
     return json.dumps({"applied":data_to_db})
