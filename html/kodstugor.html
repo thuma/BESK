@@ -47,6 +47,14 @@
                 v-bind:value="edit.data.sms_text"
                 required=""
                 class="form-control"></textarea>
+            Meddelandet skickas dagen före Kodstugan.
+            Ett exempel på ett meddelande:
+            <pre>Hej!
+Kommer %namn% till kodstugan på tisdag?
+Svara ja eller nej på detta SMS.
+
+Mvh
+Kodcenturm</pre>
         </div>
         <div class="form-group">
             <label>E-post ämne</label>
@@ -64,6 +72,16 @@
                 v-bind:value="edit.data.epost_text"
                 required=""
                 class="form-control"></textarea>
+            E-posten skickas två dagar före Kodstugan.
+            Ett exempel på e-post meddelande:
+            <pre>Hej!
+Kommer %namn% till kodstugan på tisdag?
+
+Svara ja genom att trycka på denna länk: %jalink%
+Svara nej genom att trycka på denna länk: %nejlink%
+
+Mvh
+Kodcenturm</pre>
         </div>
         <div class="form-group">
             <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
