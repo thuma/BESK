@@ -1,0 +1,74 @@
+<h1 class="text-center">Volontärer</h1>
+<table class="table" v-if="edit==''">
+  <thead>
+    <tr>
+      <th scope="col">Namn</th>
+      <th scope="col">E-Post</th>
+      <th scope="col">Telefon</th>
+      <th scope="col">Kodstuga</th>
+      <th scope="col">Redigera</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="volontär in volontärer">
+        <td>{{volontär.namn}}</td>
+        <td>{{volontär.epost}}</td>
+        <td>{{volontär.telefon}}</td>
+        <td>{{kodstuga_name_by_id(volontär.kodstugor_id)}}</td>
+        <td><button class="btn outline-btn-primary"
+            v-on:click="edit={'type':'volontär','data':volontär}">🖊</button>
+        </td>
+    </tr>
+  </tbody>
+</table>
+<button 
+    class="btn btn-primary"
+    v-if="edit==''"
+    v-on:click="edit={'type':'volontär','data':{'id':'','namn':'','epost':'','telefon':'','kodstugor_id':''}}"
+    >
+    Skapa ny
+</button>
+<div v-if="edit.type=='volontär'" class="card">
+    <div class="card-body">
+        <form method="post" @submit="check_send" action="/api/volontarer">
+            <input name="id" v-if="edit.data.id!==''"v-bind:value="edit.data.id" type="hidden">
+            <div class="form-group">
+                <label>Namn</label>
+                <input
+                    name="namn"
+                    v-bind:value="edit.data.namn"
+                    type="text"
+                    required=""
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>E-Post</label>
+                <input
+                    name="epost"
+                    v-bind:value="edit.data.epost"
+                    required=""
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>E-post ämne</label>
+                <input 
+                    name="telefon"
+                    v-bind:value="edit.data.telefon"
+                    type="text"
+                    required=""
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Kodstuga</label>
+                <select name="kodstugor_id" v-bind:value="edit.data.kodstugor_id" class="form-control">
+                    <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
+                <button v-else="" type="submit" class="btn btn-primary">Spara</button>
+                <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
+            </div>
+        </form>
+    </div>
+</div>

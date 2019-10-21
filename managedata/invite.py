@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from managedata import db, applied
 from tools import send_email, read_post_data, read_get_data
+from main import static_file
 import json
 import time
 from gevent import sleep
@@ -21,20 +22,25 @@ def new(request, response):
     return applied.all()
 
 def reply(request, response):
-    invitedata = read_get_data(request)
+    if request['REQUEST_METHOD'] == 'GET':
+        response('200 OK', [('Content-Type', 'text/html')])
+        return static_file('static/reply.html')
+    invitedata = read_post_data(request)
     delragar_id = invitedata["id"][0]
     status = invitedata["status"][0]
+    foto = invitedata["foto"][0]
     db.cursor.execute('''
             UPDATE deltagare
-            SET status = ?
+            SET status = ?,
+            foto = ?
             WHERE
             id = ? 
             AND
             status = "inbjuden";
-            ''',(status, delragar_id))
+            ''',(status, foto, delragar_id))
     db.commit()
     response('200 OK', [('Content-Type', 'text/html')])
-    return "Tack nu är anmälan bekräftad."
+    return static_file('static/reply_done.html')
 
 def send_invites():
     while True:
@@ -70,19 +76,16 @@ def send_invites():
             message = '''Hej!
 %namn% har fått plats på kodstgan %kodstuga% du behöver bekräfta platsen.
 
-Om du vill bekräfta platsen tryck på denna länk: %jalänk%
-
-Om du inte vill ha platsen så tryck på denna länk: %nejlänk%
+För att bekräfta eller tacka nej till platsen gå till denna länk: %länk%
 
 Med vänliga hälsningar,
 Kodcentrum
 info@kodcentsrum.se'''
-            link = "https://besk.kodcentrum.se/reply?status="
+            link = "https://besk.kodcentrum.se/reply?id="+row["deltagare_id"]
             message = message.replace(
                 "%namn%",row["deltagare_fornamn"]).replace(
                 "%kodstuga%",row["kodstuga"]).replace(
-                "%jalänk%",link+"ja&id="+row["deltagare_id"]).replace(
-                "%nejlänk%",link+"nej&id="+row["deltagare_id"])
+                "%länk%",link)
             send_email(row["kontaktperson_epost"],"Inbjudan", message)
         db.cursor.execute('''
                 UPDATE deltagare

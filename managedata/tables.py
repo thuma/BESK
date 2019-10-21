@@ -61,13 +61,12 @@ CREATE TABLE IF NOT EXISTS kontaktpersoner_deltagare (
 '''
 CREATE TABLE IF NOT EXISTS deltagande (
   id INTEGER PRIMARY KEY,
-  kodstugor_id INT,
   deltagare_id INT,
   status TEXT,
   datum TEXT,
-  FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id),
+  skapad INT,
   FOREIGN KEY(deltagare_id) REFERENCES deltagare(id)
-  ); 
+  );
 ''',
 '''
 CREATE TABLE IF NOT EXISTS klick_svar (
@@ -105,11 +104,9 @@ CREATE INDEX IF NOT EXISTS utskick_kodstugor_id ON utskick(kodstugor_id);
 CREATE TABLE IF NOT EXISTS volontarer (
   id INTEGER PRIMARY KEY,
   kodstugor_id INT,
-  epost TEXT  UNIQUE,
+  epost TEXT UNIQUE,
   namn TEXT,
   telefon TEXT,
-  password TEXT,
-  session TEXT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id)
   );
 ''',
@@ -122,7 +119,6 @@ CREATE TABLE IF NOT EXISTS volontarer_plannering (
   datum TEXT,
   volontarer_id INT,
   status TEXT,
-  kodstugor_id INT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id),
   FOREIGN KEY(volontarer_id) REFERENCES volontarer(id)
   );

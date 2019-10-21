@@ -1,6 +1,29 @@
 var admin = new Vue({
     el: '#admin',
     methods: {
+        get_data: function(url){
+            var main = this;
+            fetch(url).then(
+                function(response) {
+                response.json().then(function(data) {
+                    Object.keys(data).forEach(function(key){
+                        main.$set(main, key, data[key])
+                    })
+                })
+            });
+        },
+        kodstuga_name_by_id: function(id){
+            var name = ""
+            var kodstuga_id = id
+            this.kodstugor.forEach(
+                function(kodstuga){
+                    if (kodstuga.id == kodstuga_id){
+                        name = kodstuga.namn
+                    }
+                }
+            )
+            return name
+        },
         get_dates: function(id){
             if(!this.kodstugor_datum[id]){
               this.$set(this.kodstugor_datum, id, []);
@@ -30,50 +53,29 @@ var admin = new Vue({
             }
             ).then(
                 function(response){
-                response.json(
-            ).then(
-                function(data){
-                    Object.keys(data).forEach(function(key){
-                        next[key] = data[key];
+                if (response.status == 200){
+                    response.json().then(
+                        function(data){
+                            Object.keys(data).forEach(function(key){
+                                next[key] = data[key];
+                            })
+                        next.edit=""
                     })
-                    next.edit=""
+                } else {
+                    response.text().then(
+                        function(data){
+                            window.alert(data)
+                    })
                 }
-            )
             });
         },
     },
     created: function() {
-        var main = this;
-        fetch('/api/applied').then(
-            function(response) {
-                response.json().then(function(data) {
-                    data.kids.forEach(function(kid) {
-                        main.kids.push(kid);
-                    });
-                })
-            });
-        fetch('/api/kodstugor').then(
-            function(response) {
-                response.json().then(function(data) {
-                    data.kodstugor.forEach(function(kodstuga) {
-                        main.kodstugor.push(kodstuga);
-                    });
-                })
-            });
-        fetch('/api/datum').then(
-            function(response) {
-                response.json().then(function(data) {
-                    main.kodstugor_datum = data.kodstugor_datum
-                })
-            });
-        fetch('/api/kontaktpersoner').then(
-            function(response) {
-                response.json().then(function(data) {
-                    data.kontaktpersoner.forEach(function(kontaktperson) {
-                        main.kontaktpersoner.push(kontaktperson);
-                    });
-                })
-            });
+        ['/api/applied',
+        '/api/kodstugor',
+        '/api/datum',
+        '/api/kontaktpersoner',
+        '/api/volontarer'].forEach(this.get_data)
     },
     data: {
         page: "BESK",
@@ -81,6 +83,7 @@ var admin = new Vue({
         kodstugor: [],
         kodstugor_datum: {},
         edit: "",
-        kontaktpersoner: []
+        kontaktpersoner: [],
+        volontärer: []
     }
 })
