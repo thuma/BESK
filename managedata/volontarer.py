@@ -13,7 +13,7 @@ def all():
             epost,
             namn,
             telefon
-        FROM volontarer;
+        FROM volontarer ORDER BY kodstugor_id;
      """);
     def to_headers(row):
         ut = {}

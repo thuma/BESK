@@ -107,6 +107,7 @@ CREATE TABLE IF NOT EXISTS volontarer (
   epost TEXT UNIQUE,
   namn TEXT,
   telefon TEXT,
+  utdrag_datum INT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id)
   );
 ''',
@@ -124,7 +125,7 @@ CREATE TABLE IF NOT EXISTS volontarer_plannering (
   );
 ''',
 '''
-CREATE INDEX IF NOT EXISTS volontärer_plannering_kodstugor_id ON volontarer_plannering(kodstugor_id);
+CREATE INDEX IF NOT EXISTS volontarer_plannering_kodstugor_id ON volontarer_plannering(kodstugor_id);
 ''',
 '''
 CREATE TABLE IF NOT EXISTS auth (
