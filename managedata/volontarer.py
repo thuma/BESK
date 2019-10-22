@@ -12,7 +12,8 @@ def all():
             kodstugor_id,
             epost,
             namn,
-            telefon
+            telefon,
+            utdrag_datum
         FROM volontarer ORDER BY kodstugor_id;
      """);
     def to_headers(row):
@@ -39,6 +40,7 @@ def add_or_uppdate(request, response):
             post_data["epost"][0],
             phone_number_str,
             post_data["kodstugor_id"][0],
+            post_data["utdrag_datum"][0],
             post_data["id"][0]
         )
         db.cursor.execute("""
@@ -47,7 +49,8 @@ def add_or_uppdate(request, response):
                     namn = ?,
                     epost = ?,
                     telefon = ?,
-                    kodstugor_id = ?
+                    kodstugor_id = ?,
+                    utdrag_datum = ?
                 WHERE
                     id = ?
             """, data)
@@ -57,13 +60,14 @@ def add_or_uppdate(request, response):
             post_data["epost"][0],
             phone_number_str,
             post_data["kodstugor_id"][0],
+            post_data["utdrag_datum"][0],
         )
         db.cursor.execute("""
             INSERT 
                 INTO volontarer
-                    (namn, epost, telefon, kodstugor_id) 
+                    (namn, epost, telefon, kodstugor_id, utdrag_datum) 
                 VALUES 
-                    (?,?,?,?)
+                    (?,?,?,?,?)
             """, data)
     db.commit()
     response('200 OK', [('Content-Type', 'text/html')])

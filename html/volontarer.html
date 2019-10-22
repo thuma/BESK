@@ -6,6 +6,7 @@
       <th scope="col">E-Post</th>
       <th scope="col">Telefon</th>
       <th scope="col">Kodstuga</th>
+      <th scope="col">Utdrag</th>
       <th scope="col">Redigera</th>
     </tr>
   </thead>
@@ -15,6 +16,7 @@
         <td>{{volontär.epost}}</td>
         <td>{{volontär.telefon}}</td>
         <td>{{kodstuga_name_by_id(volontär.kodstugor_id)}}</td>
+        <td>{{volontär.utdrag_datum}}</td>
         <td><button class="btn outline-btn-primary"
             v-on:click="edit={'type':'volontär','data':volontär}">🖊</button>
         </td>
@@ -55,6 +57,15 @@
                     name="telefon"
                     v-bind:value="edit.data.telefon"
                     type="text"
+                    required=""
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Utdrag gilltigt till</label>
+                <input 
+                    name="utdrag_datum"
+                    v-bind:value="edit.data.utdrag_datum"
+                    type="date"
                     required=""
                     class="form-control">
             </div>
