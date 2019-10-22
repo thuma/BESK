@@ -20,7 +20,7 @@
                     <input type="hidden" v-bind:value="id" name="id">
                     <div class="form-group">
                         Bekräfta / avboka platsen.
-                        <select name="status" class="form-control">
+                        <select name="status" class="form-control" v-model:value="svar">
                             <option value="ja">
                                 Ja tack jag bekräftar här med att platsen.
                             </option>
@@ -29,7 +29,7 @@
                             </option>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" v-if="svar == 'ja'">
                         Under kodstugorna händer det att vi tar foto på deltagarna och volontärerna.
                         Dessa foto kan användas ...... är det ok att vi tar kort på ditt barn?
                         <select name="foto" class="form-control">
@@ -70,7 +70,8 @@
         data: {
             status: "",
             foto: "",
-            id: ""
+            id: "",
+            svar: "ja"
         },
         created: function(){
             this.id = findGetParameter("id")

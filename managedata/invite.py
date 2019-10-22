@@ -28,7 +28,10 @@ def reply(request, response):
     invitedata = read_post_data(request)
     delragar_id = invitedata["id"][0]
     status = invitedata["status"][0]
-    foto = invitedata["foto"][0]
+    if status == "ja":
+        foto = invitedata["foto"][0]
+    else:
+        foto = ""
     db.cursor.execute('''
             UPDATE deltagare
             SET status = ?,
