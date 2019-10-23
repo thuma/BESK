@@ -1,0 +1,85 @@
+<h1 class="text-center">Utskick</h1>
+<table class="table" v-if="edit==''">
+  <thead>
+    <tr>
+      <th scope="col">Kodstuga</th>
+      <th scope="col">Typ</th>
+      <th scope="col">Ämnde (Bara för E-Post)</th>
+      <th scope="col">Text</th>
+      <th scope="col">Datum</th>
+      <th scope="col">Status</th>
+      <th scope="col">Redigera</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="skick in utskick">
+        <td>{{kodstuga_name_by_id(skick.kodstugor_id)}}</td>
+        <td>{{skick.typ}}</td>
+        <td>{{skick.rubrik}}</td>
+        <td>{{skick.text}}</td>
+        <td>{{skick.datum}}</td>
+        <td>{{skick.status}}</td>
+        <td><button class="btn outline-btn-primary"
+            v-on:click="edit={'type':'utskick','data':skick}">🖊</button>
+        </td>
+    </tr>
+  </tbody>
+</table>
+<button 
+    class="btn btn-primary"
+    v-if="edit==''"
+    v-on:click="edit={'type':'utskick','data':{'id':'','datum':'','typ':'epost','rubrik':'','text':'','kodstugor_id':''}}"
+    >
+    Skapa ny
+</button>
+<div v-if="edit.type=='utskick'" class="card">
+    <div class="card-body">
+        <form method="post" @submit="check_send" action="/api/utskick">
+            <input name="id" v-if="edit.data.id!==''"v-bind:value="edit.data.id" type="hidden">
+            <div class="form-group">
+                <label>Kodstuga</label>
+                <select name="kodstugor_id" v-bind:value="edit.data.kodstugor_id" class="form-control">
+                    <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Typ</label>
+                <select name="typ" v-bind:value="edit.data.typ" class="form-control">
+                    <option value="e-post">E-Post</option>
+                    <option value="sms">SMS</option>
+                    <option value="e-post,sms">SMS & E-Post</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ämnde (Bara för E-Post)</label>
+                <input
+                    name="rubrik"
+                    v-bind:value="edit.data.rubrik"
+                    type="text"
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Meddelande</label>
+                <textarea
+                    name="text"
+                    v-bind:value="edit.data.text"
+                    required=""
+                    class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Datum för utskick</label>
+                <input 
+                    name="datum"
+                    v-bind:value="edit.data.datum"
+                    type="date"
+                    required=""
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
+                <button v-else="" type="submit" class="btn btn-primary">Spara</button>
+                <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
+            </div>
+        </form>
+    </div>
+</div>

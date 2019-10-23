@@ -75,7 +75,8 @@ var admin = new Vue({
         '/api/kodstugor',
         '/api/datum',
         '/api/kontaktpersoner',
-        '/api/volontarer'].forEach(this.get_data)
+        '/api/volontarer',
+        '/api/utskick'].forEach(this.get_data)
     },
     data: {
         page: "BESK",
@@ -84,6 +85,7 @@ var admin = new Vue({
         kodstugor_datum: {},
         edit: "",
         kontaktpersoner: [],
-        volontärer: []
+        volontärer: [],
+        utskick: []
     }
 })

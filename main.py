@@ -7,7 +7,7 @@ import requests
 import random
 import json
 import base64
-from managedata import db, kodstugor, kontaktpersoner, applied, datum, login, invite, volontarer
+from managedata import db, kodstugor, kontaktpersoner, applied, datum, login, invite, volontarer, utskick
 
 def generator():
      yield "string"
@@ -77,6 +77,12 @@ def route(request, response):
             return volontarer.add_or_uppdate(request, response) 
         response('200 OK', [('Content-Type', 'text/html')])
         return volontarer.all()
+
+    elif request['PATH_INFO'] == '/utskick':
+        if request['REQUEST_METHOD'] == 'POST':
+            return utskick.add_or_uppdate(request, response) 
+        response('200 OK', [('Content-Type', 'text/html')])
+        return utskick.all()
 
     elif request['PATH_INFO'] == '/datum':
         if request['REQUEST_METHOD'] == 'POST':
