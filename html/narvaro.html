@@ -1,4 +1,4 @@
-<h1 class="text-center">Volontärer Plannering</h1>
+<h1 class="text-center">Närvaro</h1>
 <table class="table" v-for="kodstuga in kodstugor">
   <thead>
     <tr>
@@ -7,8 +7,8 @@
     </tr>
   </thead>
   <tbody>
-    <tr v-for="volotar in volontärer" v-if="volotar.kodstugor_id == kodstuga.id">
-        <td>{{volotar.namn}}</td>
+    <tr v-for="kid in kids" v-if="kid.kodstuga_id == kodstuga.id">
+        <td>{{kid.deltagare_fornamn}} {{kid.deltagare_efternamn}}</td>
         <td v-for="date in get_dates(kodstuga.id)">
             <div v-if="date.typ=='lov'">Lov</div>
             <div v-else="">
