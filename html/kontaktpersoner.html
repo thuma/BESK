@@ -1,0 +1,25 @@
+<h1 class="text-center">Kontaktpersoner</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Kodstuga</th>
+            <th scope="col">Förnamn</th>
+            <th scope="col">Efternamn</th>
+            <th scope="col">E-Post</th>
+            <th scope="col">Telefon</th>
+            <th scope="col">Barn</th>
+            <th scope="col">Redigera</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="kontaktperson in kontaktpersoner">
+            <td>{{kontaktperson.kodstugor_id}}</td>
+            <td>{{kontaktperson.fornamn}}</td>
+            <td>{{kontaktperson.efternamn}}</td>
+            <td>{{kontaktperson.epost}}</td>
+            <td>{{kontaktperson.telefon}}</td>
+            <td>{{kontaktperson.deltagare_id.length}}</td>
+            <td>Penna</td>
+        </tr>
+    </tbody>
+</table>

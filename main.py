@@ -92,7 +92,7 @@ def route(request, response):
         
     elif request['PATH_INFO'] == '/kontaktpersoner':
         if request['REQUEST_METHOD'] == 'POST':
-            return kodstugor.add_or_uppdate(request, response)    
+            return kontaktpersoner.add_or_uppdate(request, response)    
         response('200 OK', [('Content-Type', 'text/html')])
         return kontaktpersoner.all()    
 
