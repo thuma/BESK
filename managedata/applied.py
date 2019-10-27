@@ -121,16 +121,15 @@ info@kodcentrum.se""".replace("%kodstuga%",kodstuga)
 def all():
     all = db.cursor.execute("""
         SELECT 
-            kodstugor.namn AS kodstuga,
             kodstugor.id AS kodstuga_id,
             deltagare.id AS deltagare_id,
-            deltagare.datum AS deltagare_datum,
-            deltagare.status AS deltagare_status,
-            deltagare.fornamn AS deltagare_fornamn,
-            deltagare.efternamn AS deltagare_efternamn,
-            deltagare.kon AS deltagare_kon,
-            deltagare.skola AS deltagare_skola,
-            deltagare.klass AS deltagare_klass,
+            deltagare.datum AS datum,
+            deltagare.status AS status,
+            deltagare.fornamn AS fornamn,
+            deltagare.efternamn AS efternamn,
+            deltagare.kon AS kon,
+            deltagare.skola AS skola,
+            deltagare.klass AS klass,
             GROUP_CONCAT(kontaktpersoner.id,",") AS kontaktperson_id
         FROM deltagare
         INNER JOIN kontaktpersoner_deltagare 

@@ -1,6 +1,6 @@
-<h1 class="text-center">Intresseanmälningr</h1>
-<form method="POST" action="/api/invite" @submit="check_send">
-<table class="table">
+<h1 class="text-center">Barn</h1>
+<form method="POST" action="/api/invite" @submit="check_send" v-if="edit==''">
+<table class="table table-sm">
     <thead>
         <tr>
             <th scope="col">Kodstuga</th>
@@ -12,18 +12,19 @@
             <th scope="col">Målsman</th>
             <th scope="col">Ansökte</th>
             <th scope="col">Status</th>
+            <th scope="col">Redigera</th>
         </tr>
     </thead>
     <tbody>
         <tr v-for="kid in kids">
-            <td>{{kid.kodstuga}}</td>
-            <td>{{kid.deltagare_fornamn}}</td>
-            <td>{{kid.deltagare_efternamn}}</td>
-            <td>{{kid.deltagare_kon}}</td>
-            <td>{{kid.deltagare_skola}}</td>
-            <td>{{kid.deltagare_klass}}</td>
+            <td>{{kid.kodstuga_id}}</td>
+            <td>{{kid.fornamn}}</td>
+            <td>{{kid.efternamn}}</td>
+            <td>{{kid.kon}}</td>
+            <td>{{kid.skola}}</td>
+            <td>{{kid.klass}}</td>
             <td>{{kid.kontaktperson_id.length}}</td>
-            <td>{{new Date(kid.deltagare_datum*1000).toISOString().split('T')[0]}}</td>
+            <td>{{new Date(kid.datum*1000).toISOString().split('T')[0]}}</td>
             <td>
                 <label v-if="kid.deltagare_status=='ansökt'">
                     <input name="invite" v-bind:value="kid.deltagare_id" type="checkbox">Bjud in
@@ -32,8 +33,78 @@
                     {{kid.deltagare_status}}
                 </label>
             </td>
+            <td><button type="button" class="btn btn-outline-secondary"
+            v-on:click="edit={'type':'kid','data':kid}">🖊</button>
+            </td>
         </tr>
     </tbody>
 </table>
 <button type="submit" class="btn btn-primary">Skicka inbjudan</button>
 </form>
+<div v-if="edit.type=='kid'" class="card">
+    <div class="card-body">
+        <form method="post" @submit="check_send" action="/api/kids">
+            <input name="id" v-if="edit.data.id!==''" v-bind:value="edit.data.id" type="hidden">
+            <div class="form-group">
+                <label>Förnamn</label>
+                <input
+                    name="namn"
+                    v-bind:value="edit.data.fornamn"
+                    type="text"
+                    required=""
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Efternamn</label>
+                <input
+                    name="namn"
+                    v-bind:value="edit.data.efternamn"
+                    type="text"
+                    required=""
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Kön</label>
+                <select name="kon" v-bind:value="edit.data.kon" class="form-control">
+                    <option value="han">Han</option>
+                    <option value="hon">Hon</option>
+                    <option value="hen">Hen</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Skola</label>
+                <input
+                    name="namn"
+                    v-bind:value="edit.data.skola"
+                    type="text"
+                    required=""
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Klass</label>
+                <select name="klass" v-bind:value="edit.data.klass" class="form-control">
+                    <option value="åk 4">åk 4</option>
+                    <option value="åk 5">åk 5</option>
+                    <option value="åk 6">åk 6</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status" v-bind:value="edit.data.status" class="form-control">
+                    <option value="ja">Ja</option>
+                    <option value="nej">Nej</option>
+                    <option value="applied">Anmäld</option>
+                    <option value="avhopp">Avhopp</option>
+                    <option value="ko">Kö</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
+                <button v-else="" type="submit" class="btn btn-primary">Spara</button>
+                <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
