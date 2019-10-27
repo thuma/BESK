@@ -1,4 +1,4 @@
-<h1 class="text-center">Barn</h1>
+<h1 class="text-center">Deltagare</h1>
 <form method="POST" action="/api/invite" @submit="check_send" v-if="edit==''">
 <table class="table table-sm">
     <thead>
@@ -30,7 +30,7 @@
                     <input name="invite" v-bind:value="kid.deltagare_id" type="checkbox">Bjud in
                 </label>
                 <label v-else="">
-                    {{kid.deltagare_status}}
+                    {{kid.status}}
                 </label>
             </td>
             <td><button type="button" class="btn btn-outline-secondary"
