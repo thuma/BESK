@@ -1,5 +1,5 @@
 <h1 class="text-center">Kontaktpersoner</h1>
-<table class="table table-sm">
+<table class="table table-sm" v-if="edit==''">
     <thead>
         <tr>
             <th scope="col">Kodstuga</th>
@@ -19,7 +19,56 @@
             <td>{{kontaktperson.epost}}</td>
             <td>{{kontaktperson.telefon}}</td>
             <td>{{kontaktperson.deltagare_id.length}}</td>
-            <td>Penna</td>
+            <td><button type="button" class="btn btn-outline-secondary"
+            v-on:click="edit={'type':'kontaktperson','data':copy(kontaktperson)}">🖊</button></td>
         </tr>
     </tbody>
 </table>
+<div v-if="edit.type=='kontaktperson'" class="card">
+    <div class="card-body">
+        <form method="post" @submit="check_send" action="/api/kontaktpersoner">
+            <input name="id" v-if="edit.data.id!==''" v-bind:value="edit.data.id" type="hidden">
+            <div class="form-group">
+                <label>Förnamn</label>
+                <input
+                    name="fornamn"
+                    v-bind:value="edit.data.fornamn"
+                    type="text"
+                    required=""
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Efternamn</label>
+                <input
+                    name="efternamn"
+                    v-bind:value="edit.data.efternamn"
+                    type="text"
+                    required=""
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>E-Post</label>
+                <input
+                    name="epost"
+                    v-bind:value="edit.data.epost"
+                    type="text"
+                    required=""
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Telefon</label>
+                <input
+                    name="telefon"
+                    v-bind:value="edit.data.telefon"
+                    type="text"
+                    required=""
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
+                <button v-else="" type="submit" class="btn btn-primary">Spara</button>
+                <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
+            </div>
+        </form>
+    </div>
+</div>

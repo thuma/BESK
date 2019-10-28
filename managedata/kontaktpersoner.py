@@ -1,7 +1,60 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from managedata import db
+from tools import read_post_data
+import uuid
 import json
+import phonenumbers
+
+def add_or_uppdate(request, response):
+    post_data = read_post_data(request)
+
+    try:
+        phone_number = phonenumbers.parse(post_data["telefon"][0], "SE")
+    except:
+        response('400 Bad Request', [('Content-Type', 'text/html')])
+        return bytes("Fyll i ett giltigt telefonummer.",'utf-8')
+    if not phonenumbers.is_valid_number(phone_number):
+        response('400 Bad Request', [('Content-Type', 'text/html')])
+        return bytes("Fyll i ett giltigt telefonummer.",'utf-8')
+
+    if "id" in post_data:
+        data = (
+            post_data["fornamn"][0],
+            post_data["efternamn"][0],
+            post_data["epost"][0],
+            phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164),
+            post_data["id"][0]
+        )
+        db.cursor.execute("""
+            UPDATE kontaktpersoner
+                SET
+                    fornamn = ?,
+                    efternamn = ?,
+                    epost = ?,
+                    telefon = ?
+                WHERE
+                    id = ?
+            """, data)
+    else:
+        data = (
+            uuid.uuid4().hex,
+            post_data["fornamn"][0],
+            post_data["efternamn"][0],
+            post_data["epost"][0],
+            phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164),
+            post_data["id"][0]
+        )
+        db.cursor.execute("""
+            INSERT 
+                INTO kontaktpersoner
+                    (id, fornamn, efternamn, epost, telefon) 
+                VALUES 
+                    (?,?,?,?,?)
+            """, data)
+    db.commit()
+    response('200 OK', [('Content-Type', 'text/html')])
+    return all()
 
 def all():
     all = db.cursor.execute("""
