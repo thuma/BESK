@@ -13,7 +13,7 @@
     </thead>
     <tbody>
         <tr v-for="kontaktperson in kontaktpersoner">
-            <td>{{kontaktperson.kodstugor_id}}</td>
+            <td>{{kodstuga_name_by_id(kontaktperson.kodstugor_id)}}</td>
             <td>{{kontaktperson.fornamn}}</td>
             <td>{{kontaktperson.efternamn}}</td>
             <td>{{kontaktperson.epost}}</td>
