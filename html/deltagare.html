@@ -16,7 +16,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr v-for="kid in kids">
+        <tr v-for="kid in deltagare">
             <td>{{kodstuga_name_by_id(kid.kodstuga_id)}}</td>
             <td>{{kid.fornamn}}</td>
             <td>{{kid.efternamn}}</td>
@@ -34,21 +34,27 @@
                 </label>
             </td>
             <td><button type="button" class="btn btn-outline-secondary"
-            v-on:click="edit={'type':'kid','data':copy(kid)}">🖊</button>
+            v-on:click="edit={'type':'deltagare','data':copy(kid)}">🖊</button>
             </td>
         </tr>
     </tbody>
 </table>
 <button type="submit" class="btn btn-primary">Skicka inbjudan</button>
 </form>
-<div v-if="edit.type=='kid'" class="card">
+<div v-if="edit.type=='deltagare'" class="card">
     <div class="card-body">
         <form method="post" @submit="check_send" action="/api/deltagare">
-            <input name="id" v-if="edit.data.id!==''" v-bind:value="edit.data.id" type="hidden">
+            <input name="id" v-if="edit.data.id!==''" v-bind:value="edit.data.deltagare_id" type="hidden">
+            <div class="form-group">
+                <label>Kodstuga</label>
+                <select name="kodstuga" v-bind:value="edit.data.kodstuga_id" class="form-control">
+                    <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
+                </select>
+            </div>
             <div class="form-group">
                 <label>Förnamn</label>
                 <input
-                    name="namn"
+                    name="fornamn"
                     v-bind:value="edit.data.fornamn"
                     type="text"
                     required=""
@@ -57,7 +63,7 @@
             <div class="form-group">
                 <label>Efternamn</label>
                 <input
-                    name="namn"
+                    name="efternamn"
                     v-bind:value="edit.data.efternamn"
                     type="text"
                     required=""
@@ -74,7 +80,7 @@
             <div class="form-group">
                 <label>Skola</label>
                 <input
-                    name="namn"
+                    name="skola"
                     v-bind:value="edit.data.skola"
                     type="text"
                     required=""

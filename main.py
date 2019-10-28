@@ -7,7 +7,7 @@ import requests
 import random
 import json
 import base64
-from managedata import db, kodstugor, kontaktpersoner, applied, datum, login, invite, volontarer, utskick
+from managedata import db, kodstugor, kontaktpersoner, applied, datum, login, invite, volontarer, utskick, deltagare
 
 def generator():
      yield "string"
@@ -59,9 +59,11 @@ def route(request, response):
     if request['PATH_INFO'].startswith("/api"):
         request['PATH_INFO'] = request['PATH_INFO'][4:]
 
-    if request['PATH_INFO'] == '/applied':
+    if request['PATH_INFO'] == '/deltagare':
+        if request['REQUEST_METHOD'] == 'POST':
+            return deltagare.add_or_uppdate(request, response) 
         response('200 OK', [('Content-Type', 'text/html')])
-        return applied.all()       
+        return deltagare.all()       
 
     elif request['PATH_INFO'] == '/invite':
         return invite.new(request, response)

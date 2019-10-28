@@ -117,36 +117,3 @@ info@kodcentrum.se""".replace("%kodstuga%",kodstuga)
     
     response('200 OK', [('Content-Type', 'text/html')])
     return json.dumps({"applied":data_to_db})
-
-def all():
-    all = db.cursor.execute("""
-        SELECT 
-            kodstugor.id AS kodstuga_id,
-            deltagare.id AS deltagare_id,
-            deltagare.datum AS datum,
-            deltagare.status AS status,
-            deltagare.fornamn AS fornamn,
-            deltagare.efternamn AS efternamn,
-            deltagare.kon AS kon,
-            deltagare.skola AS skola,
-            deltagare.klass AS klass,
-            GROUP_CONCAT(kontaktpersoner.id,",") AS kontaktperson_id
-        FROM deltagare
-        INNER JOIN kontaktpersoner_deltagare 
-            ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
-        INNER JOIN kontaktpersoner
-           ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id
-        INNER JOIN kodstugor
-           ON deltagare.kodstugor_id=kodstugor.id
-        GROUP BY deltagare.id
-        ORDER BY kodstugor.id, deltagare.datum;
-     """)
-    def to_headers(row):
-        ut = {}
-        for idx, col in enumerate(all.description):
-            ut[col[0]] = row[idx]
-            if col[0] == "kontaktperson_id":
-            	ut[col[0]] = ut[col[0]].split(',')
-        return ut
-
-    return json.dumps({"kids":list(map(to_headers, all.fetchall()))})

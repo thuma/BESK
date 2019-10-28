@@ -12,6 +12,9 @@ var admin = new Vue({
                 })
             });
         },
+        copy: function(obj){
+             return JSON.parse(JSON.stringify(obj));
+        },
         kodstuga_name_by_id: function(id){
             var name = ""
             var kodstuga_id = id
@@ -71,7 +74,7 @@ var admin = new Vue({
         },
     },
     created: function() {
-        ['/api/applied',
+        ['/api/deltagare',
         '/api/kodstugor',
         '/api/datum',
         '/api/kontaktpersoner',
@@ -80,7 +83,7 @@ var admin = new Vue({
     },
     data: {
         page: "BESK",
-        kids: [],
+        deltagare: [],
         kodstugor: [],
         kodstugor_datum: {},
         edit: "",
