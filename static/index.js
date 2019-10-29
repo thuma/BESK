@@ -42,23 +42,29 @@ var admin = new Vue({
                 return {'datum':'','typ':'kodstuga'}
             }
         }, 
-        get_status_for_volontar_at_date: function(id, date, plan){
-            if(plan[id] == undefined){
+        get_status_for_volontar_at_date: function(id, date){
+            if(this.volontarer_plannering[id] == undefined){
                 return ""
-            } else if (plan[id][date] == undefined){
+            } else if (this.volontarer_plannering[id][date] == undefined){
                 return ""
             } else {
-                return plan[id][date]["status"]
+                return this.volontarer_plannering[id][date]["status"]
             }
         },
-        get_id_for_volontar_at_date(id, date, plan){
-            if(plan[id] == undefined){
+        get_id_for_volontar_at_date: function(id, date){
+            if(this.volontarer_plannering[id] == undefined){
                 return "0"
-            } else if (plan[id][date] == undefined){
+            } else if (this.volontarer_plannering[id][date] == undefined){
                 return "0"
             } else {
-                return plan[id][date]["id"]
+                return this.volontarer_plannering[id][date]["id"]
             }
+        },
+        är_ja: function(id, date){
+            return this.get_status_for_volontar_at_date(id, date).toUpperCase().includes("JA")
+        },
+        är_nej: function(id, date){
+            return this.get_status_for_volontar_at_date(id, date).toUpperCase().includes("NEJ")
         },
         check_send: function (theform){
             next = this

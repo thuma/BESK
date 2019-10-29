@@ -16,14 +16,14 @@
                         <input
                             type="hidden"
                             name="id"
-                            v-bind:value="get_id_for_volontar_at_date(volotär.id, date.datum, volontarer_plannering)">
+                            v-bind:value="get_id_for_volontar_at_date(volotär.id, date.datum)">
                         <input type="hidden" name="datum" v-bind:value="date.datum">
                         <input type="hidden" name="volontarer_id" v-bind:value="volotär.id">
                         <input
                             type="text"
                             name="status"
-                            v-bind:value="get_status_for_volontar_at_date(volotär.id, date.datum, volontarer_plannering)"
-                            class="form-control">    
+                            v-bind:value="get_status_for_volontar_at_date(volotär.id, date.datum)"
+                            class="form-control" v-bind:class="{'is-invalid':är_nej(volotär.id, date.datum),'is-valid':är_ja(volotär.id, date.datum)}">   <!--is-valid is-valid--> 
                     </div>
                 </td>
             </tr>
