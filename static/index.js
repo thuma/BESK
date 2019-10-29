@@ -41,6 +41,24 @@ var admin = new Vue({
             } else {
                 return {'datum':'','typ':'kodstuga'}
             }
+        }, 
+        get_status_for_volontar_at_date: function(id, date, plan){
+            if(plan[id] == undefined){
+                return ""
+            } else if (plan[id][date] == undefined){
+                return ""
+            } else {
+                return plan[id][date]["status"]
+            }
+        },
+        get_id_for_volontar_at_date(id, date, plan){
+            if(plan[id] == undefined){
+                return "0"
+            } else if (plan[id][date] == undefined){
+                return "0"
+            } else {
+                return plan[id][date]["id"]
+            }
         },
         check_send: function (theform){
             next = this
@@ -79,6 +97,7 @@ var admin = new Vue({
         '/api/datum',
         '/api/kontaktpersoner',
         '/api/volontarer',
+        '/api/volontarer_plannering',
         '/api/utskick'].forEach(this.get_data)
     },
     data: {
@@ -89,6 +108,7 @@ var admin = new Vue({
         edit: "",
         kontaktpersoner: [],
         volontärer: [],
+        volontarer_plannering: {},
         utskick: []
     }
 })

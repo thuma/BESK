@@ -1,27 +1,34 @@
 <h1 class="text-center">Volontärer Plannering</h1>
-<table class="table table-sm" v-for="kodstuga in kodstugor">
-  <thead>
-    <tr>
-      <th scope="col">{{kodstuga.namn}}</th>
-      <th v-for="date in get_dates(kodstuga.id)">{{date.datum}}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="volotar in volontärer" v-if="volotar.kodstugor_id == kodstuga.id">
-        <td>{{volotar.namn}}</td>
-        <td v-for="date in get_dates(kodstuga.id)">
-            <div v-if="date.typ=='lov'">Lov</div>
-            <div v-else="">
-                <form method="post" @submit="check_send" action="/api/volontarer_plannering">
-                    <div class="input-group mb-3">
-                        <input type="text" value="" class="form-control">
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="submit">Spara</button>
-                        </div>
-                    </div> 
-                </form>
-            </div>
-        </td>
-    </tr>
-  </tbody>
-</table>
+<form method="post" @submit="check_send" action="/api/volontarer_plannering" v-for="kodstuga in kodstugor">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th scope="col">{{kodstuga.namn}}</th>
+                <th v-for="date in get_dates(kodstuga.id)">{{date.datum}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="volotär in volontärer" v-if="volotär.kodstugor_id == kodstuga.id">
+                <td>{{volotär.namn}}</td>
+                <td v-for="date in get_dates(kodstuga.id)">
+                    <div v-if="date.typ=='lov'">Lov</div>
+                    <div v-else="">
+                        <input
+                            type="hidden"
+                            name="id"
+                            v-bind:value="get_id_for_volontar_at_date(volotär.id, date.datum, volontarer_plannering)">
+                        <input type="hidden" name="datum" v-bind:value="date.datum">
+                        <input type="hidden" name="volontarer_id" v-bind:value="volotär.id">
+                        <input
+                            type="text"
+                            name="status"
+                            v-bind:value="get_status_for_volontar_at_date(volotär.id, date.datum, volontarer_plannering)"
+                            class="form-control">    
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-primary">Spara</button>
+    <hr>
+</form>
