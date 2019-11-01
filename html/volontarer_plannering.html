@@ -12,18 +12,26 @@
                 <td>{{volotär.namn}}</td>
                 <td v-for="date in get_dates(kodstuga.id)">
                     <div v-if="date.typ=='lov'">Lov</div>
-                    <div v-else="">
+                    <div v-else-if="volontarer_redigerade[volotär.id+date.datum]">
                         <input
                             type="hidden"
                             name="id"
                             v-bind:value="get_id_for_volontar_at_date(volotär.id, date.datum)">
                         <input type="hidden" name="datum" v-bind:value="date.datum">
                         <input type="hidden" name="volontarer_id" v-bind:value="volotär.id">
-                        <input
-                            type="text"
-                            name="status"
-                            v-bind:value="get_status_for_volontar_at_date(volotär.id, date.datum)"
-                            class="form-control" v-bind:class="{'is-invalid':är_nej(volotär.id, date.datum),'is-valid':är_ja(volotär.id, date.datum)}">   <!--is-valid is-valid--> 
+                        <div class="input-group">
+                            <input
+                                type="text"
+                                name="status"
+                                v-bind:value="get_status_for_volontar_at_date(volotär.id, date.datum)"
+                                class="form-control">
+                            <div class="input-group-append">
+                                <button v-on:click="$set(volontarer_redigerade, volotär.id+date.datum, false)" class="btn btn-secondary">&times;</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else="" v-on:click="$set(volontarer_redigerade, volotär.id+date.datum, true)">
+                        {{ get_status_for_volontar_at_date(volotär.id, date.datum) }}
                     </div>
                 </td>
             </tr>

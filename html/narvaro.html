@@ -1,20 +1,42 @@
 <h1 class="text-center">Närvaro</h1>
-<table class="table table-sm" v-for="kodstuga in kodstugor">
-  <thead>
-    <tr>
-      <th scope="col">{{kodstuga.namn}}</th>
-      <th v-for="date in get_dates(kodstuga.id)">{{date.datum}}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="kid in deltagare" v-if="kid.kodstuga_id == kodstuga.id">
-        <td>{{kid.fornamn}} {{kid.efternamn}}</td>
-        <td v-for="date in get_dates(kodstuga.id)">
-            <div v-if="date.typ=='lov'">Lov</div>
-            <div v-else="">
-                <input type="text" value="" v-on:change="update_value()" class="form-control">
-            </div>
-        </td>
-    </tr>
-  </tbody>
-</table>
+<form method="post" @submit="check_send" action="/api/narvaro" v-for="kodstuga in kodstugor">
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th scope="col">{{kodstuga.namn}}</th>
+          <th v-for="date in get_dates(kodstuga.id)">{{date.datum}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="kid in deltagare" v-if="kid.kodstuga_id == kodstuga.id">
+            <td>{{kid.fornamn}} {{kid.efternamn}}</td>
+            <td v-for="date in get_dates(kodstuga.id)">
+                <div v-if="date.typ=='lov'">Lov</div>
+                <div v-else-if="närvaro_redigerade[kid.deltagare_id+date.datum]">
+                    <input
+                        type="hidden"
+                        name="id"
+                        v-bind:value="get_data_for_deltagare_at_date(deltagare_id, date.datum)['id']">
+                    <input type="hidden" name="datum" v-bind:value="date.datum">
+                    <input type="hidden" name="deltagare_id" v-bind:value="kid.deltagare_id">
+                    <div class="input-group">
+                        <input
+                            type="text"
+                            name="status"
+                            v-bind:value="get_data_for_deltagare_at_date(kid.deltagare_id, date.datum)['status']"
+                            class="form-control">
+                        <div class="input-group-append">
+                            <button v-on:click="$set(närvaro_redigerade, kid.deltagare_id+date.datum, false)" class="btn btn-secondary">&times;</button>
+                        </div>
+                    </div>
+                </div><!-- btn btn-outline-danger btn-outline-warning btn-outline-success-->
+                <button v-bind:class="" class="btn btn-sm btn-block" v-else="" v-on:click="$set(närvaro_redigerade, kid.deltagare_id+date.datum, true)">
+                    {{ get_data_for_deltagare_at_date(kid.deltagare_id, date.datum)['status'] }}&nbsp;
+                </button>
+            </td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="btn btn-primary">Spara</button>
+    <hr>
+</form>

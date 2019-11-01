@@ -60,6 +60,15 @@ var admin = new Vue({
                 return this.volontarer_plannering[id][date]["id"]
             }
         },
+        get_data_for_deltagare_at_date: function(id, date){
+            if(this.volontarer_plannering[id] == undefined){
+                return {"status":"","id":0}
+            } else if (this.volontarer_plannering[id][date] == undefined){
+                return {"status":"","id":0}
+            } else {
+                return this.volontarer_plannering[id][date]
+            }
+        },
         är_ja: function(id, date){
             return this.get_status_for_volontar_at_date(id, date).toUpperCase().includes("JA")
         },
@@ -109,12 +118,15 @@ var admin = new Vue({
     data: {
         page: "BESK",
         deltagare: [],
+        närvaro:{},
+        närvaro_redigerade: {},
         kodstugor: [],
         kodstugor_datum: {},
         edit: "",
         kontaktpersoner: [],
         volontärer: [],
         volontarer_plannering: {},
+        volontarer_redigerade: {},
         utskick: []
     }
 })

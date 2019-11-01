@@ -57,4 +57,4 @@ def all():
             by_volontarer_id[date['volontarer_id']] = {}
         by_volontarer_id[date['volontarer_id']][date['datum']] = {"status":date["status"],"id":date["id"]}
 
-    return json.dumps({"volontarer_plannering":by_volontarer_id})
+    return json.dumps({"volontarer_plannering":by_volontarer_id,"volontarer_redigerade":{}})
