@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS kontaktpersoner_deltagare (
   ); 
 ''',
 '''
-CREATE TABLE IF NOT EXISTS deltagande (
+CREATE TABLE IF NOT EXISTS deltagande_närvaro (
   id INTEGER PRIMARY KEY,
   deltagare_id INT,
   status TEXT,
