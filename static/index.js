@@ -44,9 +44,9 @@ var admin = new Vue({
         }, 
         get_status_for_volontar_at_date: function(id, date){
             if(this.volontarer_plannering[id] == undefined){
-                return ""
+                return "Ja"
             } else if (this.volontarer_plannering[id][date] == undefined){
-                return ""
+                return "Ja"
             } else {
                 return this.volontarer_plannering[id][date]["status"]
             }
