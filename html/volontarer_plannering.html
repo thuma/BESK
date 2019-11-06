@@ -30,8 +30,10 @@
                             </div>
                         </div>
                     </div>
-                    <div v-else="" v-on:click="$set(volontarer_redigerade, volotär.id+date.datum, true)">
-                        {{ get_status_for_volontar_at_date(volotär.id, date.datum) }}
+                    <div v-else="">
+                        <button v-bind:class="button_color_volontär(volotär.id, date.datum)" type="button" class="btn btn-sm btn-block" v-on:click="$set(volontarer_redigerade, volotär.id+date.datum, true)">
+                        {{ get_status_for_volontar_at_date(volotär.id, date.datum) }}&nbsp;
+                        </button>
                     </div>
                 </td>
             </tr>

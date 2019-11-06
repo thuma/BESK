@@ -33,7 +33,7 @@ def add_or_uppdate(request, response):
                     INTO deltagande_närvaro 
                         (deltagare_id, datum, status, skapad) 
                     VALUES 
-                        (?,?,?)
+                        (?,?,?,?)
                 """, data)
     db.commit()
     response('200 OK', [('Content-Type', 'text/html')])
@@ -61,4 +61,4 @@ def all():
             by_volontarer_id[date['deltagare_id']] = {}
         by_volontarer_id[date['deltagare_id']][date['datum']] = {"status":date["status"],"id":date["id"]}
 
-    return json.dumps({"deltagande_närvaro":by_volontarer_id,"närvaro_redigerade":{}})
+    return json.dumps({"närvaro":by_volontarer_id,"närvaro_redigerade":{}})

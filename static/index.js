@@ -61,12 +61,12 @@ var admin = new Vue({
             }
         },
         get_data_for_deltagare_at_date: function(id, date){
-            if(this.volontarer_plannering[id] == undefined){
+            if(this.närvaro[id] == undefined){
                 return {"status":"","id":0}
-            } else if (this.volontarer_plannering[id][date] == undefined){
+            } else if (this.närvaro[id][date] == undefined){
                 return {"status":"","id":0}
             } else {
-                return this.volontarer_plannering[id][date]
+                return this.närvaro[id][date]
             }
         },
         är_ja: function(id, date){
@@ -74,6 +74,24 @@ var admin = new Vue({
         },
         är_nej: function(id, date){
             return this.get_status_for_volontar_at_date(id, date).toUpperCase().includes("NEJ")
+        },
+        button_color_volontär: function(id, date){
+            if (this.är_nej(id, date)){
+                return {'btn-outline-danger':true}
+            } else if (this.är_ja(id, date)){
+                return {'btn-outline-success':true}
+            } else {
+                return {'btn-outline-warning':true}
+            }
+        },
+        button_color_närvaro: function(id, date){
+            if (this.get_data_for_deltagare_at_date(id, date)['status'].toUpperCase().includes("NEJ")){
+                return {'btn-outline-danger':true}
+            } else if (this.get_data_for_deltagare_at_date(id, date)['status'].toUpperCase().includes("JA")){
+                return {'btn-outline-success':true}
+            } else {
+                return {'btn-outline-warning':true}
+            }
         },
         check_send: function (theform){
             next = this
@@ -113,7 +131,8 @@ var admin = new Vue({
         '/api/kontaktpersoner',
         '/api/volontarer',
         '/api/volontarer_plannering',
-        '/api/utskick'].forEach(this.get_data)
+        '/api/utskick',
+        '/api/narvaro'].forEach(this.get_data)
     },
     data: {
         page: "BESK",

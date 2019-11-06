@@ -29,10 +29,12 @@
                             <button v-on:click="$set(närvaro_redigerade, kid.deltagare_id+date.datum, false)" class="btn btn-secondary">&times;</button>
                         </div>
                     </div>
-                </div><!-- btn btn-outline-danger btn-outline-warning btn-outline-success-->
-                <button v-bind:class="" class="btn btn-sm btn-block" v-else="" v-on:click="$set(närvaro_redigerade, kid.deltagare_id+date.datum, true)">
-                    {{ get_data_for_deltagare_at_date(kid.deltagare_id, date.datum)['status'] }}&nbsp;
-                </button>
+                </div>
+                <div v-else=""> 
+                    <button v-bind:class="button_color_närvaro(kid.deltagare_id, date.datum)" type="button" class="btn btn-sm btn-block" v-on:click="$set(närvaro_redigerade, kid.deltagare_id+date.datum, true)">
+                        {{ get_data_for_deltagare_at_date(kid.deltagare_id, date.datum)['status'] }}&nbsp;
+                    </button>
+                </div>
             </td>
         </tr>
       </tbody>
