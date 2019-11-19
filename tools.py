@@ -53,5 +53,5 @@ def send_email(to, subject, message):
 
     server = smtplib.SMTP('localhost')
     server.set_debuglevel(1)
-    server.sendmsg(msg)
+    server.send_message(msg)
     server.quit()
