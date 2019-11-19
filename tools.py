@@ -46,7 +46,7 @@ def send_email(to, subject, message):
     html = markdown.markdown(message)
     msg = EmailMessage()
     msg['Subject'] = subject
-    msg['From'] = "Kodcentrum <hej@kodcenturm.se>"
+    msg['From'] = "Kodcentrum <hej@kodcentrum.se>"
     msg['To'] = to
     msg.set_content(message)
     msg.add_alternative(html, subtype='html')
