@@ -53,9 +53,9 @@ var admin = new Vue({
         },
         get_kommentar_for_volontar_at_date: function(volontarer_plannering, id, date){
             if(volontarer_plannering[id] == undefined){
-                return "Ja"
+                return ""
             } else if (volontarer_plannering[id][date] == undefined){
-                return "Ja"
+                return ""
             } else {
                 if (volontarer_plannering[id][date]["kommentar"]){
                     return volontarer_plannering[id][date]["kommentar"]
