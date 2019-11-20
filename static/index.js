@@ -42,13 +42,26 @@ var admin = new Vue({
                 return {'datum':'','typ':'kodstuga'}
             }
         }, 
-        get_status_for_volontar_at_date: function(id, date){
-            if(this.volontarer_plannering[id] == undefined){
+        get_status_for_volontar_at_date: function(volontarer_plannering, id, date){
+            if(volontarer_plannering[id] == undefined){
                 return "Ja"
-            } else if (this.volontarer_plannering[id][date] == undefined){
+            } else if (volontarer_plannering[id][date] == undefined){
                 return "Ja"
             } else {
-                return this.volontarer_plannering[id][date]["status"]
+                return volontarer_plannering[id][date]["status"]
+            }
+        },
+        get_kommentar_for_volontar_at_date: function(volontarer_plannering, id, date){
+            if(volontarer_plannering[id] == undefined){
+                return "Ja"
+            } else if (volontarer_plannering[id][date] == undefined){
+                return "Ja"
+            } else {
+                if (volontarer_plannering[id][date]["kommentar"]){
+                    return volontarer_plannering[id][date]["kommentar"]
+                } else {
+                    return ""
+                }
             }
         },
         get_id_for_volontar_at_date: function(id, date){
@@ -69,16 +82,16 @@ var admin = new Vue({
                 return this.närvaro[id][date]
             }
         },
-        är_ja: function(id, date){
-            return this.get_status_for_volontar_at_date(id, date).toUpperCase().includes("JA")
+        är_ja: function(data, id, date){
+            return this.get_status_for_volontar_at_date(data, id, date).toUpperCase().includes("JA")
         },
-        är_nej: function(id, date){
-            return this.get_status_for_volontar_at_date(id, date).toUpperCase().includes("NEJ")
+        är_nej: function(data, id, date){
+            return this.get_status_for_volontar_at_date(data, id, date).toUpperCase().includes("NEJ")
         },
-        button_color_volontär: function(id, date){
-            if (this.är_nej(id, date)){
+        button_color_volontär: function(data, id, date){
+            if (this.är_nej(data, id, date)){
                 return {'btn-outline-danger':true}
-            } else if (this.är_ja(id, date)){
+            } else if (this.är_ja(data, id, date)){
                 return {'btn-outline-success':true}
             } else {
                 return {'btn-outline-warning':true}

@@ -10,12 +10,14 @@ def add_or_uppdate(request, response):
         if not post_data["id"][i] == "0":
             data = (
                 post_data["status"][i],
-                post_data["id"][i]
+                post_data["kommentar"][i],
+                post_data["id"][i],
             )
             db.cursor.execute("""
                 UPDATE volontarer_plannering
                     SET
-                        status = ?
+                        status = ?,
+                        kommentar = ?
                     WHERE
                         id = ?
                 """, data)
@@ -24,13 +26,14 @@ def add_or_uppdate(request, response):
                 post_data["volontarer_id"][i],
                 post_data["datum"][i],
                 post_data["status"][i],
+                post_data["kommentar"][i],
             )
             db.cursor.execute("""
                 INSERT 
                     INTO volontarer_plannering 
-                        (volontarer_id, datum, status) 
+                        (volontarer_id, datum, status, kommentar) 
                     VALUES 
-                        (?,?,?)
+                        (?,?,?,?)
                 """, data)
     db.commit()
     response('200 OK', [('Content-Type', 'text/html')])
@@ -42,7 +45,8 @@ def all():
             id,
             volontarer_id,
             datum,
-            status
+            status,
+            kommentar
         FROM volontarer_plannering;
      """)
     def to_headers(row):
@@ -55,6 +59,6 @@ def all():
     for date in map(to_headers, all.fetchall()):
         if date['volontarer_id'] not in by_volontarer_id:
             by_volontarer_id[date['volontarer_id']] = {}
-        by_volontarer_id[date['volontarer_id']][date['datum']] = {"status":date["status"],"id":date["id"]}
+        by_volontarer_id[date['volontarer_id']][date['datum']] = {"kommentar":date["kommentar"],"status":date["status"],"id":date["id"]}
 
     return json.dumps({"volontarer_plannering":by_volontarer_id,"volontarer_redigerade":{}})

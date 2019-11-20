@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS volontarer_plannering (
   datum TEXT,
   volontarer_id INT,
   status TEXT,
+  kommentar TEXT,
   FOREIGN KEY(volontarer_id) REFERENCES volontarer(id)
   );
 ''',
