@@ -62,9 +62,13 @@
                 <label>Meddelande</label>
                 <textarea
                     name="text"
-                    v-bind:value="edit.data.text"
+                    v-model:value="edit.data.text"
                     required=""
                     class="form-control"></textarea>
+                    Förhandsgranskning:
+                <div  class="card">
+                    <div class="card-body" v-html="markdown_to_html.makeHtml(edit.data.text)"></div>
+                </div>
             </div>
             <div class="form-group">
                 <label>Datum för utskick</label>

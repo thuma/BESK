@@ -148,6 +148,7 @@ var admin = new Vue({
         '/api/narvaro'].forEach(this.get_data)
     },
     data: {
+        markdown_to_html: new showdown.Converter(),
         page: "BESK",
         deltagare: [],
         närvaro:{},

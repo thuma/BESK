@@ -62,13 +62,17 @@ def add_or_uppdate(request, response):
             post_data["kodstugor_id"][0],
             post_data["utdrag_datum"][0],
         )
-        db.cursor.execute("""
-            INSERT 
-                INTO volontarer
-                    (namn, epost, telefon, kodstugor_id, utdrag_datum) 
-                VALUES 
-                    (?,?,?,?,?)
-            """, data)
+        try:
+            db.cursor.execute("""
+                INSERT 
+                    INTO volontarer
+                        (namn, epost, telefon, kodstugor_id, utdrag_datum) 
+                    VALUES 
+                        (?,?,?,?,?)
+                """, data)
+        except db.sqlite3.IntegrityError:
+            response('400 Bad Request', [('Content-Type', 'text/html')])
+            return bytes("E-Postadressen finns redan.",'utf-8')
     db.commit()
     response('200 OK', [('Content-Type', 'text/html')])
     return all()

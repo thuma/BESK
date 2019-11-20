@@ -4,17 +4,15 @@
     <tr>
       <th scope="col">Namn</th>
       <th scope="col">SMS närvarofråga</th>
-      <th scope="col">E-Post närvarofråga ämne</th>
-      <th scope="col">E-post närvarofråga meddelande</th>
+      <th scope="col">E-post närvarofråga</th>
       <th scope="col">Redigera</th>
     </tr>
   </thead>
   <tbody>
     <tr v-for="kodstuga in kodstugor">
         <td>{{kodstuga.namn}}</td>
-        <td>{{kodstuga.sms_text}}</td>
-        <td>{{kodstuga.epost_rubrik}}</td>
-        <td>{{kodstuga.epost_text}}</td>
+        <td><pre>{{kodstuga.sms_text}}</pre></td>
+        <td><b>Ämne:</b> {{kodstuga.epost_rubrik}}<hr><div v-html="markdown_to_html.makeHtml(kodstuga.epost_text)"></div></td>
         <td><button class="btn outline-btn-primary"
             v-on:click="edit={'type':'kodstuga','data':kodstuga}">🖊</button>
         </td>
@@ -50,12 +48,12 @@
                     class="form-control"></textarea>
                 Meddelandet skickas dagen före Kodstugan.
                 Ett exempel på ett meddelande:
-                <pre>Hej!
-    Kommer %namn% till kodstugan på tisdag?
-    Svara ja eller nej på detta SMS.
+<pre>Hej!
+Kommer %namn% till kodstugan på tisdag?
+Svara ja eller nej på detta SMS.
 
-    Mvh
-    Kodcenturm</pre>
+Mvh
+Kodcenturm</pre>
             </div>
             <div class="form-group">
                 <label>E-post ämne</label>
@@ -70,19 +68,23 @@
                 <label>E-Post meddelande</label>
                 <textarea
                     name="epost_text"
-                    v-bind:value="edit.data.epost_text"
+                    v-model:value="edit.data.epost_text"
                     required=""
                     class="form-control"></textarea>
                 E-posten skickas två dagar före Kodstugan.
+                Förhandsvisning
+                <div  class="card">
+                    <div class="card-body" v-html="markdown_to_html.makeHtml(edit.data.epost_text)"></div>
+                </div>
                 Ett exempel på e-post meddelande:
-                <pre>Hej!
-    Kommer %namn% till kodstugan på tisdag?
+<pre>Hej!
+Kommer %namn% till kodstugan på tisdag?
 
-    Svara ja genom att trycka på denna länk: %jalink%
-    Svara nej genom att trycka på denna länk: %nejlink%
+Svara ja genom att trycka på denna länk: %jalink%
+Svara nej genom att trycka på denna länk: %nejlink%
 
-    Mvh
-    Kodcenturm</pre>
+Mvh
+Kodcenturm</pre>
             </div>
             <div class="form-group">
                 <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
