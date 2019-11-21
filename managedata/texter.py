@@ -48,7 +48,7 @@ def get_one(id):
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return list(map(to_headers, all.fetchall()))[0]
+    return list(map(to_headers, one.fetchall()))[0]
 
 def all():
     all = db.cursor.execute("""
