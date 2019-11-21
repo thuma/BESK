@@ -19,7 +19,8 @@ from managedata import (
     volontarer_plannering,
     utskick,
     deltagare,
-    narvaro
+    narvaro,
+    texter
     )
 
 def generator():
@@ -83,6 +84,12 @@ def route(request, response):
             return narvaro.add_or_uppdate(request, response) 
         response('200 OK', [('Content-Type', 'text/html')])
         return narvaro.all()   
+
+    if request['PATH_INFO'] == '/texter':
+        if request['REQUEST_METHOD'] == 'POST':
+            return texter.add_or_uppdate(request, response) 
+        response('200 OK', [('Content-Type', 'text/html')])
+        return texter.all()  
 
     elif request['PATH_INFO'] == '/invite':
         return invite.new(request, response)

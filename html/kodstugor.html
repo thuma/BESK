@@ -3,8 +3,10 @@
   <thead>
     <tr>
       <th scope="col">Namn</th>
-      <th scope="col">SMS närvarofråga</th>
-      <th scope="col">E-post närvarofråga</th>
+      <th scope="col">SMS närvarofråga (12h före)</th>
+      <th scope="col">E-post närvarofråga (36h före)</th>
+      <th scope="col">Välkomstmeddelande</th>
+      <th scope="col">Anmälan öppen</th>
       <th scope="col">Redigera</th>
     </tr>
   </thead>
@@ -13,6 +15,8 @@
         <td>{{kodstuga.namn}}</td>
         <td><pre>{{kodstuga.sms_text}}</pre></td>
         <td><b>Ämne:</b> {{kodstuga.epost_rubrik}}<hr><div v-html="markdown_to_html.makeHtml(kodstuga.epost_text)"></div></td>
+        <td><b>Ämne:</b> {{kodstuga.epost_rubrik}}<hr><div v-html="markdown_to_html.makeHtml(kodstuga.epost_text)"></div></td>
+        <td>Ja/Nej</td>
         <td><button class="btn outline-btn-primary"
             v-on:click="edit={'type':'kodstuga','data':kodstuga}">🖊</button>
         </td>

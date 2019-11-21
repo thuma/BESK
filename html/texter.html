@@ -1,0 +1,42 @@
+<h1 class="text-center">Texter</h1>
+<table class="table table-sm" v-if="edit==''">
+  <thead>
+    <tr>
+      <th scope="col">Namn</th>
+      <th scope="col">Text</th>
+      <th scope="col">Rerigera</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="text in texter">
+        <td>{{text.id}}</td>
+        <td v-html="markdown_to_html.makeHtml(text.text)" ></td>
+        <td><button class="btn outline-btn-primary"
+            v-on:click="edit={'type':'text','data':text}">🖊</button>
+        </td>
+    </tr>
+  </tbody>
+</table>
+<div v-if="edit.type=='text'" class="card">
+    <div class="card-body">
+        <form method="post" @submit="check_send" action="/api/texter">
+            <input name="id" v-bind:value="edit.data.id" type="hidden">
+            <div class="form-group">
+                <label>Text</label>
+                <textarea
+                    name="text"
+                    v-model:value="edit.data.text"
+                    required=""
+                    class="form-control"></textarea>
+                    Förhandsgranskning:
+                <div  class="card">
+                    <div class="card-body" v-html="markdown_to_html.makeHtml(edit.data.text)"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Spara</button>
+                <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
+            </div>
+        </form>
+    </div>
+</div>

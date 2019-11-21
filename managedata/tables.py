@@ -130,8 +130,8 @@ CREATE TABLE IF NOT EXISTS auth (
 ''',
 '''
 CREATE TABLE IF NOT EXISTS keyvalue (
-  key PRIMARY KEY,
-  value TEXT
+  id TEXT PRIMARY KEY,
+  text TEXT
   );
 '''
 ]
