@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from managedata import db, applied
+from managedata import db, applied, texter
 from tools import send_email, read_post_data, read_get_data
 from main import static_file
 import json
@@ -76,14 +76,7 @@ def send_invites():
                 deltagare_id = row["deltagare_id"]
             if row["deltagare_id"] != deltagare_id:
                 break
-            message = '''Hej!
-%namn% har fått plats på kodstgan %kodstuga% du behöver bekräfta platsen.
-
-För att bekräfta eller tacka nej till platsen gå till denna länk: %länk%
-
-Med vänliga hälsningar,
-Kodcentrum
-info@kodcentsrum.se'''
+            message = texter.get_one("Inbjudan")["text"]
             link = "https://besk.kodcentrum.se/reply?id="+row["deltagare_id"]
             message = message.replace(
                 "%namn%",row["deltagare_fornamn"]).replace(

@@ -36,6 +36,20 @@ def add_or_uppdate(request, response):
     response('200 OK', [('Content-Type', 'text/html')])
     return all()
 
+def get_one(id):
+    one = db.cursor.execute("""
+        SELECT 
+            id,
+            text
+        FROM keyvalue WHERE id = ? LIMIT 1;
+     """, (id,))
+    def to_headers(row):
+        ut = {}
+        for idx, col in enumerate(all.description):
+            ut[col[0]] = row[idx]
+        return ut
+    return list(map(to_headers, all.fetchall()))[0]
+
 def all():
     all = db.cursor.execute("""
         SELECT 

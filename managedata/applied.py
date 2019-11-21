@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from managedata import db
+from managedata import db, texter
 from tools import send_email, read_post_data
 import uuid
 import json
@@ -100,17 +100,7 @@ def new(request, response):
     db.cursor.execute("INSERT INTO hittade (hittade) VALUES (?)", hittade)
     db.commit()
 
-    mailmessage = """Hej!
-
-Vi har mottagit din intresseanmälan till Kodstugan på %kodstuga%
-och återkommer till dig via mail så snart vi fördelat platserna. Det finns ett
-begränsat antal platser vilket innebär att ditt barn inte är garanterad en plats.
-Vi strävar efter en jämn fördelning mellan könen samt att samarbetsskolor har
-företräde men utgår annars efter en först till kvarn-princip.
-
-Med vänliga hälsningar,
-Kodcentrum
-info@kodcentrum.se""".replace("%kodstuga%",kodstuga)
+    mailmessage = texter.get_one("Intresse anmälan")["text"].replace("%kodstuga%",kodstuga)
     mailsubject = "Tack för din intresseanmälan"
     for email in formdata["email"]:
         spawn(send_email, email, mailsubject, mailmessage)
