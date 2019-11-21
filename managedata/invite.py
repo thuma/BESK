@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from managedata import db, applied, texter
+from managedata import db, deltagare, texter
 from tools import send_email, read_post_data, read_get_data
 from main import static_file
 import json
@@ -19,7 +19,7 @@ def new(request, response):
             ''',(invite,))
     db.commit()
     response('200 OK', [('Content-Type', 'text/html')])
-    return applied.all()
+    return deltagare.all()
 
 def reply(request, response):
     if request['REQUEST_METHOD'] == 'GET':
