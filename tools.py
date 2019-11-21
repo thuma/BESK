@@ -52,6 +52,5 @@ def send_email(to, subject, message):
     msg.add_alternative(html, subtype='html')
 
     server = smtplib.SMTP('localhost')
-    server.set_debuglevel(1)
     server.send_message(msg)
     server.quit()
