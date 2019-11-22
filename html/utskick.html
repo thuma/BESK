@@ -16,11 +16,12 @@
         <td>{{kodstuga_name_by_id(skick.kodstugor_id)}}</td>
         <td>{{skick.typ}}</td>
         <td>{{skick.rubrik}}</td>
-        <td>{{skick.text}}</td>
+        <td v-if="skick.typ=='e-post'" v-html="markdown_to_html.makeHtml(skick.text)"></td>
+        <td v-else=""><pre>{{skick.text}}</pre></td>
         <td>{{skick.datum}}</td>
         <td>{{skick.status}}</td>
         <td><button class="btn outline-btn-primary"
-            v-on:click="edit={'type':'utskick','data':skick}">🖊</button>
+            v-on:click="edit={'type':'utskick','data':copy(skick)}">🖊</button>
         </td>
     </tr>
   </tbody>
@@ -28,7 +29,7 @@
 <button 
     class="btn btn-primary"
     v-if="edit==''"
-    v-on:click="edit={'type':'utskick','data':{'id':'','datum':'','typ':'epost','rubrik':'','text':'','kodstugor_id':''}}"
+    v-on:click="edit={'type':'utskick','data':{'id':'','datum':'','typ':'e-post','rubrik':'','text':'','kodstugor_id':''}}"
     >
     Skapa ny
 </button>
@@ -38,26 +39,30 @@
             <input name="id" v-if="edit.data.id!==''"v-bind:value="edit.data.id" type="hidden">
             <div class="form-group">
                 <label>Kodstuga</label>
-                <select name="kodstugor_id" v-bind:value="edit.data.kodstugor_id" class="form-control">
+                <select name="kodstugor_id"  v-model:value="edit.data.kodstugor_id" class="form-control">
+                    <option value="">Välj kodstuga...</option>
                     <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>Typ</label>
-                <select name="typ" v-bind:value="edit.data.typ" class="form-control">
+                <select name="typ" required v-model:value="edit.data.typ" class="form-control">
                     <option value="e-post">E-Post</option>
                     <option value="sms">SMS</option>
-                    <option value="e-post,sms">SMS & E-Post</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Ämne (Bara för E-Post)</label>
-                <input
+            <div class="form-group" v-if="edit.data.typ=='e-post'">
+                <label>Ämne</label>
+                <input 
                     name="rubrik"
-                    v-bind:value="edit.data.rubrik"
+                    v-model:value="edit.data.rubrik"
                     type="text"
                     class="form-control">
             </div>
+            <input v-else=""
+                    name="rubrik"
+                    v-model:value="edit.data.rubrik"
+                    type="hidden">
             <div class="form-group">
                 <label>Meddelande</label>
                 <textarea
@@ -67,14 +72,15 @@
                     class="form-control"></textarea>
                     Förhandsgranskning:
                 <div  class="card">
-                    <div class="card-body" v-html="markdown_to_html.makeHtml(edit.data.text)"></div>
+                    <div class="card-body" v-if="edit.data.typ=='e-post'" v-html="markdown_to_html.makeHtml(edit.data.text)"></div>
+                    <div class="card-body" v-else=""><pre>{{edit.data.text}}</pre></div>
                 </div>
             </div>
             <div class="form-group">
                 <label>Datum för utskick</label>
                 <input 
                     name="datum"
-                    v-bind:value="edit.data.datum"
+                    v-model:value="edit.data.datum"
                     type="date"
                     required=""
                     class="form-control">

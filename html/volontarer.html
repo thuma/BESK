@@ -18,7 +18,7 @@
         <td>{{kodstuga_name_by_id(volontär.kodstugor_id)}}</td>
         <td>{{volontär.utdrag_datum}}</td>
         <td><button class="btn outline-btn-primary"
-            v-on:click="edit={'type':'volontär','data':volontär}">🖊</button>
+            v-on:click="edit={'type':'volontär','data':copy(volontär)}">🖊</button>
         </td>
     </tr>
   </tbody>
@@ -38,7 +38,7 @@
                 <label>Namn</label>
                 <input
                     name="namn"
-                    v-bind:value="edit.data.namn"
+                    v-model:value="edit.data.namn"
                     type="text"
                     required=""
                     class="form-control">
@@ -47,7 +47,7 @@
                 <label>E-Post</label>
                 <input
                     name="epost"
-                    v-bind:value="edit.data.epost"
+                    v-model:value="edit.data.epost"
                     required=""
                     class="form-control">
             </div>
@@ -55,7 +55,7 @@
                 <label>Telefon</label>
                 <input 
                     name="telefon"
-                    v-bind:value="edit.data.telefon"
+                    v-model:value="edit.data.telefon"
                     type="text"
                     required=""
                     class="form-control">
@@ -64,14 +64,14 @@
                 <label>Utdrag gilltigt till</label>
                 <input 
                     name="utdrag_datum"
-                    v-bind:value="edit.data.utdrag_datum"
+                    v-model:value="edit.data.utdrag_datum"
                     type="date"
                     required=""
                     class="form-control">
             </div>
             <div class="form-group">
                 <label>Kodstuga</label>
-                <select name="kodstugor_id" v-bind:value="edit.data.kodstugor_id" class="form-control">
+                <select name="kodstugor_id" v-model:value="edit.data.kodstugor_id" class="form-control">
                     <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
                 </select>
             </div>

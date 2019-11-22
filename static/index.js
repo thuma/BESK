@@ -42,35 +42,13 @@ var admin = new Vue({
                 return {'datum':'','typ':'kodstuga'}
             }
         }, 
-        get_status_for_volontar_at_date: function(volontarer_plannering, id, date){
-            if(volontarer_plannering[id] == undefined){
-                return "Ja"
-            } else if (volontarer_plannering[id][date] == undefined){
-                return "Ja"
-            } else {
-                return volontarer_plannering[id][date]["status"]
-            }
-        },
-        get_kommentar_for_volontar_at_date: function(volontarer_plannering, id, date){
-            if(volontarer_plannering[id] == undefined){
-                return ""
-            } else if (volontarer_plannering[id][date] == undefined){
-                return ""
-            } else {
-                if (volontarer_plannering[id][date]["kommentar"]){
-                    return volontarer_plannering[id][date]["kommentar"]
-                } else {
-                    return ""
-                }
-            }
-        },
-        get_id_for_volontar_at_date: function(id, date){
+        get_data_volontar_at_date: function(id, date){
             if(this.volontarer_plannering[id] == undefined){
-                return "0"
+                return {"status":"", "id":0, "kommentar":""}
             } else if (this.volontarer_plannering[id][date] == undefined){
-                return "0"
+                return {"status":"", "id":0, "kommentar":""}
             } else {
-                return this.volontarer_plannering[id][date]["id"]
+                return this.volontarer_plannering[id][date]
             }
         },
         get_data_for_deltagare_at_date: function(id, date){
@@ -83,10 +61,10 @@ var admin = new Vue({
             }
         },
         är_ja: function(data, id, date){
-            return this.get_status_for_volontar_at_date(data, id, date).toUpperCase().includes("JA")
+            return this.get_data_volontar_at_date(id, date)['status'].toUpperCase().includes("JA")
         },
         är_nej: function(data, id, date){
-            return this.get_status_for_volontar_at_date(data, id, date).toUpperCase().includes("NEJ")
+            return this.get_data_volontar_at_date(id, date)['status'].toUpperCase().includes("NEJ")
         },
         button_color_volontär: function(data, id, date){
             if (this.är_nej(data, id, date)){

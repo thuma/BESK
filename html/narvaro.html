@@ -16,22 +16,25 @@
                     <input
                         type="hidden"
                         name="id"
-                        v-bind:value="get_data_for_deltagare_at_date(deltagare_id, date.datum)['id']">
+                        v-bind:value="närvaro_redigerade[kid.deltagare_id+date.datum]['id']">
                     <input type="hidden" name="datum" v-bind:value="date.datum">
                     <input type="hidden" name="deltagare_id" v-bind:value="kid.deltagare_id">
                     <div class="input-group">
-                        <input
-                            type="text"
+                        <select
                             name="status"
-                            v-bind:value="get_data_for_deltagare_at_date(kid.deltagare_id, date.datum)['status']"
-                            class="form-control">
+                            v-model:value="närvaro_redigerade[kid.deltagare_id+date.datum]['status']"
+                            class="custom-select">
+                            <option value="">Välj...</option>
+                            <option value="ja">Ja</option>
+                            <option value="nej">Nej</option>
+                        </select>
                         <div class="input-group-append">
                             <button v-on:click="$set(närvaro_redigerade, kid.deltagare_id+date.datum, false)" class="btn btn-secondary">&times;</button>
                         </div>
                     </div>
                 </div>
                 <div v-else=""> 
-                    <button v-bind:class="button_color_närvaro(kid.deltagare_id, date.datum)" type="button" class="btn btn-sm btn-block" v-on:click="$set(närvaro_redigerade, kid.deltagare_id+date.datum, true)">
+                    <button v-bind:class="button_color_närvaro(kid.deltagare_id, date.datum)" type="button" class="btn btn-sm btn-block" v-on:click="$set(närvaro_redigerade, kid.deltagare_id+date.datum, copy(get_data_for_deltagare_at_date(kid.deltagare_id, date.datum)))">
                         {{ get_data_for_deltagare_at_date(kid.deltagare_id, date.datum)['status'] }}&nbsp;
                     </button>
                 </div>

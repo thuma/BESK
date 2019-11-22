@@ -32,7 +32,7 @@
                 <label>Förnamn</label>
                 <input
                     name="fornamn"
-                    v-bind:value="edit.data.fornamn"
+                    v-model:value="edit.data.fornamn"
                     type="text"
                     required=""
                     class="form-control">
@@ -41,7 +41,7 @@
                 <label>Efternamn</label>
                 <input
                     name="efternamn"
-                    v-bind:value="edit.data.efternamn"
+                    v-model:value="edit.data.efternamn"
                     type="text"
                     required=""
                     class="form-control">
@@ -50,7 +50,7 @@
                 <label>E-Post</label>
                 <input
                     name="epost"
-                    v-bind:value="edit.data.epost"
+                    v-model:value="edit.data.epost"
                     type="text"
                     required=""
                     class="form-control">
@@ -59,7 +59,7 @@
                 <label>Telefon</label>
                 <input
                     name="telefon"
-                    v-bind:value="edit.data.telefon"
+                    v-model:value="edit.data.telefon"
                     type="text"
                     required=""
                     class="form-control">

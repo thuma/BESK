@@ -14,11 +14,11 @@
     <tr v-for="kodstuga in kodstugor">
         <td>{{kodstuga.namn}}</td>
         <td><pre>{{kodstuga.sms_text}}</pre></td>
-        <td><b>Ämne:</b> {{kodstuga.epost_rubrik}}<hr><div v-html="markdown_to_html.makeHtml(kodstuga.epost_text)"></div></td>
-        <td><b>Ämne:</b> {{kodstuga.epost_rubrik}}<hr><div v-html="markdown_to_html.makeHtml(kodstuga.epost_text)"></div></td>
-        <td>Ja/Nej</td>
+        <td><b>Ämne:</b> {{kodstuga.epost_rubrik}}<div v-html="markdown_to_html.makeHtml(kodstuga.epost_text)"></div></td>
+        <td><b>Ämne:</b> {{kodstuga.epost_rubrik_ja}}<div v-html="markdown_to_html.makeHtml(kodstuga.epost_text_ja)"></div></td>
+        <td>{{kodstuga.open}}</td>
         <td><button class="btn outline-btn-primary"
-            v-on:click="edit={'type':'kodstuga','data':kodstuga}">🖊</button>
+            v-on:click="edit={'type':'kodstuga','data':copy(kodstuga)}">🖊</button>
         </td>
     </tr>
   </tbody>
@@ -26,7 +26,7 @@
 <button 
     class="btn btn-primary"
     v-if="edit==''"
-    v-on:click="edit={'type':'kodstuga','data':{'id':'','namn':'','sms_text':'','epost_rubrik':'','epost_text':''}}"
+    v-on:click="edit={'type':'kodstuga','data':{'id':'','namn':'','sms_text':'','epost_rubrik':'','epost_text':'','epost_rubrik_ja':'','epost_text_ja':''}}"
     >
     Skapa ny
 </button>
@@ -43,53 +43,94 @@
                     required=""
                     class="form-control">
             </div>
+            <hr>
             <div class="form-group">
-                <label>SMS meddelande</label>
-                <textarea
-                    name="sms_text"
-                    v-bind:value="edit.data.sms_text"
-                    required=""
-                    class="form-control"></textarea>
-                Meddelandet skickas dagen före Kodstugan.
-                Ett exempel på ett meddelande:
-<pre>Hej!
-Kommer %namn% till kodstugan på tisdag?
-Svara ja eller nej på detta SMS.
-
-Mvh
-Kodcenturm</pre>
+                <label>Ansökan öppen</label>
+                <select name="open" v-model:value="edit.data.open" class="form-control">
+                    <option value="Ja">Ja</option>
+                    <option value="Nej">Nej</option>
+                </select>
             </div>
+            <hr>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label>SMS närvarofråga (skickas 12h före varje kodstuga)</label>
+                        <textarea
+                            name="sms_text"
+                            v-model:value="edit.data.sms_text"
+                            required=""
+                            style="height: 240px;"
+                            class="form-control"></textarea>
+                        För att inte skicka SMS skriv "NEJ" i fältet.
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label>Förhandsvisning</label>
+                    <div  class="card">
+                        <div class="card-body"><pre>{{edit.data.sms_text}}</pre></div>
+                    </div>
+                </div>
+            </div>
+            <hr>
             <div class="form-group">
-                <label>E-post ämne</label>
-                <input 
+                <label>E-post ämne (skickas 36h före varje kodstuga)</label>
+                <input
                     name="epost_rubrik"
-                    v-bind:value="edit.data.epost_rubrik"
+                    v-model:value="edit.data.epost_rubrik"
                     type="text"
                     required=""
                     class="form-control">
             </div>
-            <div class="form-group">
-                <label>E-Post meddelande</label>
-                <textarea
-                    name="epost_text"
-                    v-model:value="edit.data.epost_text"
-                    required=""
-                    class="form-control"></textarea>
-                E-posten skickas två dagar före Kodstugan.
-                Förhandsvisning
-                <div  class="card">
-                    <div class="card-body" v-html="markdown_to_html.makeHtml(edit.data.epost_text)"></div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label>E-Post meddelande</label>
+                        <textarea
+                            name="epost_text"
+                            v-model:value="edit.data.epost_text"
+                            required=""
+                            style="height: 240px;"
+                            class="form-control"></textarea>
+                    </div>
                 </div>
-                Ett exempel på e-post meddelande:
-<pre>Hej!
-Kommer %namn% till kodstugan på tisdag?
-
-Svara ja genom att trycka på denna länk: %jalink%
-Svara nej genom att trycka på denna länk: %nejlink%
-
-Mvh
-Kodcenturm</pre>
+                <div class="col-6">
+                    <label>Förhandsvisning</label>
+                    <div  class="card">
+                        <div class="card-body" v-html="markdown_to_html.makeHtml(edit.data.epost_text)"></div>
+                    </div>
+                </div>
             </div>
+            <hr>
+            <div class="form-group">
+                <label>Välkomstmeddelande ämne (Skickas när deltagaren tackar ja till inbjudan.) </label>
+                <input
+                    name="epost_rubrik_ja"
+                    v-model:value="edit.data.epost_rubrik_ja"
+                    type="text"
+                    required=""
+                    class="form-control">
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label>Välkomstepostmeddelande</label>
+                        <textarea
+                            name="epost_text_ja"
+                            v-model:value="edit.data.epost_text_ja"
+                            required=""
+                            style="height: 240px;"
+                            class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label>Förhandsvisning</label>
+                    <div  class="card">
+                        <div class="card-body" v-html="markdown_to_html.makeHtml(edit.data.epost_text_ja)"></div>
+                    </div>
+                </div>
+            </div>
+            <hr>
             <div class="form-group">
                 <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
                 <button v-else="" type="submit" class="btn btn-primary">Spara</button>

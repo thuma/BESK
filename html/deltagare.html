@@ -39,7 +39,7 @@
         </tr>
     </tbody>
 </table>
-<button type="submit" class="btn btn-primary">Skicka inbjudan</button>
+<button type="submit" class="btn btn-primary">Skicka inbjudan till valda deltagare</button> <a target="_blank" href="/apply" class="btn btn-secondary">Lägg till ny deltagare</a>
 </form>
 <div v-if="edit.type=='deltagare'" class="card">
     <div class="card-body">
@@ -55,7 +55,7 @@
                 <label>Förnamn</label>
                 <input
                     name="fornamn"
-                    v-bind:value="edit.data.fornamn"
+                    v-model:value="edit.data.fornamn"
                     type="text"
                     required=""
                     class="form-control">
@@ -64,14 +64,14 @@
                 <label>Efternamn</label>
                 <input
                     name="efternamn"
-                    v-bind:value="edit.data.efternamn"
+                    v-model:value="edit.data.efternamn"
                     type="text"
                     required=""
                     class="form-control">
             </div>
             <div class="form-group">
                 <label>Kön</label>
-                <select name="kon" v-bind:value="edit.data.kon" class="form-control">
+                <select name="kon" v-model:value="edit.data.kon" class="form-control">
                     <option value="han">Han</option>
                     <option value="hon">Hon</option>
                     <option value="hen">Hen</option>
@@ -81,14 +81,14 @@
                 <label>Skola</label>
                 <input
                     name="skola"
-                    v-bind:value="edit.data.skola"
+                    v-model:value="edit.data.skola"
                     type="text"
                     required=""
                     class="form-control">
             </div>
             <div class="form-group">
                 <label>Klass</label>
-                <select name="klass" v-bind:value="edit.data.klass" class="form-control">
+                <select name="klass" v-model:value="edit.data.klass" class="form-control">
                     <option value="åk 4">åk 4</option>
                     <option value="åk 5">åk 5</option>
                     <option value="åk 6">åk 6</option>
@@ -96,7 +96,7 @@
             </div>
             <div class="form-group">
                 <label>Status</label>
-                <select name="status" v-bind:value="edit.data.status" class="form-control">
+                <select name="status" v-model:value="edit.data.status" class="form-control">
                     <option value="ja">Ja</option>
                     <option value="nej">Nej</option>
                     <option value="ansökt">Ansökt</option>

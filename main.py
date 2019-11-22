@@ -49,7 +49,7 @@ def route(request, response):
         return invite.reply(request, response)
     elif request['PATH_INFO'] == '/apply/kodstugor':     
         response('200 OK', [('Content-Type', 'text/html')])
-        return kodstugor.all()
+        return kodstugor.active()
     else:
         request["BESK_login"] = login.get_login_status(request)
 

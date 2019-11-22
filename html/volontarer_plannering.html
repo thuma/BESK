@@ -16,11 +16,11 @@
                         <input
                             type="hidden"
                             name="id"
-                            v-bind:value="get_id_for_volontar_at_date(volotär.id, date.datum)">
+                            v-model:value="volontarer_redigerade[volotär.id+date.datum]['id']">
                         <input type="hidden" name="datum" v-bind:value="date.datum">
                         <input type="hidden" name="volontarer_id" v-bind:value="volotär.id">
                         <div class="input-group">
-                            <select class="custom-select" name="status" v-bind:value="get_status_for_volontar_at_date(volontarer_plannering, volotär.id, date.datum)">
+                            <select class="custom-select" name="status" v-model:value="volontarer_redigerade[volotär.id+date.datum]['status']">
                                 <option value="Kanske">Kanske</option>
                                 <option value="Ja">Ja</option>
                                 <option value="Nej">Nej</option>
@@ -30,16 +30,16 @@
                             </div>
                         </div>
                         <input
-                                type="text"
-                                name="kommentar"
-                                v-bind:value="get_kommentar_for_volontar_at_date(volontarer_plannering, volotär.id, date.datum)"
-                                class="form-control">
+                            type="text"
+                            name="kommentar"
+                            v-model:value="volontarer_redigerade[volotär.id+date.datum]['kommentar']"
+                            class="form-control">
                     </div>
                     <div v-else="">
-                        <button v-bind:class="button_color_volontär(volontarer_plannering, volotär.id, date.datum)" type="button" class="btn btn-sm btn-block" v-on:click="$set(volontarer_redigerade, volotär.id+date.datum, true)">
-                        {{ get_status_for_volontar_at_date(volontarer_plannering, volotär.id, date.datum) }}&nbsp;
+                        <button v-bind:class="button_color_volontär(volontarer_plannering, volotär.id, date.datum)" type="button" class="btn btn-sm btn-block" v-on:click="$set(volontarer_redigerade, volotär.id+date.datum, copy(get_data_volontar_at_date(volotär.id, date.datum)))">
+                        {{ get_data_volontar_at_date(volotär.id, date.datum)["status"] }}&nbsp;
                         </button>
-                        {{ get_kommentar_for_volontar_at_date(volontarer_plannering, volotär.id, date.datum) }}
+                        {{ get_data_volontar_at_date(volotär.id, date.datum)["kommentar"] }}
                     </div>
                 </td>
             </tr>

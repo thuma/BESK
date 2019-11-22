@@ -12,7 +12,7 @@
         <td>{{text.id}}</td>
         <td v-html="markdown_to_html.makeHtml(text.text)" ></td>
         <td><button class="btn outline-btn-primary"
-            v-on:click="edit={'type':'text','data':text}">🖊</button>
+            v-on:click="edit={'type':'text','data':copy(text)}">🖊</button>
         </td>
     </tr>
   </tbody>

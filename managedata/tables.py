@@ -7,7 +7,11 @@ tables = ['''
   namn TEXT,
   sms_text TEXT,
   epost_text TEXT,
-  epost_rubrik TEXT );
+  epost_rubrik TEXT,
+  epost_text_ja TEXT,
+  epost_rubrik_ja TEXT,
+  open TEXT
+   );
 ''',
 '''
   CREATE TABLE IF NOT EXISTS hittade (
