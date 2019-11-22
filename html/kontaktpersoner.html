@@ -18,7 +18,9 @@
             <td>{{kontaktperson.efternamn}}</td>
             <td>{{kontaktperson.epost}}</td>
             <td>{{kontaktperson.telefon}}</td>
-            <td>{{kontaktperson.deltagare_id.length}}</td>
+            <td>
+                <div v-for="deltagare_id in kontaktperson.deltagare_id">{{deltagare_by_id(deltagare_id).fornamn}} {{deltagare_by_id(deltagare_id).efternamn}}</div>
+            </td>
             <td><button type="button" class="btn btn-outline-secondary"
             v-on:click="edit={'type':'kontaktperson','data':copy(kontaktperson)}">🖊</button></td>
         </tr>

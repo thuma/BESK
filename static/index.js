@@ -15,6 +15,30 @@ var admin = new Vue({
         copy: function(obj){
              return JSON.parse(JSON.stringify(obj));
         },
+       kontaktperson_by_id: function(id){
+            var data
+            var kontaktpersoner_id = id
+            this.kontaktpersoner.forEach(
+                function(kontaktperson){
+                    if (kontaktperson.id == kontaktpersoner_id){
+                        data = kontaktperson
+                    }
+                }
+            )
+            return data
+        },
+       deltagare_by_id: function(id){
+            var data
+            var deltagare_id = id
+            this.deltagare.forEach(
+                function(kid){
+                    if (kid.deltagare_id == deltagare_id){
+                        data = kid
+                    }
+                }
+            )
+            return data
+        },
         kodstuga_name_by_id: function(id){
             var name = ""
             var kodstuga_id = id

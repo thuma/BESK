@@ -23,7 +23,9 @@
             <td>{{kid.kon}}</td>
             <td>{{kid.skola}}</td>
             <td>{{kid.klass}}</td>
-            <td>{{kid.kontaktperson_id.length}}</td>
+            <td>
+                <div v-for="kontaktperson_id in kid.kontaktperson_id">{{kontaktperson_by_id(kontaktperson_id).fornamn}} {{kontaktperson_by_id(kontaktperson_id).efternamn}}</div>
+            </td>
             <td>{{new Date(kid.datum*1000).toISOString().split('T')[0]}}</td>
             <td>
                 <label v-if="kid.status=='ansökt'">
