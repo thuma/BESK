@@ -24,13 +24,31 @@ def all():
         return ut
     return json.dumps({"volontärer":list(map(to_headers, all.fetchall()))})
 
+def delete(request, response):
+    post_data = read_post_data(request)
+    db.cursor.execute("""
+        DELETE FROM 
+            volontarer
+        WHERE 
+            epost = ?
+     """,(post_data['epost'][0],))
+    return all()
+
+slack_members = []
+
 def from_slack():
+    if not slack_members:
+        result_groups = requests.get("https://slack.com/api/conversations.list?token="+config['slack']['token']+"&exclude_archived=true&types=private_channel%2Cpublic_channel")
+        for channel in result_groups.json()["channels"]:
+            members = requests.get("https://slack.com/api/conversations.members?token="+config['slack']['token']+"&channel="+channel["id"])
+            channel["members"] = members.json()["members"]
+            slack_members.append(channel)
     result = requests.get("https://slack.com/api/users.list?limit=999&token="+config['slack']['token'])
     def basicdata(member):
-        return {"namn":member["profile"]["real_name"],"epost":member["profile"]["email"],"telefon":member["profile"]["phone"]}
+        return {"slack_id":member["id"],"namn":member["profile"]["real_name"],"epost":member["profile"]["email"],"telefon":member["profile"]["phone"]}
     def filterusers(member):
         return "email" in member["profile"]
-    return json.dumps({"volontärer_slack":list(map(basicdata,filter(filterusers,result.json()["members"])))})
+    return json.dumps({"slack_members":slack_members,"volontärer_slack":list(map(basicdata,filter(filterusers,result.json()["members"])))})
 
 def add_or_uppdate(request, response):
     post_data = read_post_data(request)

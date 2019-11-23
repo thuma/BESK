@@ -37,6 +37,7 @@
       <th scope="col">Namn</th>
       <th scope="col">E-Post</th>
       <th scope="col">Telefon</th>
+      <th scope="col">Kodstuga</th>
       <th scope="col">Lägg till</th>
     </tr>
   </thead>
@@ -45,6 +46,7 @@
         <td>{{volontär.namn}}</td>
         <td>{{volontär.epost}}</td>
         <td>{{volontär.telefon}}</td>
+        <td><div v-for="channel in get_groups_for_volontär(volontär.slack_id)">{{channel.name}}</div></td>
         <td>
             <button class="btn btn-secondary"
             v-on:click="edit={'type':'volontär','data':{'id':'','namn':volontär.namn,'epost':volontär.epost,'telefon':volontär.telefon,'kodstugor_id':''}}">
@@ -103,6 +105,7 @@
                 <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
                 <button v-else="" type="submit" class="btn btn-primary">Spara</button>
                 <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
+                <button v-on:click="radera_volontär(edit.data.epost);edit=''" type="button" class="btn btn-danger">Radera</button>
             </div>
         </form>
     </div>

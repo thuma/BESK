@@ -12,8 +12,50 @@ var admin = new Vue({
                 })
             });
         },
+        delete_data:function(url, body){
+            var next = this
+            fetch(url, {
+                method: 'DELETE',
+                credentials: 'same-origin',
+                headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: body
+                }
+            ).then(
+                function(response){
+                if (response.status == 200){
+                    response.json().then(
+                        function(data){
+                            Object.keys(data).forEach(function(key){
+                                next[key] = data[key];
+                            })
+                        next.edit=""
+                    })
+                } else {
+                    response.text().then(
+                        function(data){
+                            window.alert(data)
+                    })
+                }
+            });
+        },
         copy: function(obj){
              return JSON.parse(JSON.stringify(obj));
+        },
+        radera_volontär: function(epost){
+            this.delete_data('/api/volontarer',"epost="+epost)
+        },
+        get_groups_for_volontär: function(id){
+            var channels = []
+            function removeif_not_id(channel){
+                if  (channel.members.indexOf(id) >= 0){
+                    channels.push(channel)
+                }
+            }
+            this.slack_members.forEach(removeif_not_id)
+            
+            return channels
         },
         volontär_finns: function(epost){
             var status = false
@@ -176,6 +218,7 @@ var admin = new Vue({
         volontarer_redigerade: {},
         volontärer_slack: [],
         utskick: [],
+        slack_members: [],
         texter: [],
     }
 })

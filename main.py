@@ -106,7 +106,10 @@ def route(request, response):
 
     elif request['PATH_INFO'] == '/volontarer':
         if request['REQUEST_METHOD'] == 'POST':
-            return volontarer.add_or_uppdate(request, response) 
+            return volontarer.add_or_uppdate(request, response)
+        if request['REQUEST_METHOD'] == 'DELETE':
+            response('200 OK', [('Content-Type', 'text/html')])
+            return volontarer.delete(request, response) 
         response('200 OK', [('Content-Type', 'text/html')])
         return volontarer.all()
 
