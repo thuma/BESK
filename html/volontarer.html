@@ -30,6 +30,30 @@
     >
     Skapa ny
 </button>
+<h1 class="text-center">Volontärer som finns på Slack men inte i BESK</h1>
+<table class="table table-sm" v-if="edit==''">
+  <thead>
+    <tr>
+      <th scope="col">Namn</th>
+      <th scope="col">E-Post</th>
+      <th scope="col">Telefon</th>
+      <th scope="col">Lägg till</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="volontär in volontärer_slack" v-if="!volontär_finns(volontär.epost)">
+        <td>{{volontär.namn}}</td>
+        <td>{{volontär.epost}}</td>
+        <td>{{volontär.telefon}}</td>
+        <td>
+            <button class="btn btn-secondary"
+            v-on:click="edit={'type':'volontär','data':{'id':'','namn':volontär.namn,'epost':volontär.epost,'telefon':volontär.telefon,'kodstugor_id':''}}">
+                Lägg till i BESK
+            </button>
+        </td>
+    </tr>
+  </tbody>
+</table>
 <div v-if="edit.type=='volontär'" class="card">
     <div class="card-body">
         <form method="post" @submit="check_send" action="/api/volontarer">

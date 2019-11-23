@@ -14,9 +14,9 @@ def add_or_uppdate(request, response):
             post_data["efternamn"][0],
             post_data["status"][0],
             post_data["kon"][0],
-			post_data["klass"][0],
-			post_data["skola"][0],
-			post_data["kodstuga"][0],
+            post_data["klass"][0],
+            post_data["skola"][0],
+            post_data["kodstuga"][0],
             post_data["id"][0]
         )
         db.cursor.execute("""
@@ -34,14 +34,14 @@ def add_or_uppdate(request, response):
             """, data)
     else:
         data = (
-        	uuid.uuid4().hex,
+            uuid.uuid4().hex,
             post_data["fornamn"][0],
             post_data["efternamn"][0],
             post_data["status"][0],
             post_data["kon"][0],
-			post_data["klass"][0],
-			post_data["skola"][0],
-			post_data["kodstuga"][0]
+            post_data["klass"][0],
+            post_data["skola"][0],
+            post_data["kodstuga"][0]
         )
         db.cursor.execute("""
             INSERT 
@@ -82,7 +82,7 @@ def all():
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
             if col[0] == "kontaktperson_id":
-            	ut[col[0]] = ut[col[0]].split(',')
+                ut[col[0]] = ut[col[0]].split(',')
         return ut
 
     return json.dumps({"deltagare":list(map(to_headers, all.fetchall()))})

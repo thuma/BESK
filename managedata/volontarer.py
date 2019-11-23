@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from managedata import db
-from tools import read_post_data
+from tools import read_post_data, config
 import json
 import phonenumbers
+import requests
 
 def all():
     all = db.cursor.execute("""
@@ -22,7 +23,15 @@ def all():
             ut[col[0]] = row[idx]
         return ut
     return json.dumps({"volontärer":list(map(to_headers, all.fetchall()))})
-    
+
+def from_slack():
+    result = requests.get("https://slack.com/api/users.list?limit=999&token="+config['slack']['token'])
+    def basicdata(member):
+        return {"namn":member["profile"]["real_name"],"epost":member["profile"]["email"],"telefon":member["profile"]["phone"]}
+    def filterusers(member):
+        return "email" in member["profile"]
+    return json.dumps({"volontärer_slack":list(map(basicdata,filter(filterusers,result.json()["members"])))})
+
 def add_or_uppdate(request, response):
     post_data = read_post_data(request)
     try:

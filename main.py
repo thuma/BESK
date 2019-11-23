@@ -79,6 +79,10 @@ def route(request, response):
         response('200 OK', [('Content-Type', 'text/html')])
         return deltagare.all()
 
+    if request['PATH_INFO'] == '/volontarer/slack':
+        response('200 OK', [('Content-Type', 'text/html')])
+        return volontarer.from_slack()
+
     if request['PATH_INFO'] == '/narvaro':
         if request['REQUEST_METHOD'] == 'POST':
             return narvaro.add_or_uppdate(request, response) 

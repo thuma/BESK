@@ -15,7 +15,17 @@ var admin = new Vue({
         copy: function(obj){
              return JSON.parse(JSON.stringify(obj));
         },
-       kontaktperson_by_id: function(id){
+        volontär_finns: function(epost){
+            var status = false
+            var epost_in = epost
+            this.volontärer.forEach(function(vol){
+                if(vol.epost == epost_in){
+                    status = true
+                }
+            })
+            return status
+        },
+        kontaktperson_by_id: function(id){
             var data
             var kontaktpersoner_id = id
             this.kontaktpersoner.forEach(
@@ -27,7 +37,7 @@ var admin = new Vue({
             )
             return data
         },
-       deltagare_by_id: function(id){
+        deltagare_by_id: function(id){
             var data
             var deltagare_id = id
             this.deltagare.forEach(
@@ -68,9 +78,9 @@ var admin = new Vue({
         }, 
         get_data_volontar_at_date: function(id, date){
             if(this.volontarer_plannering[id] == undefined){
-                return {"status":"", "id":0, "kommentar":""}
+                return {"status":"Ja", "id":0, "kommentar":""}
             } else if (this.volontarer_plannering[id][date] == undefined){
-                return {"status":"", "id":0, "kommentar":""}
+                return {"status":"Ja", "id":0, "kommentar":""}
             } else {
                 return this.volontarer_plannering[id][date]
             }
@@ -148,7 +158,8 @@ var admin = new Vue({
         '/api/volontarer_plannering',
         '/api/utskick',
         '/api/narvaro',
-        '/api/texter'].forEach(this.get_data)
+        '/api/texter',
+        '/api/volontarer/slack'].forEach(this.get_data)
     },
     data: {
         markdown_to_html: new showdown.Converter(),
@@ -163,6 +174,7 @@ var admin = new Vue({
         volontärer: [],
         volontarer_plannering: {},
         volontarer_redigerade: {},
+        volontärer_slack: [],
         utskick: [],
         texter: [],
     }
