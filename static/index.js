@@ -46,17 +46,6 @@ var admin = new Vue({
         radera_volontär: function(epost){
             this.delete_data('/api/volontarer',"epost="+epost)
         },
-        get_groups_for_volontär: function(id){
-            var channels = []
-            function removeif_not_id(channel){
-                if  (channel.members.indexOf(id) >= 0){
-                    channels.push(channel)
-                }
-            }
-            this.slack_members.forEach(removeif_not_id)
-            
-            return channels
-        },
         volontär_finns: function(epost){
             var status = false
             var epost_in = epost
@@ -218,7 +207,6 @@ var admin = new Vue({
         volontarer_redigerade: {},
         volontärer_slack: [],
         utskick: [],
-        slack_members: [],
         texter: [],
     }
 })
