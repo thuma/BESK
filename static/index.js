@@ -44,7 +44,7 @@ var admin = new Vue({
              return JSON.parse(JSON.stringify(obj));
         },
         radera_volontär: function(epost){
-            this.delete_data('/api/volontarer',"epost="+epost)
+            this.delete_data('/api/volontarer',"epost="+encodeURIComponent(epost))
         },
         volontär_finns: function(epost){
             var status = false
