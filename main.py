@@ -53,11 +53,8 @@ def route(request, response):
     else:
         request["BESK_login"] = login.get_login_status(request)
 
-    if request['PATH_INFO'] == '/':
-        if request["BESK_login"]["user"] == False:
-            return login.start(request, response)
-        response('200 OK', [('Content-Type', 'text/html')])
-        return static_file('static/start.html')
+    if request["BESK_login"]["user"] == False and request['PATH_INFO'] == '/':
+        return login.start(request, response)
 
     if request['PATH_INFO'] == '/login':
         return login.validate(request, response)
@@ -65,7 +62,18 @@ def route(request, response):
     if request["BESK_login"]["user"] == False:
         response('403 Forbidden', [('Content-Type', 'text/html')])
         return "You need to login at https://besk.kodcentrum.se/"
-    
+    else:
+        request["BESK_admin"] = login.is_admin(request["BESK_login"]["user"]["user"]["email"])
+
+    if not request["BESK_admin"]:
+        if not login.is_approved(request["BESK_login"]["user"]["user"]["email"]):
+            response('403 Forbidden', [('Content-Type', 'text/html')])
+            return "Your account has expired."
+
+    if request['PATH_INFO'] == '/':
+        response('200 OK', [('Content-Type', 'text/html')])
+        return static_file('static/start.html')
+
     if request['PATH_INFO'] == '/index.js':
         response('200 OK', [('Content-Type', 'text/html')])
         return static_file('static/index.js')

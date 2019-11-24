@@ -30,6 +30,17 @@ def get_auth(session_id):
     except:
         return False
 
+def is_admin(user):
+    return user in config['general']['admins']
+
+def is_approved(user):
+    now = int(time())
+    result = db.cursor.execute('''SELECT epost FROM volontarer WHERE epost=? AND utdrag_datum > ?;''', (user, now))
+    if result.fetchone() is None:
+        return False
+    else:
+        return True
+
 def get_login_status(request):
     session = get_session_token(request)
     return {"user":get_auth(session)}

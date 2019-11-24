@@ -5,6 +5,8 @@ from tools import read_post_data, config
 import json
 import phonenumbers
 import requests
+import datetime
+import time
 
 def all():
     all = db.cursor.execute("""
@@ -20,7 +22,10 @@ def all():
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
-            ut[col[0]] = row[idx]
+            if col[0] == "utdrag_datum" and isinstance(row[idx], int):
+                ut[col[0]] = int_to_date(row[idx])
+            else:
+                ut[col[0]] = row[idx]
         return ut
     return json.dumps({"volontärer":list(map(to_headers, all.fetchall()))})
 
@@ -51,6 +56,12 @@ def phonenumber_to_format(number):
     except:
         return "+46700000000"
 
+def date_to_int(date_text):
+    return time.mktime(datetime.datetime.strptime(date_text, '%Y-%m-%d').timetuple())
+
+def int_to_date(int):
+    return datetime.datetime.utcfromtimestamp(int).strftime('%Y-%m-%d')
+
 def add_or_uppdate(request, response):
     post_data = read_post_data(request)
     if "flytta" in post_data:
@@ -69,7 +80,7 @@ def add_or_uppdate(request, response):
                 post_data["epost"][i],
                 phonenumber_to_format(post_data["telefon"][i]),
                 post_data["kodstugor_id"][0],
-                post_data["utdrag_datum"][i],
+                date_to_int(post_data["utdrag_datum"][i]),
             )
             try:
                 db.cursor.execute("""
@@ -97,7 +108,7 @@ def add_or_uppdate(request, response):
                 post_data["epost"][0],
                 phone_number_str,
                 post_data["kodstugor_id"][0],
-                post_data["utdrag_datum"][0],
+                date_to_int(post_data["utdrag_datum"][0]),
                 post_data["id"][0]
             )
             db.cursor.execute("""
@@ -117,7 +128,7 @@ def add_or_uppdate(request, response):
                 post_data["epost"][0],
                 phone_number_str,
                 post_data["kodstugor_id"][0],
-                post_data["utdrag_datum"][0],
+                date_to_int(post_data["utdrag_datum"][0]),
             )
             try:
                 db.cursor.execute("""
