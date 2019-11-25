@@ -97,11 +97,9 @@ def add_or_uppdate(request, response):
             phone_number = phonenumbers.parse(post_data["telefon"][0], "SE")
             phone_number_str = phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
         except:
-            response('400 Bad Request', [('Content-Type', 'text/html')])
-            return bytes("Fyll i ett giltigt telefonummer.",'utf-8')
+            raise Exception("Fyll i ett giltigt telefonummer.")
         if not phonenumbers.is_valid_number(phone_number):
-            response('400 Bad Request', [('Content-Type', 'text/html')])
-            return bytes("Fyll i ett giltigt telefonummer.",'utf-8')
+            raise Exception("Fyll i ett giltigt telefonummer.")
         if "id" in post_data:
             data = (
                 post_data["namn"][0],

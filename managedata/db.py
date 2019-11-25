@@ -7,7 +7,7 @@ db = sqlite3.connect("../BESK.db")
 cursor = db.cursor()
 
 def commit():
-	db.commit()
+    db.commit()
 
 for table in tables.tables:
   db.execute(table)

@@ -23,130 +23,117 @@ from managedata import (
     texter
     )
 
+class Error404(Exception):
+     pass
+
+class Error403(Exception):
+    pass
+
 def generator():
      yield "string"
 
-def to_array_bytes(data):
-    if type(data) == type("string"):
-        return [data.encode('utf-8')]
-    if type(data) == type(b"bytes"):
-        return [data]
-    if type(data) == type([]):
-        return data
-    if type(data) == type(generator()):
-        return data
+def convert(data):
+    if type(data) == type({}):
+        return json.dumps(data)
+    elif type(data) == type("string"):
+        return data.encode()
+    elif type(data) == type([]):
+        return json.dumps(data)
 
 def application(request, response):
-    return to_array_bytes(route(request, response))
+    try:
+        resultdata = convert(route(request))
+        if resultdata[0:1] == b"<":
+            response('200 OK', [('Content-Type', 'text/html')])
+        else:
+            response('200 OK', [('Content-Type', 'application/json')])
+        return [resultdata]
+    except Error403 as error:
+        response('403 Forbidden', [('Content-Type', 'text/html')])
+        return [str(error).encode('utf-8')]
+    except Error404 as error:
+        response('404 Not Found', [('Content-Type', 'text/html')])
+        return [b'<h1>Not Found</h1>']
+    except Exception as error:
+        response('400 Bad Request', [('Content-Type', 'text/html')])
+        return [str(error).encode('utf-8')]
 
-def route(request, response):
-    if request['PATH_INFO'] == '/apply':
-        if request['REQUEST_METHOD'] == 'POST':
-            return applied.new(request, response)         
-        response('200 OK', [('Content-Type', 'text/html')])
+def route(request):
+    if request['PATH_INFO'] == '/api/apply':
+        return applied.handle(request)
+    elif request['PATH_INFO'] == '/apply':
         return static_file('static/apply.html')
-    elif request['PATH_INFO'] == '/reply':     
-        return invite.reply(request, response)
-    elif request['PATH_INFO'] == '/apply/kodstugor':     
-        response('200 OK', [('Content-Type', 'text/html')])
-        return kodstugor.active()
-    else:
-        request["BESK_login"] = login.get_login_status(request)
+    elif request['PATH_INFO'] == '/reply':
+        return invite.handle(request)
+    elif request['PATH_INFO'] == '/apply/kodstugor':
+        return kodstugor.active(request)
+
+    request["BESK_login"] = login.get_login_status(request)
 
     if request["BESK_login"]["user"] == False and request['PATH_INFO'] == '/':
         return login.start(request, response)
 
     if request['PATH_INFO'] == '/login':
-        return login.validate(request, response)
+        return login.validate(request)
 
     if request["BESK_login"]["user"] == False:
-        response('403 Forbidden', [('Content-Type', 'text/html')])
-        return "You need to login at https://besk.kodcentrum.se/"
+        raise Error403("You need to login at https://besk.kodcentrum.se/")
     else:
         request["BESK_admin"] = login.is_admin(request["BESK_login"]["user"]["user"]["email"])
 
     if not request["BESK_admin"]:
         if not login.is_approved(request["BESK_login"]["user"]["user"]["email"]):
-            response('403 Forbidden', [('Content-Type', 'text/html')])
-            return "Your account has expired."
+            raise Error403("Your account has expired.")
 
     if request['PATH_INFO'] == '/':
-        response('200 OK', [('Content-Type', 'text/html')])
         return static_file('static/start.html')
 
     if request['PATH_INFO'] == '/index.js':
-        response('200 OK', [('Content-Type', 'text/html')])
         return static_file('static/index.js')
 
     if request['PATH_INFO'].startswith("/api"):
         request['PATH_INFO'] = request['PATH_INFO'][4:]
 
+    ######################################################################
+    #                                                                    #
+    #                         API endpoints                              #
+    #                                                                    #
+    ######################################################################
+
     if request['PATH_INFO'] == '/deltagare':
-        if request['REQUEST_METHOD'] == 'POST':
-            return deltagare.add_or_uppdate(request, response) 
-        response('200 OK', [('Content-Type', 'text/html')])
-        return deltagare.all()
+        return deltagare.handle(request) 
 
     if request['PATH_INFO'] == '/volontarer/slack':
-        response('200 OK', [('Content-Type', 'text/html')])
-        return volontarer.from_slack()
+        return volontarer.handle_slack(request)
 
     if request['PATH_INFO'] == '/narvaro':
-        if request['REQUEST_METHOD'] == 'POST':
-            return narvaro.add_or_uppdate(request, response) 
-        response('200 OK', [('Content-Type', 'text/html')])
-        return narvaro.all()   
+        return narvaro.handle(request) 
 
     if request['PATH_INFO'] == '/texter':
-        if request['REQUEST_METHOD'] == 'POST':
-            return texter.add_or_uppdate(request, response) 
-        response('200 OK', [('Content-Type', 'text/html')])
-        return texter.all()  
+        return texter.handle(request)
 
     elif request['PATH_INFO'] == '/invite':
-        return invite.new(request, response)
+        return invite.handle(request)
 
     elif request['PATH_INFO'] == '/kodstugor':
-        if request['REQUEST_METHOD'] == 'POST':
-            return kodstugor.add_or_uppdate(request, response) 
-        response('200 OK', [('Content-Type', 'text/html')])
-        return kodstugor.all()
+        return kodstugor.handle(request) 
 
     elif request['PATH_INFO'] == '/volontarer':
-        if request['REQUEST_METHOD'] == 'POST':
-            return volontarer.add_or_uppdate(request, response)
-        if request['REQUEST_METHOD'] == 'DELETE':
-            response('200 OK', [('Content-Type', 'text/html')])
-            return volontarer.delete(request, response) 
-        response('200 OK', [('Content-Type', 'text/html')])
-        return volontarer.all()
+        return volontarer.handle(request)
 
     elif request['PATH_INFO'] == '/volontarer_plannering':
-        if request['REQUEST_METHOD'] == 'POST':
-            return volontarer_plannering.add_or_uppdate(request, response) 
-        response('200 OK', [('Content-Type', 'text/html')])
-        return volontarer_plannering.all()
+        return volontarer_plannering.handle(request)
         
     elif request['PATH_INFO'] == '/utskick':
-        if request['REQUEST_METHOD'] == 'POST':
-            return utskick.add_or_uppdate(request, response) 
-        response('200 OK', [('Content-Type', 'text/html')])
-        return utskick.all()
+        return utskick.handle(request)
 
     elif request['PATH_INFO'] == '/datum':
-        if request['REQUEST_METHOD'] == 'POST':
-            return datum.set(request, response) 
-        response('200 OK', [('Content-Type', 'text/html')])
-        return datum.all()
+        return datum.handle(request) 
         
     elif request['PATH_INFO'] == '/kontaktpersoner':
-        if request['REQUEST_METHOD'] == 'POST':
-            return kontaktpersoner.add_or_uppdate(request, response)    
-        response('200 OK', [('Content-Type', 'text/html')])
-        return kontaktpersoner.all()    
+        return kontaktpersoner.handle(request)
 
-    response('404 Not Found', [('Content-Type', 'text/html')])
-    return '<h1>Not Found</h1>'
+    raise Error404
 
 def static_file(filename):
     with open(filename, 'r') as content_file:
@@ -159,7 +146,7 @@ def static_file(filename):
                     out+=file[0]+importfile.read()
             else:
                 out+=file[0]
-        return out.encode('utf-8')
+        return out
 
 if __name__ == '__main__':
     spawn(invite.send_invites)
