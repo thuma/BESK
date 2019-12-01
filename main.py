@@ -64,7 +64,7 @@ def route(request):
     elif request['PATH_INFO'] == '/apply':
         return static_file('static/apply.html')
     elif request['PATH_INFO'] == '/reply':
-        return invite.handle(request)
+        return invite.reply(request)
     elif request['PATH_INFO'] == '/apply/kodstugor':
         return kodstugor.active(request)
 
@@ -122,7 +122,7 @@ def route(request):
         return texter.handle(request)
 
     elif request['PATH_INFO'] == '/invite':
-        return invite.handle(request)
+        return invite.new(request)
 
     elif request['PATH_INFO'] == '/kodstugor':
         return kodstugor.handle(request) 

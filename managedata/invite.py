@@ -6,14 +6,6 @@ import json
 import time
 from gevent import sleep
 
-def handle(request):
-    if request['REQUEST_METHOD'] == 'GET':
-        return all()
-    if request['REQUEST_METHOD'] == 'POST':
-        return new(request)
-    if request['REQUEST_METHOD'] == 'DELETE':
-        return all()
-
 def new(request):
     post_data = read_post_data(request)
     invites = post_data["invite"]
@@ -29,7 +21,6 @@ def new(request):
 
 def reply(request):
     if request['REQUEST_METHOD'] == 'GET':
-        response('200 OK', [('Content-Type', 'text/html')])
         return static_file('static/reply.html')
     invitedata = read_post_data(request)
     delragar_id = invitedata["id"][0]
