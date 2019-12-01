@@ -25,7 +25,7 @@ def new(request):
             id = ?
             ''',(invite,))
     db.commit()
-    return deltagare.all()
+    return deltagare.all(request)
 
 def reply(request):
     if request['REQUEST_METHOD'] == 'GET':
