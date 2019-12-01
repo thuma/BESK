@@ -7,6 +7,8 @@ import requests
 import random
 import json
 import base64
+import traceback
+from tools import Error302, Error403, Error404, static_file
 from managedata import (
     db,
     kodstugor,
@@ -23,22 +25,16 @@ from managedata import (
     texter
     )
 
-class Error404(Exception):
-     pass
-
-class Error403(Exception):
-    pass
-
 def generator():
      yield "string"
 
 def convert(data):
     if type(data) == type({}):
-        return json.dumps(data)
+        return json.dumps(data).encode("utf-8")
     elif type(data) == type("string"):
-        return data.encode()
+        return data.encode("utf-8")
     elif type(data) == type([]):
-        return json.dumps(data)
+        return json.dumps(data).encode("utf-8")
 
 def application(request, response):
     try:
@@ -54,7 +50,11 @@ def application(request, response):
     except Error404 as error:
         response('404 Not Found', [('Content-Type', 'text/html')])
         return [b'<h1>Not Found</h1>']
+    except Error302 as error:
+        response(error.args[0], error.args[1])
+        return [b""]
     except Exception as error:
+        traceback.print_exc()
         response('400 Bad Request', [('Content-Type', 'text/html')])
         return [str(error).encode('utf-8')]
 
@@ -71,7 +71,7 @@ def route(request):
     request["BESK_login"] = login.get_login_status(request)
 
     if request["BESK_login"]["user"] == False and request['PATH_INFO'] == '/':
-        return login.start(request, response)
+        return login.start(request)
 
     if request['PATH_INFO'] == '/login':
         return login.validate(request)
@@ -84,6 +84,7 @@ def route(request):
     if not request["BESK_admin"]:
         if not login.is_approved(request["BESK_login"]["user"]["user"]["email"]):
             raise Error403("Your account has expired.")
+        request["BESK_kodstuga"] = volontarer.get_kodstuga(request["BESK_login"]["user"]["user"]["email"])
 
     if request['PATH_INFO'] == '/':
         return static_file('static/start.html')
@@ -100,11 +101,19 @@ def route(request):
     #                                                                    #
     ######################################################################
 
+    if request['PATH_INFO'] == '/me':
+        return {
+            "me":{
+                "epost":request["BESK_login"]["user"]["user"]["email"],
+                "admin":request["BESK_admin"]
+            }
+        } 
+
     if request['PATH_INFO'] == '/deltagare':
         return deltagare.handle(request) 
 
     if request['PATH_INFO'] == '/volontarer/slack':
-        return volontarer.handle_slack(request)
+        return volontarer.from_slack(request)
 
     if request['PATH_INFO'] == '/narvaro':
         return narvaro.handle(request) 
@@ -134,19 +143,6 @@ def route(request):
         return kontaktpersoner.handle(request)
 
     raise Error404
-
-def static_file(filename):
-    with open(filename, 'r') as content_file:
-        imports = content_file.read().split("?>")
-        out = ""
-        for one_import in imports:
-            file = one_import.split("<?")
-            if len(file) == 2:
-                with open("html/"+file[1], 'r') as importfile:
-                    out+=file[0]+importfile.read()
-            else:
-                out+=file[0]
-        return out
 
 if __name__ == '__main__':
     spawn(invite.send_invites)

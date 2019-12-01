@@ -190,7 +190,8 @@ var admin = new Vue({
         '/api/utskick',
         '/api/narvaro',
         '/api/texter',
-        '/api/volontarer/slack'].forEach(this.get_data)
+        '/api/volontarer/slack',
+        '/api/me'].forEach(this.get_data)
     },
     data: {
         markdown_to_html: new showdown.Converter(),
@@ -208,5 +209,6 @@ var admin = new Vue({
         volontärer_slack: [],
         utskick: [],
         texter: [],
+        me: {}
     }
 })

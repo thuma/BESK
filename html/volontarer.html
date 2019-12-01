@@ -6,9 +6,9 @@
           <th scope="col">Namn</th>
           <th scope="col">E-Post</th>
           <th scope="col">Telefon</th>
-          <th scope="col">Kodstuga</th>
-          <th scope="col">Utdrag</th>
-          <th scope="col">Välj</th>
+          <th scope="col" v-if="me.admin">Kodstuga</th>
+          <th scope="col" v-if="me.admin">Utdrag</th>
+          <th scope="col" v-if="me.admin">Välj</th>
           <th scope="col">Redigera</th>
         </tr>
       </thead>
@@ -17,16 +17,16 @@
             <td>{{volontär.namn}}</td>
             <td>{{volontär.epost}}</td>
             <td>{{volontär.telefon}}</td>
-            <td>{{kodstuga_name_by_id(volontär.kodstugor_id)}}</td>
-            <td>{{volontär.utdrag_datum}}</td>
-            <td><input type="checkbox" name="flytta" v-bind:value="volontär.id" v-model="volontär.selected"></td>
-            <td><button class="btn outline-btn-primary"
+            <td v-if="me.admin">{{kodstuga_name_by_id(volontär.kodstugor_id)}}</td>
+            <td v-if="me.admin">{{volontär.utdrag_datum}}</td>
+            <td v-if="me.admin"><input type="checkbox" name="flytta" v-bind:value="volontär.id" v-model="volontär.selected"></td>
+            <td><button class="btn btn-outline-secondary"
                 v-on:click="edit={'type':'volontär','data':copy(volontär)}">🖊</button>
             </td>
         </tr>
       </tbody>
     </table>
-    <div class="row">
+    <div class="row" v-if="me.admin">
         <div class="col-sm">
             <button 
             class="btn btn-primary"
@@ -48,7 +48,7 @@
         </div>
     </div>
 </form>
-<form  v-if="edit==''" method="post" @submit="check_send" action="/api/volontarer">
+<form  v-if="edit=='' && me.admin" method="post" @submit="check_send" action="/api/volontarer">
     <h1 class="text-center">Volontärer som finns på Slack men inte i BESK</h1>
     <table class="table table-sm">
       <thead>

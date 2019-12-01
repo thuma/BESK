@@ -24,10 +24,10 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-              <li class="nav-item">
+              <li class="nav-item" v-if="me.admin">
                 <a class="nav-link" href="#" v-on:click="page='Kodstugor'">Kodstugor</a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" v-if="me.admin">
                 <a class="nav-link" href="#" v-on:click="page='Datum'">Datum</a>
               </li>
               <li class="nav-item">
@@ -48,10 +48,10 @@
               <li class="nav-item">
                 <a class="nav-link" href="#" v-on:click="page='Närvaro'">Närvaro</a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" v-if="me.admin">
                 <a class="nav-link" href="#" v-on:click="page='Texter'">Texter</a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" v-if="me.admin">
                 <a class="nav-link" href="#" v-on:click="page='Statistik'">Statistik</a>
               </li>
             </ul>

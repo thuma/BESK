@@ -8,6 +8,27 @@ import smtplib
 from email.message import EmailMessage
 import markdown
 
+def static_file(filename):
+    with open(filename, 'r') as content_file:
+        imports = content_file.read().split("?>")
+        out = ""
+        for one_import in imports:
+            file = one_import.split("<?")
+            if len(file) == 2:
+                with open("html/"+file[1], 'r') as importfile:
+                    out+=file[0]+importfile.read()
+            else:
+                out+=file[0]
+        return out
+
+class Error404(Exception):
+     pass
+
+class Error403(Exception):
+    pass
+
+class Error302(Exception):
+    pass
 
 config = configparser.RawConfigParser()
 config.read('../BESK.ini')

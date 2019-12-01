@@ -4,6 +4,14 @@ from managedata import db
 from tools import read_post_data
 import json
 
+def handle(request):
+    if request['REQUEST_METHOD'] == 'GET':
+        return all(request)
+    if request['REQUEST_METHOD'] == 'POST':
+        return add_or_uppdate(request)
+    if request['REQUEST_METHOD'] == 'DELETE':
+        return all(request)
+
 def active():
     all = db.cursor.execute("""
         SELECT 
@@ -22,9 +30,13 @@ def active():
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return json.dumps({"kodstugor":list(map(to_headers, all.fetchall()))})
+    return {"kodstugor":list(map(to_headers, all.fetchall()))}
 
-def all():
+def all(request):
+    if request["BESK_admin"]:
+        where = ""
+    else:
+        where = "WHERE id = " + str(request["BESK_kodstuga"])
     all = db.cursor.execute("""
         SELECT 
             id,
@@ -35,16 +47,16 @@ def all():
             epost_text_ja,
             epost_rubrik_ja,
             open
-        FROM kodstugor;
-     """);
+        FROM kodstugor
+     """ + where);
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return json.dumps({"kodstugor":list(map(to_headers, all.fetchall()))})
+    return {"kodstugor":list(map(to_headers, all.fetchall()))}
     
-def add_or_uppdate(request, response):
+def add_or_uppdate(request):
     post_data = read_post_data(request)
     if "id" in post_data:
         data = (
@@ -88,5 +100,4 @@ def add_or_uppdate(request, response):
                     (?,?,?,?,?,?,?)
             """, data)
     db.commit()
-    response('200 OK', [('Content-Type', 'text/html')])
-    return all()
+    return all(request)

@@ -4,7 +4,19 @@ from managedata import db
 from tools import read_post_data
 import json
 
-def all():
+def handle(request):
+    if request['REQUEST_METHOD'] == 'GET':
+        return all(request)
+    if request['REQUEST_METHOD'] == 'POST':
+        return add_or_uppdate(request)
+    if request['REQUEST_METHOD'] == 'DELETE':
+        return all(request)
+
+def all(request):
+    if request["BESK_admin"]:
+        where = ""
+    else:
+        where = "WHERE kodstugor_id = " + str(request["BESK_kodstuga"])
     all = db.cursor.execute("""
         SELECT 
             id,
@@ -14,16 +26,20 @@ def all():
             text,
             datum,
             status
-        FROM utskick ORDER BY kodstugor_id;
-     """);
+        FROM utskick 
+        """ + 
+        where + 
+        """
+        ORDER BY kodstugor_id;
+        """);
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return json.dumps({"utskick":list(map(to_headers, all.fetchall()))})
+    return {"utskick":list(map(to_headers, all.fetchall()))}
     
-def add_or_uppdate(request, response):
+def add_or_uppdate(request):
     post_data = read_post_data(request)
     if "id" in post_data:
         data = (
@@ -61,5 +77,4 @@ def add_or_uppdate(request, response):
                     (?,?,?,?,?,"väntar")
             """, data)
     db.commit()
-    response('200 OK', [('Content-Type', 'text/html')])
-    return all()
+    return all(request)

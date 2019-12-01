@@ -8,7 +8,30 @@ import requests
 import datetime
 import time
 
-def all():
+def handle(request):
+    if request['REQUEST_METHOD'] == 'GET':
+        return all(request)
+    if request['REQUEST_METHOD'] == 'POST':
+        return add_or_uppdate(request)
+    if request['REQUEST_METHOD'] == 'DELETE':
+        return delete(request)
+
+def get_kodstuga(epost):
+    all = db.cursor.execute("""
+        SELECT 
+            kodstugor_id
+        FROM 
+            volontarer 
+        WHERE 
+            epost = ?;
+     """, (epost,));
+    return all.fetchall()[0][0]
+
+def all(request):
+    if request["BESK_admin"]:
+        where = ""
+    else:
+        where = "WHERE kodstugor_id = " + str(request["BESK_kodstuga"])
     all = db.cursor.execute("""
         SELECT 
             id,
@@ -17,8 +40,8 @@ def all():
             namn,
             telefon,
             utdrag_datum
-        FROM volontarer ORDER BY kodstugor_id;
-     """);
+        FROM volontarer 
+     """ + where + """ ORDER BY kodstugor_id """);
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
@@ -27,9 +50,9 @@ def all():
             else:
                 ut[col[0]] = row[idx]
         return ut
-    return json.dumps({"volontärer":list(map(to_headers, all.fetchall()))})
+    return {"volontärer":list(map(to_headers, all.fetchall()))}
 
-def delete(request, response):
+def delete(request):
     post_data = read_post_data(request)
     db.cursor.execute("""
         DELETE FROM 
@@ -37,17 +60,20 @@ def delete(request, response):
         WHERE 
             epost = ?
      """,(post_data['epost'][0],))
-    return all()
+    return all(request)
 
 slack_members = []
 
-def from_slack():
-    result = requests.get("https://slack.com/api/users.list?limit=999&token="+config['slack']['token'])
-    def basicdata(member):
-        return {"selected":False,"slack_id":member["id"],"namn":member["profile"]["real_name"],"epost":member["profile"]["email"],"telefon":phonenumber_to_format(member["profile"]["phone"])}
-    def filterusers(member):
-        return "email" in member["profile"]
-    return json.dumps({"volontärer_slack":list(map(basicdata,filter(filterusers,result.json()["members"])))})
+def from_slack(request):
+    if request["BESK_admin"]:
+        result = requests.get("https://slack.com/api/users.list?limit=999&token="+config['slack']['token'])
+        def basicdata(member):
+            return {"selected":False,"slack_id":member["id"],"namn":member["profile"]["real_name"],"epost":member["profile"]["email"],"telefon":phonenumber_to_format(member["profile"]["phone"])}
+        def filterusers(member):
+            return "email" in member["profile"]
+        return {"volontärer_slack":list(map(basicdata,filter(filterusers,result.json()["members"])))}
+    else:
+        return {"volontärer_slack":[]}
 
 def phonenumber_to_format(number):
     try:
@@ -62,7 +88,7 @@ def date_to_int(date_text):
 def int_to_date(int):
     return datetime.datetime.utcfromtimestamp(int).strftime('%Y-%m-%d')
 
-def add_or_uppdate(request, response):
+def add_or_uppdate(request):
     post_data = read_post_data(request)
     if "flytta" in post_data:
         for flytta_id in post_data["flytta"]:
@@ -137,8 +163,6 @@ def add_or_uppdate(request, response):
                             (?,?,?,?,?)
                     """, data)
             except db.sqlite3.IntegrityError:
-                response('400 Bad Request', [('Content-Type', 'text/html')])
-                return bytes("E-Postadressen finns redan.",'utf-8')
+                 raise Exception("E-Postadressen finns redan.")
     db.commit()
-    response('200 OK', [('Content-Type', 'text/html')])
-    return all()
+    return all(request)

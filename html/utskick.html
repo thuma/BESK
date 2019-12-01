@@ -2,7 +2,7 @@
 <table class="table table-sm" v-if="edit==''">
   <thead>
     <tr>
-      <th scope="col">Kodstuga</th>
+      <th scope="col" v-if="me.admin">Kodstuga</th>
       <th scope="col">Typ</th>
       <th scope="col">Ämne (Bara för E-Post)</th>
       <th scope="col">Text</th>
@@ -13,7 +13,7 @@
   </thead>
   <tbody>
     <tr v-for="skick in utskick">
-        <td>{{kodstuga_name_by_id(skick.kodstugor_id)}}</td>
+        <td v-if="me.admin">{{kodstuga_name_by_id(skick.kodstugor_id)}}</td>
         <td>{{skick.typ}}</td>
         <td>{{skick.rubrik}}</td>
         <td v-if="skick.typ=='e-post'" v-html="markdown_to_html.makeHtml(skick.text)"></td>

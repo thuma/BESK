@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from managedata import db, deltagare, texter
-from tools import send_email, read_post_data, read_get_data
-from main import static_file
+from tools import send_email, read_post_data, read_get_data, static_file
 import json
 import time
 from gevent import sleep
 
-def new(request, response):
+def handle(request):
+    if request['REQUEST_METHOD'] == 'GET':
+        return all()
+    if request['REQUEST_METHOD'] == 'POST':
+        return new(request)
+    if request['REQUEST_METHOD'] == 'DELETE':
+        return all()
+
+def new(request):
     post_data = read_post_data(request)
     invites = post_data["invite"]
     for invite in invites:
@@ -18,10 +25,9 @@ def new(request, response):
             id = ?
             ''',(invite,))
     db.commit()
-    response('200 OK', [('Content-Type', 'text/html')])
     return deltagare.all()
 
-def reply(request, response):
+def reply(request):
     if request['REQUEST_METHOD'] == 'GET':
         response('200 OK', [('Content-Type', 'text/html')])
         return static_file('static/reply.html')
@@ -42,7 +48,6 @@ def reply(request, response):
             status = "inbjuden";
             ''',(status, foto, delragar_id))
     db.commit()
-    response('200 OK', [('Content-Type', 'text/html')])
     return static_file('static/reply_done.html')
 
 def send_invites():

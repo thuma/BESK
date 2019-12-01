@@ -6,7 +6,15 @@ import uuid
 import json
 import phonenumbers
 
-def add_or_uppdate(request, response):
+def handle(request):
+    if request['REQUEST_METHOD'] == 'GET':
+        return all(request)
+    if request['REQUEST_METHOD'] == 'POST':
+        return add_or_uppdate(request)
+    if request['REQUEST_METHOD'] == 'DELETE':
+        return all(request)
+
+def add_or_uppdate(request):
     post_data = read_post_data(request)
     if "id" in post_data:
         data = (
@@ -51,10 +59,13 @@ def add_or_uppdate(request, response):
                     (?,?,?,?,?,?,?)
             """, data)
     db.commit()
-    response('200 OK', [('Content-Type', 'text/html')])
-    return all()
+    return all(request)
 
-def all():
+def all(request):
+    if request["BESK_admin"]:
+        where = ""
+    else:
+        where = "WHERE deltagare.status = 'ja' AND kodstugor.id = " + str(request["BESK_kodstuga"])
     all = db.cursor.execute("""
         SELECT 
             kodstugor.id AS kodstuga_id,
@@ -74,6 +85,7 @@ def all():
            ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id
         INNER JOIN kodstugor
            ON deltagare.kodstugor_id=kodstugor.id
+        """ + where + """
         GROUP BY deltagare.id
         ORDER BY kodstugor.id, deltagare.datum;
      """)
@@ -85,4 +97,4 @@ def all():
                 ut[col[0]] = ut[col[0]].split(',')
         return ut
 
-    return json.dumps({"deltagare":list(map(to_headers, all.fetchall()))})
+    return {"deltagare":list(map(to_headers, all.fetchall()))}

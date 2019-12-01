@@ -8,7 +8,15 @@ import phonenumbers
 import time
 from gevent import spawn
 
-def new(request, response):
+def handle(request):
+    if request['REQUEST_METHOD'] == 'GET':
+        return {}
+    if request['REQUEST_METHOD'] == 'POST':
+        return new(request)
+    if request['REQUEST_METHOD'] == 'DELETE':
+        return {}
+
+def new(request):
     data_to_db = {
         "kids":[],
         "adults":[]
@@ -105,5 +113,4 @@ def new(request, response):
     for email in formdata["email"]:
         spawn(send_email, email, mailsubject, mailmessage)
     
-    response('200 OK', [('Content-Type', 'text/html')])
-    return json.dumps({"applied":data_to_db})
+    return {"applied":data_to_db}

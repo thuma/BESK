@@ -4,7 +4,15 @@ from managedata import db
 from tools import read_post_data
 import json
 
-def add_or_uppdate(request, response):
+def handle(request):
+    if request['REQUEST_METHOD'] == 'GET':
+        return all()
+    if request['REQUEST_METHOD'] == 'POST':
+        return add_or_uppdate(request)
+    if request['REQUEST_METHOD'] == 'DELETE':
+        return all()
+
+def add_or_uppdate(request):
     post_data = read_post_data(request)
     for i in range(len(post_data["id"])):
         if not post_data["id"][i] == "0":
@@ -33,7 +41,6 @@ def add_or_uppdate(request, response):
                         (?,?)
                 """, data)
     db.commit()
-    response('200 OK', [('Content-Type', 'text/html')])
     return all()
 
 def get_one(id):
@@ -62,4 +69,4 @@ def all():
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return json.dumps({"texter":list(map(to_headers, all.fetchall()))})
+    return {"texter":list(map(to_headers, all.fetchall()))}

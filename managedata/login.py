@@ -7,7 +7,7 @@ import configparser
 import uuid
 from time import time
 from managedata import db
-from tools import read_get_data, url_encode
+from tools import read_get_data, url_encode, Error302
 config = configparser.RawConfigParser()
 config.read('../BESK.ini')
 
@@ -53,7 +53,7 @@ def get_session_token(request):
                 return data
     return False
 
-def start(request, response):
+def start(request):
     session = get_session_token(request)
     auth_start_url = "https://slack.com/oauth/authorize"+\
         "?scope=identity.basic%20identity.email"+\
@@ -62,24 +62,22 @@ def start(request, response):
         "&team=TE0MWC4Q3"
     if not session:
         session_token = uuid.uuid4().hex
-        response(
+        raise Error302(
             "302 Found",
             [
                 ("Set-Cookie", "session_token="+session_token+"; HttpOnly"), # TODO add Secure
                 ("Location", auth_start_url)
             ]
         )
-        return "Login"
     else:
-        response(
+        raise Error302(
             "302 Found",
             [
                 ("Location", auth_start_url)
             ]
         )
-        return "Login"
 
-def validate(request, response):
+def validate(request):
     try:
         query_data = read_get_data(request)
         code = query_data["code"][0]
@@ -97,15 +95,16 @@ def validate(request, response):
             )
         session = get_session_token(request)
         set_auth(session, userdata.json())
-        response(
+        raise Error302(
             "302 Found",
             [
                 ("Location","/")
             ]
         )
-        return "Login"
+    except Error302 as e:
+        raise e
     except Exception as e:
-        return start(request, response)
+        return start(request)
 
 def auth(email):
     verify='../freja.cert'

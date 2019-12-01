@@ -2,7 +2,7 @@
 <table class="table table-sm" v-if="edit==''">
     <thead>
         <tr>
-            <th scope="col">Kodstuga</th>
+            <th scope="col" v-if="me.admin">Kodstuga</th>
             <th scope="col">Förnamn</th>
             <th scope="col">Efternamn</th>
             <th scope="col">E-Post</th>
@@ -13,7 +13,7 @@
     </thead>
     <tbody>
         <tr v-for="kontaktperson in kontaktpersoner">
-            <td>{{kodstuga_name_by_id(kontaktperson.kodstugor_id)}}</td>
+            <td v-if="me.admin">{{kodstuga_name_by_id(kontaktperson.kodstugor_id)}}</td>
             <td>{{kontaktperson.fornamn}}</td>
             <td>{{kontaktperson.efternamn}}</td>
             <td>{{kontaktperson.epost}}</td>

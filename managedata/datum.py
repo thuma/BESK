@@ -4,14 +4,26 @@ from managedata import db
 import json
 from tools import read_post_data
 
-def all():
+def handle(request):
+    if request['REQUEST_METHOD'] == 'GET':
+        return all(request)
+    if request['REQUEST_METHOD'] == 'POST':
+        return set(request)
+    if request['REQUEST_METHOD'] == 'DELETE':
+        return all(request)
+
+def all(request):
+    if request["BESK_admin"]:
+        where = ""
+    else:
+        where = "WHERE kodstugor_id = " + str(request["BESK_kodstuga"])
     all = db.cursor.execute("""
         SELECT 
             kodstugor_id,
             datum,
             typ
-        FROM kodstugor_datum;
-     """);
+        FROM kodstugor_datum
+     """ + where);
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
@@ -24,9 +36,9 @@ def all():
         else:
             datum_id[one_datum["kodstugor_id"]].append(one_datum)
 
-    return json.dumps({"kodstugor_datum":datum_id})
+    return {"kodstugor_datum":datum_id}
     
-def set(request, response):
+def set(request):
     post_data = read_post_data(request)
     if "datum" in post_data:
         data = []
@@ -44,10 +56,9 @@ def set(request, response):
         for query in data:
             db.cursor.execute("""
                 INSERT INTO 
-                	kodstugor_datum(kodstugor_id,datum,typ)
-				VALUES
-					(?, ?, ?);
+                    kodstugor_datum(kodstugor_id,datum,typ)
+                VALUES
+                    (?, ?, ?);
                 """, query)
     db.commit()
-    response('200 OK', [('Content-Type', 'text/html')])
-    return all()
+    return all(request)

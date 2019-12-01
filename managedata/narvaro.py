@@ -5,7 +5,15 @@ from tools import read_post_data
 import json
 from time import time
 
-def add_or_uppdate(request, response):
+def handle(request):
+    if request['REQUEST_METHOD'] == 'GET':
+        return all()
+    if request['REQUEST_METHOD'] == 'POST':
+        return add_or_uppdate(request)
+    if request['REQUEST_METHOD'] == 'DELETE':
+        return all()
+
+def add_or_uppdate(request):
     post_data = read_post_data(request)
     for i in range(len(post_data["id"])):
         if not post_data["id"][i] == "0":
@@ -36,7 +44,6 @@ def add_or_uppdate(request, response):
                         (?,?,?,?)
                 """, data)
     db.commit()
-    response('200 OK', [('Content-Type', 'text/html')])
     return all()
 
 def all():
@@ -61,4 +68,4 @@ def all():
             by_volontarer_id[date['deltagare_id']] = {}
         by_volontarer_id[date['deltagare_id']][date['datum']] = {"status":date["status"],"id":date["id"]}
 
-    return json.dumps({"närvaro":by_volontarer_id,"närvaro_redigerade":{}})
+    return {"närvaro":by_volontarer_id,"närvaro_redigerade":{}}
