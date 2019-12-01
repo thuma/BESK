@@ -8,7 +8,7 @@
       <th scope="col">Text</th>
       <th scope="col">Datum</th>
       <th scope="col">Status</th>
-      <th scope="col">Redigera</th>
+      <th scope="col" v-if="me.admin">Redigera</th>
     </tr>
   </thead>
   <tbody>
@@ -20,7 +20,7 @@
         <td v-else=""><pre>{{skick.text}}</pre></td>
         <td>{{skick.datum}}</td>
         <td>{{skick.status}}</td>
-        <td><button class="btn outline-btn-primary"
+        <td v-if="me.admin"><button class="btn outline-btn-primary"
             v-on:click="edit={'type':'utskick','data':copy(skick)}">🖊</button>
         </td>
     </tr>
@@ -28,7 +28,7 @@
 </table>
 <button 
     class="btn btn-primary"
-    v-if="edit==''"
+    v-if="edit=='' && me.admin"
     v-on:click="edit={'type':'utskick','data':{'id':'','datum':'','typ':'e-post','rubrik':'','text':'','kodstugor_id':''}}"
     >
     Skapa ny
