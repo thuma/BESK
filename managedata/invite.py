@@ -7,16 +7,17 @@ import time
 from gevent import sleep
 
 def new(request):
-    post_data = read_post_data(request)
-    invites = post_data["invite"]
-    for invite in invites:
-        db.cursor.execute('''
-            UPDATE deltagare
-            SET status = "inbjudan"
-            WHERE
-            id = ?
-            ''',(invite,))
-    db.commit()
+    if request["BESK_admin"]:
+        post_data = read_post_data(request)
+        invites = post_data["invite"]
+        for invite in invites:
+            db.cursor.execute('''
+                UPDATE deltagare
+                SET status = "inbjudan"
+                WHERE
+                id = ?
+                ''',(invite,))
+        db.commit()
     return deltagare.all(request)
 
 def reply(request):

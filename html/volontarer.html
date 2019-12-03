@@ -123,7 +123,7 @@
                     required=""
                     class="form-control">
             </div>
-            <div class="form-group">
+            <div class="form-group" v-if="me.admin">
                 <label>Utdrag gilltigt till</label>
                 <input 
                     name="utdrag_datum"
@@ -132,7 +132,7 @@
                     required=""
                     class="form-control">
             </div>
-            <div class="form-group">
+            <div class="form-group" v-if="me.admin">
                 <label>Kodstuga</label>
                 <select name="kodstugor_id" v-model:value="edit.data.kodstugor_id" class="form-control">
                     <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
@@ -142,7 +142,7 @@
                 <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
                 <button v-else="" type="submit" class="btn btn-primary">Spara</button>
                 <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
-                <button v-on:click="radera_volontär(edit.data.epost)" type="button" class="btn btn-danger">Radera</button>
+                <button v-on:click="radera_volontär(edit.data.epost)" type="button" class="btn btn-danger" v-if="me.admin">Radera</button>
             </div>
         </form>
     </div>

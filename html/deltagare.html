@@ -47,7 +47,7 @@
     <div class="card-body">
         <form method="post" @submit="check_send" action="/api/deltagare">
             <input name="id" v-if="edit.data.id!==''" v-bind:value="edit.data.deltagare_id" type="hidden">
-            <div class="form-group">
+            <div class="form-group" v-if="me.admin">
                 <label>Kodstuga</label>
                 <select name="kodstuga" v-bind:value="edit.data.kodstuga_id" class="form-control">
                     <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
@@ -71,7 +71,7 @@
                     required=""
                     class="form-control">
             </div>
-            <div class="form-group">
+            <div class="form-group" v-if="me.admin">
                 <label>Kön</label>
                 <select name="kon" v-model:value="edit.data.kon" class="form-control">
                     <option value="han">Han</option>
@@ -79,7 +79,7 @@
                     <option value="hen">Hen</option>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="form-group" v-if="me.admin">
                 <label>Skola</label>
                 <input
                     name="skola"
@@ -88,7 +88,7 @@
                     required=""
                     class="form-control">
             </div>
-            <div class="form-group">
+            <div class="form-group" v-if="me.admin">
                 <label>Klass</label>
                 <select name="klass" v-model:value="edit.data.klass" class="form-control">
                     <option value="åk 4">åk 4</option>
@@ -96,7 +96,7 @@
                     <option value="åk 6">åk 6</option>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="form-group" v-if="me.admin">
                 <label>Status</label>
                 <select name="status" v-model:value="edit.data.status" class="form-control">
                     <option value="ja">Ja</option>

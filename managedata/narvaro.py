@@ -7,11 +7,11 @@ from time import time
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
-        return all()
+        return all(request)
     if request['REQUEST_METHOD'] == 'POST':
         return add_or_uppdate(request)
     if request['REQUEST_METHOD'] == 'DELETE':
-        return all()
+        return all(request)
 
 def add_or_uppdate(request):
     post_data = read_post_data(request)
@@ -44,18 +44,27 @@ def add_or_uppdate(request):
                         (?,?,?,?)
                 """, data)
     db.commit()
-    return all()
+    return all(request)
 
-def all():
+def all(request):
+    if request["BESK_admin"]:
+        where = ""
+    else:
+        where = "WHERE deltagare.status = 'ja' AND deltagare.kodstugor_id = " + str(request["BESK_kodstuga"])
     all = db.cursor.execute("""
         SELECT 
-            id,
-            deltagare_id,
-            datum,
-            status,
-            skapad
-        FROM deltagande_närvaro;
-     """)
+            deltagande_närvaro.id as id,
+            deltagande_närvaro.deltagare_id as deltagare_id,
+            deltagande_närvaro.datum as datum,
+            deltagande_närvaro.status as status,
+            deltagande_närvaro.skapad as skapad
+        FROM 
+            deltagande_närvaro
+        INNER JOIN 
+            deltagare 
+        ON 
+            deltagande_närvaro.deltagare_id = deltagare.id
+     """ + where)
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):

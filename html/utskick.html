@@ -69,7 +69,9 @@
                     name="text"
                     v-model:value="edit.data.text"
                     required=""
-                    class="form-control"></textarea>
+                    class="form-control"
+                    style="height: 300px;"
+                    ></textarea>
                     Förhandsgranskning:
                 <div  class="card">
                     <div class="card-body" v-if="edit.data.typ=='e-post'" v-html="markdown_to_html.makeHtml(edit.data.text)"></div>

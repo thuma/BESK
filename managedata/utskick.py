@@ -40,41 +40,42 @@ def all(request):
     return {"utskick":list(map(to_headers, all.fetchall()))}
     
 def add_or_uppdate(request):
-    post_data = read_post_data(request)
-    if "id" in post_data:
-        data = (
-            post_data["kodstugor_id"][0],
-            post_data["typ"][0],
-            post_data["rubrik"][0],
-            post_data["text"][0],
-            post_data["datum"][0],
-            post_data["id"][0]
-        )
-        db.cursor.execute("""
-            UPDATE utskick
-                SET
-            		kodstugor_id = ?,
-            		typ = ?,
-            		rubrik = ?,
-            		text = ?,
-            		datum = ?
-                WHERE
-                    id = ?
-            """, data)
-    else:
-        data = (
-            post_data["kodstugor_id"][0],
-            post_data["typ"][0],
-            post_data["rubrik"][0],
-            post_data["text"][0],
-            post_data["datum"][0],
-        )
-        db.cursor.execute("""
-            INSERT 
-                INTO utskick
-                    (kodstugor_id, typ, rubrik, text, datum, status) 
-                VALUES 
-                    (?,?,?,?,?,"väntar")
-            """, data)
-    db.commit()
+    if request["BESK_admin"]:
+        post_data = read_post_data(request)
+        if "id" in post_data:
+            data = (
+                post_data["kodstugor_id"][0],
+                post_data["typ"][0],
+                post_data["rubrik"][0],
+                post_data["text"][0],
+                post_data["datum"][0],
+                post_data["id"][0]
+            )
+            db.cursor.execute("""
+                UPDATE utskick
+                    SET
+                        kodstugor_id = ?,
+                        typ = ?,
+                        rubrik = ?,
+                        text = ?,
+                        datum = ?
+                    WHERE
+                        id = ?
+                """, data)
+        else:
+            data = (
+                post_data["kodstugor_id"][0],
+                post_data["typ"][0],
+                post_data["rubrik"][0],
+                post_data["text"][0],
+                post_data["datum"][0],
+            )
+            db.cursor.execute("""
+                INSERT 
+                    INTO utskick
+                        (kodstugor_id, typ, rubrik, text, datum, status) 
+                    VALUES 
+                        (?,?,?,?,?,"väntar")
+                """, data)
+        db.commit()
     return all(request)

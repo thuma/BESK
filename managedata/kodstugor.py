@@ -57,47 +57,48 @@ def all(request):
     return {"kodstugor":list(map(to_headers, all.fetchall()))}
     
 def add_or_uppdate(request):
-    post_data = read_post_data(request)
-    if "id" in post_data:
-        data = (
-            post_data["namn"][0],
-            post_data["sms_text"][0],
-            post_data["epost_text"][0],
-            post_data["epost_rubrik"][0],
-            post_data["epost_text_ja"][0],
-            post_data["epost_rubrik_ja"][0],
-            post_data["open"][0],
-            post_data["id"][0]
-        )
-        db.cursor.execute("""
-            UPDATE kodstugor
-                SET
-                    namn = ?,
-                    sms_text = ?,
-                    epost_text = ?,
-                    epost_rubrik = ?,
-                    epost_text_ja = ?,
-                    epost_rubrik_ja = ?,
-                    open = ?
-                WHERE
-                    id = ?
-            """, data)
-    else:
-        data = (
-            post_data["namn"][0],
-            post_data["sms_text"][0],
-            post_data["epost_text"][0],
-            post_data["epost_rubrik"][0],
-            post_data["epost_text_ja"][0],
-            post_data["epost_rubrik_ja"][0],
-            post_data["open"][0],
-        )
-        db.cursor.execute("""
-            INSERT 
-                INTO kodstugor 
-                    (namn, sms_text, epost_text, epost_rubrik, epost_text_ja, epost_rubrik_ja, open) 
-                VALUES 
-                    (?,?,?,?,?,?,?)
-            """, data)
-    db.commit()
+    if request["BESK_admin"]:
+        post_data = read_post_data(request)
+        if "id" in post_data:
+            data = (
+                post_data["namn"][0],
+                post_data["sms_text"][0],
+                post_data["epost_text"][0],
+                post_data["epost_rubrik"][0],
+                post_data["epost_text_ja"][0],
+                post_data["epost_rubrik_ja"][0],
+                post_data["open"][0],
+                post_data["id"][0]
+            )
+            db.cursor.execute("""
+                UPDATE kodstugor
+                    SET
+                        namn = ?,
+                        sms_text = ?,
+                        epost_text = ?,
+                        epost_rubrik = ?,
+                        epost_text_ja = ?,
+                        epost_rubrik_ja = ?,
+                        open = ?
+                    WHERE
+                        id = ?
+                """, data)
+        else:
+            data = (
+                post_data["namn"][0],
+                post_data["sms_text"][0],
+                post_data["epost_text"][0],
+                post_data["epost_rubrik"][0],
+                post_data["epost_text_ja"][0],
+                post_data["epost_rubrik_ja"][0],
+                post_data["open"][0],
+            )
+            db.cursor.execute("""
+                INSERT 
+                    INTO kodstugor 
+                        (namn, sms_text, epost_text, epost_rubrik, epost_text_ja, epost_rubrik_ja, open) 
+                    VALUES 
+                        (?,?,?,?,?,?,?)
+                """, data)
+        db.commit()
     return all(request)

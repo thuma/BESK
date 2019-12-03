@@ -15,49 +15,68 @@ def handle(request):
         return all(request)
 
 def add_or_uppdate(request):
-    post_data = read_post_data(request)
-    if "id" in post_data:
-        data = (
-            post_data["fornamn"][0],
-            post_data["efternamn"][0],
-            post_data["status"][0],
-            post_data["kon"][0],
-            post_data["klass"][0],
-            post_data["skola"][0],
-            post_data["kodstuga"][0],
-            post_data["id"][0]
-        )
-        db.cursor.execute("""
-            UPDATE deltagare
-                SET
-                    fornamn = ?,
-                    efternamn = ?,
-                    status = ?,
-                    kon = ?,
-                    klass = ?,
-                    skola = ?,
-                    kodstugor_id = ?
-                WHERE
-                    id = ?
-            """, data)
+    if request["BESK_admin"]:
+        post_data = read_post_data(request)
+        if "id" in post_data:
+            data = (
+                post_data["fornamn"][0],
+                post_data["efternamn"][0],
+                post_data["status"][0],
+                post_data["kon"][0],
+                post_data["klass"][0],
+                post_data["skola"][0],
+                post_data["kodstuga"][0],
+                post_data["id"][0]
+            )
+            db.cursor.execute("""
+                UPDATE deltagare
+                    SET
+                        fornamn = ?,
+                        efternamn = ?,
+                        status = ?,
+                        kon = ?,
+                        klass = ?,
+                        skola = ?,
+                        kodstugor_id = ?
+                    WHERE
+                        id = ?
+                """, data)
+        else:
+            data = (
+                uuid.uuid4().hex,
+                post_data["fornamn"][0],
+                post_data["efternamn"][0],
+                post_data["status"][0],
+                post_data["kon"][0],
+                post_data["klass"][0],
+                post_data["skola"][0],
+                post_data["kodstuga"][0]
+            )
+            db.cursor.execute("""
+                INSERT 
+                    INTO deltagare 
+                        (id, fornamn, efternamn, status, kon, klass, skola,kodstugor_id) 
+                    VALUES 
+                        (?,?,?,?,?,?,?)
+                """, data)
     else:
+        post_data = read_post_data(request)
         data = (
-            uuid.uuid4().hex,
-            post_data["fornamn"][0],
-            post_data["efternamn"][0],
-            post_data["status"][0],
-            post_data["kon"][0],
-            post_data["klass"][0],
-            post_data["skola"][0],
-            post_data["kodstuga"][0]
-        )
+                post_data["fornamn"][0],
+                post_data["efternamn"][0],
+                post_data["id"][0],
+                request["BESK_kodstuga"]
+            )
         db.cursor.execute("""
-            INSERT 
-                INTO deltagare 
-                    (id, fornamn, efternamn, status, kon, klass, skola,kodstugor_id) 
-                VALUES 
-                    (?,?,?,?,?,?,?)
-            """, data)
+                UPDATE deltagare
+                    SET
+                        fornamn = ?,
+                        efternamn = ?
+                    WHERE
+                        id = ?
+                    AND
+                        kodstugor_id = ?
+                """, data)
     db.commit()
     return all(request)
 

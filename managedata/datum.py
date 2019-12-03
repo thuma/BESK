@@ -39,26 +39,27 @@ def all(request):
     return {"kodstugor_datum":datum_id}
     
 def set(request):
-    post_data = read_post_data(request)
-    if "datum" in post_data:
-        data = []
-        for i, datum in enumerate(post_data["datum"]):
-            data.append((
-                post_data["kodstugor_id"][0],
-                post_data["datum"][i],
-                post_data["typ"][i])
-            )
-        db.cursor.execute("""
-                DELETE FROM
-                    kodstugor_datum 
-                WHERE kodstugor_id = ?
-                """, (data[0][0],))
-        for query in data:
+    if request["BESK_admin"]:
+        post_data = read_post_data(request)
+        if "datum" in post_data:
+            data = []
+            for i, datum in enumerate(post_data["datum"]):
+                data.append((
+                    post_data["kodstugor_id"][0],
+                    post_data["datum"][i],
+                    post_data["typ"][i])
+                )
             db.cursor.execute("""
-                INSERT INTO 
-                    kodstugor_datum(kodstugor_id,datum,typ)
-                VALUES
-                    (?, ?, ?);
-                """, query)
-    db.commit()
+                    DELETE FROM
+                        kodstugor_datum 
+                    WHERE kodstugor_id = ?
+                    """, (data[0][0],))
+            for query in data:
+                db.cursor.execute("""
+                    INSERT INTO 
+                        kodstugor_datum(kodstugor_id,datum,typ)
+                    VALUES
+                        (?, ?, ?);
+                    """, query)
+        db.commit()
     return all(request)

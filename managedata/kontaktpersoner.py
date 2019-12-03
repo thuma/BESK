@@ -16,7 +16,6 @@ def handle(request):
 
 def add_or_uppdate(request):
     post_data = read_post_data(request)
-
     try:
         phone_number = phonenumbers.parse(post_data["telefon"][0], "SE")
     except:
@@ -26,7 +25,43 @@ def add_or_uppdate(request):
         response('400 Bad Request', [('Content-Type', 'text/html')])
         return bytes("Fyll i ett giltigt telefonummer.",'utf-8')
 
-    if "id" in post_data:
+    if request["BESK_admin"]:
+        if "id" in post_data:
+            data = (
+                post_data["fornamn"][0],
+                post_data["efternamn"][0],
+                post_data["epost"][0],
+                phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164),
+                post_data["id"][0]
+            )
+            db.cursor.execute("""
+                UPDATE kontaktpersoner
+                    SET
+                        fornamn = ?,
+                        efternamn = ?,
+                        epost = ?,
+                        telefon = ?
+                    WHERE
+                        id = ?
+                """, data)
+        else:
+            data = (
+                uuid.uuid4().hex,
+                post_data["fornamn"][0],
+                post_data["efternamn"][0],
+                post_data["epost"][0],
+                phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164),
+                post_data["id"][0]
+            )
+            db.cursor.execute("""
+                INSERT 
+                    INTO kontaktpersoner
+                        (id, fornamn, efternamn, epost, telefon) 
+                    VALUES 
+                        (?,?,?,?,?)
+                """, data)
+        db.commit()
+    else:
         data = (
             post_data["fornamn"][0],
             post_data["efternamn"][0],
@@ -44,23 +79,6 @@ def add_or_uppdate(request):
                 WHERE
                     id = ?
             """, data)
-    else:
-        data = (
-            uuid.uuid4().hex,
-            post_data["fornamn"][0],
-            post_data["efternamn"][0],
-            post_data["epost"][0],
-            phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164),
-            post_data["id"][0]
-        )
-        db.cursor.execute("""
-            INSERT 
-                INTO kontaktpersoner
-                    (id, fornamn, efternamn, epost, telefon) 
-                VALUES 
-                    (?,?,?,?,?)
-            """, data)
-    db.commit()
     return all(request)
 
 def fordeltagare(deltagar_id):

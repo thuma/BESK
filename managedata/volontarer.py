@@ -53,13 +53,14 @@ def all(request):
     return {"volontärer":list(map(to_headers, all.fetchall()))}
 
 def delete(request):
-    post_data = read_post_data(request)
-    db.cursor.execute("""
-        DELETE FROM 
-            volontarer
-        WHERE 
-            epost = ?
-     """,(post_data['epost'][0],))
+    if request["BESK_admin"]:
+        post_data = read_post_data(request)
+        db.cursor.execute("""
+            DELETE FROM 
+                volontarer
+            WHERE 
+                epost = ?
+         """,(post_data['epost'][0],))
     return all(request)
 
 slack_members = []
@@ -88,7 +89,7 @@ def date_to_int(date_text):
 def int_to_date(int):
     return datetime.datetime.utcfromtimestamp(int).strftime('%Y-%m-%d')
 
-def add_or_uppdate(request):
+def add_or_update_admin(request):
     post_data = read_post_data(request)
     if "flytta" in post_data:
         for flytta_id in post_data["flytta"]:
@@ -165,4 +166,37 @@ def add_or_uppdate(request):
             except db.sqlite3.IntegrityError:
                  raise Exception("E-Postadressen finns redan.")
     db.commit()
+
+def update_as_vol(request):
+    post_data = read_post_data(request)
+    try:
+        phone_number = phonenumbers.parse(post_data["telefon"][0], "SE")
+        phone_number_str = phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
+    except:
+        raise Exception("Fyll i ett giltigt telefonummer.")
+    if not phonenumbers.is_valid_number(phone_number):
+        raise Exception("Fyll i ett giltigt telefonummer.")
+    if "id" in post_data:
+        data = (
+            post_data["namn"][0],
+            post_data["epost"][0],
+            phone_number_str,
+            post_data["id"][0]
+        )
+        db.cursor.execute("""
+            UPDATE volontarer
+                SET
+                    namn = ?,
+                    epost = ?,
+                    telefon = ?
+                WHERE
+                    id = ?
+            """, data)
+    db.commit()
+
+def add_or_uppdate(request):
+    if request["BESK_admin"]:
+        add_or_update_admin(request)
+    else:
+        update_as_vol(request)
     return all(request)
