@@ -63,6 +63,36 @@ def add_or_uppdate(request):
     db.commit()
     return all(request)
 
+def fordeltagare(deltagar_id):
+    all = db.cursor.execute("""
+        SELECT 
+            kontaktpersoner.id AS id,
+            kontaktpersoner.fornamn AS fornamn,
+            kontaktpersoner.efternamn AS efternamn,
+            kontaktpersoner.epost AS epost,
+            kontaktpersoner.telefon AS telefon,
+            kodstugor.id AS kodstugor_id,
+            GROUP_CONCAT(deltagare.id,",") AS deltagare_id
+        FROM deltagare
+        INNER JOIN kontaktpersoner_deltagare 
+            ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
+        INNER JOIN kontaktpersoner
+           ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id
+        INNER JOIN kodstugor
+           ON deltagare.kodstugor_id=kodstugor.id
+        WHERE deltagare.id = ?
+        GROUP BY kontaktpersoner.id
+        ORDER BY kodstugor.id, deltagare.datum;
+     """, (deltagar_id,))
+    def to_headers(row):
+        ut = {}
+        for idx, col in enumerate(all.description):
+            ut[col[0]] = row[idx]
+            if col[0] == "deltagare_id":
+                ut[col[0]] = ut[col[0]].split(',')
+        return ut
+    return list(map(to_headers, all.fetchall()))
+
 def all(request):
     if request["BESK_admin"]:
         where = ""

@@ -23,7 +23,7 @@ def reply(request):
     if request['REQUEST_METHOD'] == 'GET':
         return static_file('static/reply.html')
     invitedata = read_post_data(request)
-    delragar_id = invitedata["id"][0]
+    deltagar_id = invitedata["id"][0]
     status = invitedata["status"][0]
     if status == "ja":
         foto = invitedata["foto"][0]
@@ -37,8 +37,13 @@ def reply(request):
             id = ? 
             AND
             status = "inbjuden";
-            ''',(status, foto, delragar_id))
+            ''',(status, foto, deltagar_id))
     db.commit()
+    if status == "ja":
+        kontakter = kontakptersoner.fordeltagare(deltagar_id)
+        meddelande = texter.get_one("Erbjudande om plats")
+        for kontakt in kontakter:
+            send_email(kontakt["epost"],"Erbjudande om plats", meddelande)
     return static_file('static/reply_done.html')
 
 def send_invites():

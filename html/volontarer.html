@@ -142,7 +142,7 @@
                 <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
                 <button v-else="" type="submit" class="btn btn-primary">Spara</button>
                 <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
-                <button v-on:click="radera_volontär(edit.data.epost);edit=''" type="button" class="btn btn-danger">Radera</button>
+                <button v-on:click="radera_volontär(edit.data.epost)" type="button" class="btn btn-danger">Radera</button>
             </div>
         </form>
     </div>

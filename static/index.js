@@ -12,7 +12,10 @@ var admin = new Vue({
                 })
             });
         },
-        delete_data:function(url, body){
+        radera_text: function(id){
+            this.delete_data('/api/texter',"id="+encodeURIComponent(id))
+        },
+        delete_data: function(url, body){
             var next = this
             fetch(url, {
                 method: 'DELETE',

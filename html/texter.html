@@ -17,10 +17,20 @@
     </tr>
   </tbody>
 </table>
+<button v-on:click="edit={'type':'text','data':{'id':'','text':'','ny':true}}"  v-if="edit==''" class="btn btn-secondary">Lägg till text</button>
 <div v-if="edit.type=='text'" class="card">
     <div class="card-body">
         <form method="post" @submit="check_send" action="/api/texter">
-            <input name="id" v-bind:value="edit.data.id" type="hidden">
+            <div v-if="edit.data.ny" class="form-group">
+                <label>Textnamn</label>
+                <input
+                    name="id"
+                    v-model:value="edit.data.id"
+                    required=""
+                    class="form-control">
+                <input name="new" value="true" type="hidden">
+            </div>
+            <input v-else="" name="id" v-bind:value="edit.data.id" type="hidden">
             <div class="form-group">
                 <label>Text</label>
                 <textarea
@@ -36,6 +46,7 @@
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Spara</button>
                 <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
+                <button v-if="!edit.data.ny" v-on:click="radera_text(edit.data.id)" type="button" class="btn btn-danger">Radera</button>
             </div>
         </form>
     </div>
