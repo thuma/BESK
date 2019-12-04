@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from managedata import db, deltagare, texter
+from managedata import db, deltagare, texter, kontaktpersoner
 from tools import send_email, read_post_data, read_get_data, static_file
 import json
 import time
@@ -41,8 +41,13 @@ def reply(request):
             ''',(status, foto, deltagar_id))
     db.commit()
     if status == "ja":
-        kontakter = kontakptersoner.fordeltagare(deltagar_id)
-        meddelande = texter.get_one("Erbjudande om plats")
+        kontakter = kontaktpersoner.fordeltagare(deltagar_id)
+        kodstuga = deltagare.get_kodstuga(deltagar_id)
+        this_deltagare = deltagare.get_one(deltagar_id)
+        meddelande = texter.get_one("Erbjudande om plats")["text"]
+        meddelande = meddelande.replace(
+                "%namn%",this_deltagare["fornamn"]).replace(
+                "%kodstuga%",kodstuga["namn"])
         for kontakt in kontakter:
             send_email(kontakt["epost"],"Erbjudande om plats", meddelande)
     return static_file('static/reply_done.html')
@@ -57,7 +62,8 @@ def send_invites():
                 deltagare.status AS deltagare_status,
                 deltagare.fornamn AS deltagare_fornamn,
                 kontaktpersoner.epost AS kontaktperson_epost
-            FROM deltagare 
+            FROM 
+                deltagare 
             INNER JOIN kontaktpersoner_deltagare 
                 ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
             INNER JOIN kontaktpersoner
@@ -78,13 +84,13 @@ def send_invites():
                 deltagare_id = row["deltagare_id"]
             if row["deltagare_id"] != deltagare_id:
                 break
-            message = texter.get_one("Inbjudan")["text"]
+            message = texter.get_one("Erbjudande om plats")["text"]
             link = "https://besk.kodcentrum.se/reply?id="+row["deltagare_id"]
             message = message.replace(
                 "%namn%",row["deltagare_fornamn"]).replace(
                 "%kodstuga%",row["kodstuga"]).replace(
                 "%länk%",link)
-            send_email(row["kontaktperson_epost"],"Inbjudan", message)
+            send_email(row["kontaktperson_epost"], "Erbjudande om plats", message)
         db.cursor.execute('''
                 UPDATE deltagare
                 SET status = "inbjuden"

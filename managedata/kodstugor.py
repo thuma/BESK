@@ -12,7 +12,7 @@ def handle(request):
     if request['REQUEST_METHOD'] == 'DELETE':
         return all(request)
 
-def active():
+def active(request):
     all = db.cursor.execute("""
         SELECT 
             id,

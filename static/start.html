@@ -57,7 +57,7 @@
             </ul>
           </div>
         </nav>
-        <div v-if="page=='BESK'">
+        <div v-if="page=='BESK'" class="container">
             <h1 class="text-center">BESK</h1>
             <p>Anmälan och hantering av närvaro.</p>
             <ol>
@@ -67,6 +67,17 @@
               <li>Markera de som ska bjudas in som deltagare och tryck på bjud in så kommer de att få ett mail.</li>
               <li>När föräldrarna har svarat genom att trycka på länken i mailet så sparas det i systemet.</li>
             </ol>
+            <h2>Textformat</h2>
+            <p>
+            När du fyller i texten som ska vara till E-Post meddelande i systemet så 
+            används <a href="https://www.markdownguide.org/basic-syntax">Markdown</a> som
+            är ett enkelt format som används för att skapa texter med tillexempel länkar
+            och rubriker.
+            </p>
+            <p>
+            Om du önskar ytteligare egenskaper på ditt meddelande så kan du lägga in HTML-kod också.
+            För att tillexempel ändra storlek på texten eller teckensnitt.
+            </p>
         </div>
         <div v-if="page=='Datum'">
             <?datum.html?>

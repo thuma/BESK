@@ -14,6 +14,72 @@ def handle(request):
     if request['REQUEST_METHOD'] == 'DELETE':
         return all(request)
 
+def get_kodstuga(id):
+    all = db.cursor.execute("""
+        SELECT 
+            kodstugor.id AS id,
+            kodstugor.namn AS namn,
+            kodstugor.sms_text AS sms_text,
+            kodstugor.epost_rubrik AS epost_rubrik,
+            kodstugor.epost_text AS epost_text,
+            kodstugor.epost_text_ja AS epost_text_ja,
+            kodstugor.epost_rubrik_ja AS epost_rubrik_ja,
+            kodstugor.open AS open
+        FROM 
+            deltagare
+        INNER JOIN 
+            kodstugor
+        ON 
+           deltagare.kodstugor_id=kodstugor.id
+        WHERE 
+            deltagare.id = ?
+        GROUP BY 
+            deltagare.id
+        ORDER BY 
+            kodstugor.id, deltagare.datum;
+     """, (id,))
+
+    def to_headers(row):
+        ut = {}
+        for idx, col in enumerate(all.description):
+            ut[col[0]] = row[idx]
+        return ut
+    return list(map(to_headers, all.fetchall()))[0]
+
+
+def get_one(id):
+    all = db.cursor.execute("""
+        SELECT 
+            kodstugor.id AS kodstuga_id,
+            deltagare.id AS deltagare_id,
+            deltagare.datum AS datum,
+            deltagare.status AS status,
+            deltagare.fornamn AS fornamn,
+            deltagare.efternamn AS efternamn,
+            deltagare.kon AS kon,
+            deltagare.skola AS skola,
+            deltagare.klass AS klass,
+            GROUP_CONCAT(kontaktpersoner.id,",") AS kontaktperson_id
+        FROM deltagare
+        INNER JOIN kontaktpersoner_deltagare 
+            ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
+        INNER JOIN kontaktpersoner
+           ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id
+        INNER JOIN kodstugor
+           ON deltagare.kodstugor_id=kodstugor.id
+        WHERE deltagare.id = ?
+        GROUP BY deltagare.id
+        ORDER BY kodstugor.id, deltagare.datum;
+     """, (id,))
+    def to_headers(row):
+        ut = {}
+        for idx, col in enumerate(all.description):
+            ut[col[0]] = row[idx]
+            if col[0] == "kontaktperson_id":
+                ut[col[0]] = ut[col[0]].split(',')
+        return ut
+    return list(map(to_headers, all.fetchall()))[0]
+    
 def add_or_uppdate(request):
     if request["BESK_admin"]:
         post_data = read_post_data(request)
