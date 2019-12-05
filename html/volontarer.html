@@ -20,7 +20,7 @@
             <td v-if="me.admin">{{kodstuga_name_by_id(volontär.kodstugor_id)}}</td>
             <td v-if="me.admin">{{volontär.utdrag_datum}}</td>
             <td v-if="me.admin"><input type="checkbox" name="flytta" v-bind:value="volontär.id" v-model="volontär.selected"></td>
-            <td><button class="btn btn-outline-secondary"
+            <td><button class="btn btn-sm btn-outline-secondary"
                 v-on:click="edit={'type':'volontär','data':copy(volontär)}">🖊</button>
             </td>
         </tr>
@@ -75,7 +75,7 @@
             <td>
                 <button
                     type="button" 
-                    class="btn btn-secondary"
+                    class="btn btn-sm btn-secondary"
                     v-on:click="edit={'type':'volontär','data':{'utdrag_datum':'1970-01-01','id':'','namn':volontär.namn,'epost':volontär.epost,'telefon':volontär.telefon,'kodstugor_id':''}}">
                     Lägg till i BESK
                 </button>

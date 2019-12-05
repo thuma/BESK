@@ -20,7 +20,7 @@
         <td v-else=""><pre>{{skick.text}}</pre></td>
         <td>{{skick.datum}}</td>
         <td>{{skick.status}}</td>
-        <td v-if="me.admin"><button class="btn btn-outline-secondary"
+        <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
             v-on:click="edit={'type':'utskick','data':copy(skick)}">🖊</button>
         </td>
     </tr>

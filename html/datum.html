@@ -10,7 +10,7 @@
     <tr v-for="kodstuga in kodstugor">
         <td>{{kodstuga.namn}}</td>
         <td v-for="date in get_dates(kodstuga.id)">{{date.datum}} <br>({{date.typ}})</td>
-        <td><button class="btn btn-outline-secondary"
+        <td><button class="btn btn-sm btn-outline-secondary"
             v-on:click="edit={'type':'date','datum':copy(get_dates(kodstuga.id)),'data':copy(kodstuga)}">🖊</button>
         </td>
     </tr>
@@ -19,10 +19,10 @@
 <div v-if="edit.type=='date'">
     <form method="post" @submit="check_send" action="/api/datum">
         Datum för <b>{{edit.data.namn}}</b>
-        <button class="btn btn-primary" type="button"
+        <button class="btn btn-sm btn-primary" type="button"
             v-on:click="edit.datum.pop()">-</button>
         <button 
-            class="btn btn-primary"
+            class="btn btn-sm btn-primary"
             type="button" 
             v-on:click="edit.datum.push(next_date(edit.datum))">+</button>
         <input type="hidden" name="kodstugor_id" v-bind:value="edit.data.id">

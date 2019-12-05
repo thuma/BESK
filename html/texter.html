@@ -11,7 +11,7 @@
     <tr v-for="text in texter">
         <td>{{text.id}}</td>
         <td v-html="markdown_to_html.makeHtml(text.text)" ></td>
-        <td><button class="btn btn-outline-secondary"
+        <td><button class="btn btn-sm btn-outline-secondary"
             v-on:click="edit={'type':'text','data':copy(text)}">🖊</button>
         </td>
     </tr>
