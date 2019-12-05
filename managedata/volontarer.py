@@ -7,6 +7,7 @@ import phonenumbers
 import requests
 import datetime
 import time
+import arrow
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
@@ -46,7 +47,7 @@ def all(request):
         ut = {}
         for idx, col in enumerate(all.description):
             if col[0] == "utdrag_datum" and isinstance(row[idx], int):
-                ut[col[0]] = int_to_date(row[idx])
+                ut[col[0]] = arrow.Arrow.utcfromtimestamp(row[idx]).format("YYYY-MM-DD")
             else:
                 ut[col[0]] = row[idx]
         return ut
@@ -133,7 +134,7 @@ def add_or_update_admin(request):
                 post_data["epost"][0],
                 phone_number_str,
                 post_data["kodstugor_id"][0],
-                date_to_int(post_data["utdrag_datum"][0]),
+                arrow.get(post_data["utdrag_datum"][0]).timestamp,
                 post_data["id"][0]
             )
             db.cursor.execute("""
@@ -153,7 +154,7 @@ def add_or_update_admin(request):
                 post_data["epost"][0],
                 phone_number_str,
                 post_data["kodstugor_id"][0],
-                date_to_int(post_data["utdrag_datum"][0]),
+                arrow.get(post_data["utdrag_datum"][0]).timestamp,
             )
             try:
                 db.cursor.execute("""

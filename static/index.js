@@ -108,7 +108,7 @@ var admin = new Vue({
             if(list.slice(-1)[0]){
                 var current_last_date = new Date(list.slice(-1)[0].datum);
                 var new_date = new Date(current_last_date.setDate(current_last_date.getDate() + 7));
-                return {'datum':new_date.toISOString().substring(0,10),'typ':'kodstuga'}
+                return {'datum':new_date.toISOString().substring(0,10), 'typ':'kodstuga'}
             } else {
                 return {'datum':'','typ':'kodstuga'}
             }
