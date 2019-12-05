@@ -63,3 +63,6 @@ def set(request):
                     """, query)
         db.commit()
     return all(request)
+
+def send_reminders():
+    pass

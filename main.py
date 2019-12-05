@@ -157,6 +157,7 @@ def route(request):
 if __name__ == '__main__':
     spawn(invite.send_invites)
     spawn(utskick.send_utskick)
+    spawn(datum.send_reminders)
     print('Serving on 9191...')
     green_pool = pool.Pool()
     server = WSGIServer(('127.0.0.1', 9191), application, spawn=green_pool, log=logger, error_log=logger)

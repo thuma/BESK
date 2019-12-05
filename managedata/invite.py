@@ -101,9 +101,6 @@ def send_invites():
         ''',(deltagare_id,))
         db.commit()
 
-def send_reminders():
-    pass
-
 
 
 
