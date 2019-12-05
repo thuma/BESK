@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS utskick (
   typ TEXT,
   rubrik TEXT,
   text TEXT,
-  datum TEXT,
+  datum INT,
   status TEXT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id)
   );

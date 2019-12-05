@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gevent.pywsgi import WSGIServer
-from gevent import monkey, sleep, spawn
+from gevent import monkey, sleep, spawn, signal, pool
 monkey.patch_all()
 import requests
 import random
 import json
 import base64
 import traceback
+import logging
+from logging.handlers import TimedRotatingFileHandler, RotatingFileHandler
 from tools import Error302, Error403, Error404, static_file
 from managedata import (
     db,
@@ -24,6 +26,14 @@ from managedata import (
     narvaro,
     texter
     )
+    
+file_hanlder = RotatingFileHandler('../BESK.log', mode='a')
+rotation_handler = TimedRotatingFileHandler('../BESK.log',
+                                       when="m",
+                                       interval=1,
+                                       backupCount=5)
+logging.basicConfig(handlers=[file_hanlder, rotation_handler], level=logging.INFO)
+logger = logging.getLogger('server')
 
 def generator():
      yield "string"
@@ -146,5 +156,16 @@ def route(request):
 
 if __name__ == '__main__':
     spawn(invite.send_invites)
+    spawn(utskick.send_utskick)
     print('Serving on 9191...')
-    WSGIServer(('127.0.0.1', 9191), application).serve_forever()
+    green_pool = pool.Pool()
+    server = WSGIServer(('127.0.0.1', 9191), application, spawn=green_pool, log=logger, error_log=logger)
+    def shutdown():
+        print('Shutting down ...')
+        server.close()
+        server.stop(timeout=60)
+        exit(signal.SIGTERM)
+    signal(signal.SIGTERM, shutdown)
+    signal(signal.SIGINT, shutdown) #CTRL C
+    server.serve_forever(stop_timeout=60)
+    

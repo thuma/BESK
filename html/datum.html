@@ -10,7 +10,7 @@
     <tr v-for="kodstuga in kodstugor">
         <td>{{kodstuga.namn}}</td>
         <td v-for="date in get_dates(kodstuga.id)">{{date.datum}} <br>({{date.typ}})</td>
-        <td><button class="btn outline-btn-primary"
+        <td><button class="btn btn-outline-secondary"
             v-on:click="edit={'type':'date','datum':copy(get_dates(kodstuga.id)),'data':copy(kodstuga)}">🖊</button>
         </td>
     </tr>

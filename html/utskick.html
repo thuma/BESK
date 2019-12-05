@@ -20,7 +20,7 @@
         <td v-else=""><pre>{{skick.text}}</pre></td>
         <td>{{skick.datum}}</td>
         <td>{{skick.status}}</td>
-        <td v-if="me.admin"><button class="btn outline-btn-primary"
+        <td v-if="me.admin"><button class="btn btn-outline-secondary"
             v-on:click="edit={'type':'utskick','data':copy(skick)}">🖊</button>
         </td>
     </tr>
@@ -91,6 +91,7 @@
                 <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
                 <button v-else="" type="submit" class="btn btn-primary">Spara</button>
                 <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
+                <button v-on:click="radera_utskick(edit.data.id)" type="button" class="btn btn-danger" v-if="me.admin && edit.data.id!==''" >Radera</button>
             </div>
         </form>
     </div>

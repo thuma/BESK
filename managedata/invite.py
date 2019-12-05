@@ -44,12 +44,12 @@ def reply(request):
         kontakter = kontaktpersoner.fordeltagare(deltagar_id)
         kodstuga = deltagare.get_kodstuga(deltagar_id)
         this_deltagare = deltagare.get_one(deltagar_id)
-        meddelande = texter.get_one("Erbjudande om plats")["text"]
+        meddelande = kodstuga["epost_text_ja"]
         meddelande = meddelande.replace(
                 "%namn%",this_deltagare["fornamn"]).replace(
                 "%kodstuga%",kodstuga["namn"])
         for kontakt in kontakter:
-            send_email(kontakt["epost"],"Erbjudande om plats", meddelande)
+            send_email(kontakt["epost"], kodstuga["epost_rubrik_ja"], meddelande)
     return static_file('static/reply_done.html')
 
 def send_invites():
@@ -92,10 +92,18 @@ def send_invites():
                 "%länk%",link)
             send_email(row["kontaktperson_epost"], "Erbjudande om plats", message)
         db.cursor.execute('''
-                UPDATE deltagare
-                SET status = "inbjuden"
+                UPDATE
+                    deltagare
+                SET
+                    status = "inbjuden"
                 WHERE
-                id = ?;
+                    id = ?;
         ''',(deltagare_id,))
         db.commit()
+
+def send_reminders():
+    pass
+
+
+
 
