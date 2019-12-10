@@ -78,8 +78,7 @@ def send_sms_reminders():
             SELECT 
                 id,
                 kodstugor_id,
-                datum,
-                status
+                datum
             FROM 
                 kodstugor_datum
             WHERE
@@ -115,8 +114,7 @@ def send_email_reminders():
             SELECT 
                 id,
                 kodstugor_id,
-                datum,
-                status
+                datum
             FROM 
                 kodstugor_datum
             WHERE
