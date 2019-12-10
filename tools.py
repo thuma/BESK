@@ -79,7 +79,7 @@ def send_sms(to, message):
     try:
         db.cursor.execute('''
             INSERT INTO 
-                mail_queue(id, date, till, message, status) 
+                sms_queue(id, date, till, message, status) 
             VALUES
                 (?, ?, ?, ?, ?);
             ''',
@@ -89,36 +89,47 @@ def send_sms(to, message):
     except db.sqlite3.IntegrityError:
         logger.info("SMS redan i kö")
 
-def send_sms_queue(to, message):
-    datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
-    id = hashlib.sha512((to+message+datum).encode("utf-8")).hexdigest()
-    all = db.cursor.execute("""
-        SELECT id FROM sent WHERE id = ?;''',
-     """, (id,))
-    if all.fetcone() is None:
-        pass
-    else:
-        return
-    
-    requests.post(
-        'https://api.46elks.com/a1/sms',
-        auth = (
-            config["46elks"]["username"],
-            config["46elks"]["password"]
-            ),
-        data = {
-            'from': 'Kodcentrum',
-            'to': to,
-            'message': message
-        }
-    )
-    db.cursor.execute('''
-        INSERT INTO sent(id, date, type, value)
-        VALUES(?, ?, ?, ?);''',
-          (id, datum, "sms", to + "\n" + message)
-        )
-    db.commit()
+def send_sms_queue():
+    while True:
+        sleep(2)
+        datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
+        all = db.cursor.execute("""
+            SELECT 
+                id, till, message
+            FROM
+                sms_queue
+            WHERE
+                status = "köad";
+        """)
+        tosend = all.fetchone()
+        if tosend is None:
+            continue
+        (id, to, message) = tosend
 
+        result = requests.post(
+            'https://api.46elks.com/a1/sms',
+            auth = (
+                config["46elks"]["username"],
+                config["46elks"]["password"]
+                ),
+            data = {
+                'from': 'Kodcentrum',
+                'to': to,
+                'message': message
+            }
+        )
+        db.cursor.execute("""
+            UPDATE 
+                sms_queue
+            SET
+                status = "skickad",
+                sms_id = ?
+            WHERE
+                id = ?;
+            """,
+            (result.json()["id"], id)
+        )
+        db.commit()
 
 def send_email(to, subject, message):
     datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
@@ -126,9 +137,9 @@ def send_email(to, subject, message):
     try:
         db.cursor.execute('''
             INSERT INTO 
-                sms_queue(id, date, till, message, status) 
+                mail_queue(id, date, till, message, status) 
             VALUES
-                (?, ?, ?, ?);
+                (?, ?, ?, ?, ?);
             ''',
             (id, datum, to, message, "köad" )
         )
@@ -136,21 +147,22 @@ def send_email(to, subject, message):
     except db.sqlite3.IntegrityError:
         logger.info("Epost redan i kö.")
 
-def send_email_queue(to, subject, message):
-    datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
-    id = hashlib.sha512((to+subject+message+datum).encode("utf-8")).hexdigest()
-    all = db.cursor.execute("""
-        SELECT 
-            id, till, subject, message
-        FROM
-            mail_queue
-        WHERE
-            status = "köad";
-    """)
-    tosend = all.fetcone()
-    if tosend is None:
+def send_email_queue():
+    while True:
         sleep(2)
-    else:
+        datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
+        all = db.cursor.execute("""
+            SELECT 
+                id, till, subject, message
+            FROM
+                mail_queue
+            WHERE
+                status = "köad";
+        """)
+        tosend = all.fetchone()
+        if tosend is None:
+            continue
+
         (id, to, subject, message) = tosend
         html = markdown.markdown(message)
         msg = EmailMessage()
@@ -159,9 +171,14 @@ def send_email_queue(to, subject, message):
         msg['To'] = to
         msg.set_content(message)
         msg.add_alternative(html, subtype='html')
-        server = smtplib.SMTP('localhost')
-        server.send_message(msg)
-        server.quit()
+        try:
+            server = smtplib.SMTP('localhost')
+            server.send_message(msg)
+            server.quit()
+        except:
+            logger.error("SMTP send failed.")
+            sleep(60*10)
+            continue
         db.cursor.execute("""
             UPDATE 
                 mail_queue

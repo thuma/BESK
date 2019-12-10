@@ -89,7 +89,8 @@ def for_kodstuga(kodstugor_id):
             kontaktpersoner.telefon AS telefon,
             kodstugor.namn AS kodstugor_namn,
             deltagare.fornamn AS deltagare_fornamn,
-            deltagare.efternamn AS deltagare_efternamn
+            deltagare.efternamn AS deltagare_efternamn,
+            deltagare.id AS deltagare_id
         FROM 
             deltagare
         INNER JOIN 
@@ -115,8 +116,6 @@ def for_kodstuga(kodstugor_id):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
-            if col[0] == "deltagare_id":
-                ut[col[0]] = ut[col[0]].split(',')
         return ut
     return list(map(to_headers, all.fetchall()))
 

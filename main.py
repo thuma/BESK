@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from gevent.pywsgi import WSGIServer
-from gevent import monkey, sleep, spawn, signal, pool
+from gevent import monkey
 monkey.patch_all()
+from gevent.pywsgi import WSGIServer
+from gevent import sleep, spawn, signal, pool
 import requests
 import random
 import json
@@ -10,7 +11,15 @@ import base64
 import traceback
 import logging
 from logging.handlers import TimedRotatingFileHandler, RotatingFileHandler
-from tools import Error302, Error400, Error403, Error404, static_file
+from tools import ( 
+    Error302,
+    Error400,
+    Error403,
+    Error404,
+    static_file,
+    send_email_queue,
+    send_sms_queue
+    )
 from managedata import (
     db,
     kodstugor,
@@ -26,13 +35,12 @@ from managedata import (
     narvaro,
     texter
     )
-    
-file_hanlder = RotatingFileHandler('../BESK.log', mode='a')
+
 rotation_handler = TimedRotatingFileHandler('../BESK.log',
                                        when="D",
                                        interval=1,
                                        backupCount=28)
-logging.basicConfig(handlers=[file_hanlder, rotation_handler], level=logging.INFO)
+logging.basicConfig(handlers=[rotation_handler], level=logging.INFO)
 logger = logging.getLogger('server')
 
 def generator():
@@ -159,10 +167,13 @@ def route(request):
     raise Error404
 
 if __name__ == '__main__':
+    print('Serving on 9191...')
     spawn(invite.send_invites)
     spawn(utskick.send_utskick)
+    spawn(datum.send_sms_reminders)
     spawn(datum.send_email_reminders)
-    print('Serving on 9191...')
+    spawn(send_email_queue)
+    spawn(send_sms_queue)
     green_pool = pool.Pool()
     server = WSGIServer(('127.0.0.1', 9191), application, spawn=green_pool, log=logger, error_log=logger)
     def shutdown():
@@ -173,4 +184,3 @@ if __name__ == '__main__':
     signal(signal.SIGTERM, shutdown)
     signal(signal.SIGINT, shutdown) #CTRL C
     server.serve_forever(stop_timeout=60)
-    

@@ -140,4 +140,6 @@ def send_utskick():
                         id = ?;
             ''',(utskick["id"],))
             db.commit()
-        sleep(60*10)
+        now = arrow.utcnow().timestamp
+        then = arrow.utcnow().shift(hours=24).replace(hour=9, minute=30).timestamp
+        sleep(then - now)
