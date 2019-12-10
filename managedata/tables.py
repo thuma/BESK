@@ -137,5 +137,31 @@ CREATE TABLE IF NOT EXISTS keyvalue (
   id TEXT PRIMARY KEY,
   text TEXT
   );
+''',
+'''
+CREATE TABLE IF NOT EXISTS mail_queue (
+  id TEXT UNIQUE PRIMARY KEY,
+  date TEXT,
+  till TEXT,
+  subject TEXT,
+  message TEXT,
+  status TEXT
+  );
+''',
+'''
+CREATE INDEX IF NOT EXISTS mail_queue_status ON mail_queue(status, date);
+''',
+'''
+CREATE TABLE IF NOT EXISTS sms_queue (
+  id TEXT UNIQUE PRIMARY KEY,
+  date TEXT,
+  till TEXT,
+  message TEXT,
+  status TEXT,
+  sms_id TEXT
+  );
+''',
+'''
+CREATE INDEX IF NOT EXISTS sms_queue_status ON sms_queue(status, date);
 '''
 ]

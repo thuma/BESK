@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from managedata import db, texter
-from tools import send_email, read_post_data
+from tools import send_email, read_post_data, Error400
 import uuid
 import json
 import phonenumbers
@@ -23,7 +23,7 @@ def new(request):
         }
     formdata = read_post_data(request)
     if "approve" not in formdata:
-        raise Exception("Du måste acceptera Kodcentrums Integritetspolicy.")
+        raise Error400("Du måste acceptera Kodcentrums Integritetspolicy.")
     try:
         kodstugaid = formdata["kodstuga"][0]
         kodstuga = db.cursor.execute("""
@@ -31,20 +31,20 @@ def new(request):
             FROM kodstugor WHERE id = ?;
         """,(kodstugaid,)).fetchall()[0][0]
     except:
-         raise Exception("Välj en kodstuga.")
+         raise Error400("Välj en kodstuga.")
     now = int(time.time())
 
     for i, value in enumerate(formdata["barn_efternamn"]):
         if formdata["barn_fornamn"][i] == "":
-            raise Exception("Fyll i förnamn för samtliga barn.")
+            raise Error400("Fyll i förnamn för samtliga barn.")
         if formdata["barn_efternamn"][i] == "":
-            raise Exception("Fyll i efternamn för samtliga barn.")
+            raise Error400("Fyll i efternamn för samtliga barn.")
         if formdata["kon"][i] == "":
-            raise Exception("Fyll i kön för samtliga barn.")
+            raise Error400("Fyll i kön för samtliga barn.")
         if formdata["klass"][i] == "":
-            raise Exception("Fyll i klass för samtliga barn.")
+            raise Error400("Fyll i klass för samtliga barn.")
         if formdata["skola"][i] == "":
-            raise Exception("Fyll i skola för samtliga barn.")
+            raise Error400("Fyll i skola för samtliga barn.")
         data_to_db["kids"].append(
             (
             uuid.uuid4().hex,
@@ -63,15 +63,15 @@ def new(request):
         try:
             phone_number= phonenumbers.parse(formdata["telefon"][i], "SE")
         except:
-            raise Exception("Fyll i ett giltigt telefonummer för alla målsmän.")
+            raise Error400("Fyll i ett giltigt telefonummer för alla målsmän.")
         if not phonenumbers.is_valid_number(phone_number):
-            raise Exception("Fyll i ett giltigt telefonummer för alla målsmän.")
+            raise Error400("Fyll i ett giltigt telefonummer för alla målsmän.")
         if formdata["vuxen_fornamn"][i] == "":
-            raise Exception("Fyll i förnamn för alla målsmän.")
+            raise Error400("Fyll i förnamn för alla målsmän.")
         if formdata["vuxen_efternamn"][i] == "":
-            raise Exception("Fyll i efternamn för alla målsmän.")
+            raise Error400("Fyll i efternamn för alla målsmän.")
         if formdata["email"][i] == "":
-            raise Exception("Fyll i en email för alla målsmän.")
+            raise Error400("Fyll i en email för alla målsmän.")
         data_to_db["adults"].append(
             (
             uuid.uuid4().hex,

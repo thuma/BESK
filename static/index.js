@@ -41,7 +41,7 @@ var admin = new Vue({
                 } else {
                     response.text().then(
                         function(data){
-                            window.alert(data)
+                            swal({text: data, icon:"error"});
                     })
                 }
             });
@@ -155,6 +155,9 @@ var admin = new Vue({
                 return {'btn-outline-warning':true}
             }
         },
+        show_kontaktperson: function(kontaktperson){
+            swal(JSON.stringify(kontaktperson));
+        },
         check_send: function (theform){
             next = this
             theform.preventDefault();
@@ -180,7 +183,7 @@ var admin = new Vue({
                 } else {
                     response.text().then(
                         function(data){
-                            window.alert(data)
+                            swal({text: data, icon:"error"});
                     })
                 }
             });
@@ -203,7 +206,7 @@ var admin = new Vue({
         markdown_to_html: new showdown.Converter(),
         page: "BESK",
         deltagare: [],
-        närvaro:{},
+        närvaro: {},
         närvaro_redigerade: {},
         kodstugor: [],
         kodstugor_datum: {},

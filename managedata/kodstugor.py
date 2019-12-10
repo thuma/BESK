@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from managedata import db
+from managedata import db, login
 from tools import read_post_data
 import json
 
@@ -13,6 +13,41 @@ def handle(request):
         return all(request)
 
 def active(request):
+    if request["BESK_login"]["user"] and login.is_admin(request["BESK_login"]["user"]["user"]["email"]):
+        all = db.cursor.execute("""
+            SELECT 
+                id,
+                namn,
+                sms_text,
+                epost_rubrik,
+                epost_text,
+                epost_text_ja,
+                epost_rubrik_ja,
+                open
+            FROM kodstugor;
+         """);
+    else:
+        all = db.cursor.execute("""
+            SELECT 
+                id,
+                namn,
+                sms_text,
+                epost_rubrik,
+                epost_text,
+                epost_text_ja,
+                epost_rubrik_ja,
+                open
+            FROM kodstugor WHERE open ='Ja';
+         """);
+
+    def to_headers(row):
+        ut = {}
+        for idx, col in enumerate(all.description):
+            ut[col[0]] = row[idx]
+        return ut
+    return {"kodstugor":list(map(to_headers, all.fetchall()))}
+
+def get_kodstuga(kodstua_id):
     all = db.cursor.execute("""
         SELECT 
             id,
@@ -23,14 +58,17 @@ def active(request):
             epost_text_ja,
             epost_rubrik_ja,
             open
-        FROM kodstugor WHERE open ='Ja';
-     """);
+        FROM
+            kodstugor
+        WHERE
+            id = ?
+     """, (kodstua_id,));
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return {"kodstugor":list(map(to_headers, all.fetchall()))}
+    return list(map(to_headers, all.fetchall()))[0]
 
 def all(request):
     if request["BESK_admin"]:

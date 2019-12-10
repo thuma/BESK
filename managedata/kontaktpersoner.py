@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from managedata import db
-from tools import read_post_data
+from tools import read_post_data, Error400
 import uuid
 import json
 import phonenumbers
@@ -19,11 +19,9 @@ def add_or_uppdate(request):
     try:
         phone_number = phonenumbers.parse(post_data["telefon"][0], "SE")
     except:
-        response('400 Bad Request', [('Content-Type', 'text/html')])
-        return bytes("Fyll i ett giltigt telefonummer.",'utf-8')
+         raise Error400("Fyll i ett giltigt telefonummer.")
     if not phonenumbers.is_valid_number(phone_number):
-        response('400 Bad Request', [('Content-Type', 'text/html')])
-        return bytes("Fyll i ett giltigt telefonummer.",'utf-8')
+         raise Error400("Fyll i ett giltigt telefonummer.")
 
     if request["BESK_admin"]:
         if "id" in post_data:

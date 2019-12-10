@@ -10,7 +10,7 @@ import base64
 import traceback
 import logging
 from logging.handlers import TimedRotatingFileHandler, RotatingFileHandler
-from tools import Error302, Error403, Error404, static_file
+from tools import Error302, Error400, Error403, Error404, static_file
 from managedata import (
     db,
     kodstugor,
@@ -29,9 +29,9 @@ from managedata import (
     
 file_hanlder = RotatingFileHandler('../BESK.log', mode='a')
 rotation_handler = TimedRotatingFileHandler('../BESK.log',
-                                       when="m",
+                                       when="D",
                                        interval=1,
-                                       backupCount=5)
+                                       backupCount=28)
 logging.basicConfig(handlers=[file_hanlder, rotation_handler], level=logging.INFO)
 logger = logging.getLogger('server')
 
@@ -54,21 +54,27 @@ def application(request, response):
         else:
             response('200 OK', [('Content-Type', 'application/json')])
         return [resultdata]
+    except Error302 as error:
+        response(error.args[0], error.args[1])
+        return [b""]
+    except Error400 as error:
+        response('400 Bad Request', [('Content-Type', 'text/html')])
+        return [str(error).encode('utf-8')]
     except Error403 as error:
         response('403 Forbidden', [('Content-Type', 'text/html')])
         return [str(error).encode('utf-8')]
     except Error404 as error:
         response('404 Not Found', [('Content-Type', 'text/html')])
         return [b'<h1>Not Found</h1>']
-    except Error302 as error:
-        response(error.args[0], error.args[1])
-        return [b""]
     except Exception as error:
-        traceback.print_exc()
-        response('400 Bad Request', [('Content-Type', 'text/html')])
-        return [str(error).encode('utf-8')]
+        logger.error("SERVER FEL:", exc_info=1)
+        response('500 Internal Server Error', [('Content-Type', 'text/html')])
+        return ["Ett fel inträffade v.g. kontakta: hej@kodcentrum.se".encode('utf-8')]
 
 def route(request):
+
+    request["BESK_login"] = login.get_login_status(request)
+
     if request['PATH_INFO'] == '/api/apply':
         return applied.handle(request)
     elif request['PATH_INFO'] == '/apply':
@@ -77,8 +83,6 @@ def route(request):
         return invite.reply(request)
     elif request['PATH_INFO'] == '/apply/kodstugor':
         return kodstugor.active(request)
-
-    request["BESK_login"] = login.get_login_status(request)
 
     if request["BESK_login"]["user"] == False and request['PATH_INFO'] == '/':
         return login.start(request)
@@ -142,13 +146,13 @@ def route(request):
 
     elif request['PATH_INFO'] == '/volontarer_plannering':
         return volontarer_plannering.handle(request)
-        
+
     elif request['PATH_INFO'] == '/utskick':
         return utskick.handle(request)
 
     elif request['PATH_INFO'] == '/datum':
         return datum.handle(request) 
-        
+
     elif request['PATH_INFO'] == '/kontaktpersoner':
         return kontaktpersoner.handle(request)
 
@@ -157,7 +161,7 @@ def route(request):
 if __name__ == '__main__':
     spawn(invite.send_invites)
     spawn(utskick.send_utskick)
-    spawn(datum.send_reminders)
+    spawn(datum.send_email_reminders)
     print('Serving on 9191...')
     green_pool = pool.Pool()
     server = WSGIServer(('127.0.0.1', 9191), application, spawn=green_pool, log=logger, error_log=logger)

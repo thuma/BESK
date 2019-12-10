@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from managedata import db
-from tools import read_post_data
+from tools import read_post_data, Error400
+import logging
 import json
 from time import time
+
+logger = logging.getLogger("naravro")
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
@@ -15,6 +18,8 @@ def handle(request):
 
 def add_or_uppdate(request):
     post_data = read_post_data(request)
+    if "id" not in post_data:
+        raise Error400("Inga ändringar sparade.")
     for i in range(len(post_data["id"])):
         if not post_data["id"][i] == "0":
             data = (

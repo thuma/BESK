@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from managedata import db, deltagare, texter, kontaktpersoner
-from tools import send_email, read_post_data, read_get_data, static_file
+from tools import send_email, read_post_data, read_get_data, static_file, Error400
 import json
 import time
 from gevent import sleep
@@ -9,13 +9,17 @@ from gevent import sleep
 def new(request):
     if request["BESK_admin"]:
         post_data = read_post_data(request)
+        if "invite" not in post_data:
+            raise Error400("Inga deltagare valda.")
         invites = post_data["invite"]
         for invite in invites:
             db.cursor.execute('''
-                UPDATE deltagare
-                SET status = "inbjudan"
+                UPDATE
+                    deltagare
+                SET 
+                    status = "inbjudan"
                 WHERE
-                id = ?
+                    id = ?;
                 ''',(invite,))
         db.commit()
     return deltagare.all(request)
@@ -31,13 +35,15 @@ def reply(request):
     else:
         foto = ""
     db.cursor.execute('''
-            UPDATE deltagare
-            SET status = ?,
-            foto = ?
+            UPDATE
+                deltagare
+            SET 
+                status = ?,
+                foto = ?
             WHERE
-            id = ? 
+                id = ? 
             AND
-            status = "inbjuden";
+                status = "inbjuden";
             ''',(status, foto, deltagar_id))
     db.commit()
     if status == "ja":
@@ -56,14 +62,14 @@ def send_invites():
     while True:
         sleep(2)
         found = db.cursor.execute('''
-            SELECT 
+            SELECT
                 kodstugor.namn AS kodstuga,
                 deltagare.id AS deltagare_id,
                 deltagare.status AS deltagare_status,
                 deltagare.fornamn AS deltagare_fornamn,
                 kontaktpersoner.epost AS kontaktperson_epost
-            FROM 
-                deltagare 
+            FROM
+                deltagare
             INNER JOIN kontaktpersoner_deltagare 
                 ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
             INNER JOIN kontaktpersoner

@@ -2,7 +2,11 @@
 # -*- coding: utf-8 -*-
 from managedata import db
 import json
-from tools import read_post_data
+from tools import read_post_data, send_email
+import arrow
+import logging
+from gevent import sleep
+logger = logging.getLogger("datum")
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
@@ -22,7 +26,8 @@ def all(request):
             kodstugor_id,
             datum,
             typ
-        FROM kodstugor_datum
+        FROM
+            kodstugor_datum
      """ + where);
     def to_headers(row):
         ut = {}
@@ -51,8 +56,9 @@ def set(request):
                 )
             db.cursor.execute("""
                     DELETE FROM
-                        kodstugor_datum 
-                    WHERE kodstugor_id = ?
+                        kodstugor_datum
+                    WHERE
+                        kodstugor_id = ?;
                     """, (data[0][0],))
             for query in data:
                 db.cursor.execute("""
@@ -64,5 +70,71 @@ def set(request):
         db.commit()
     return all(request)
 
-def send_reminders():
-    pass
+def send_sms_reminders():
+    while True:
+        datum = arrow.utcnow().shift(hours=24).to('Europe/Stockholm').format('YYYY-MM-DD')
+        logger.info("Sending reminders for: " + datum)
+        found = db.cursor.execute('''
+            SELECT 
+                id,
+                kodstugor_id,
+                datum,
+                status
+            FROM 
+                kodstugor_datum
+            WHERE
+                datum = ?
+            ORDER BY
+                datum;
+            ''',(datum, ))
+        def to_headers(row):
+            ut = {}
+            for idx, col in enumerate(found.description):
+                ut[col[0]] = row[idx]
+            return ut
+
+        for utskick in list(map(to_headers,found.fetchall())):
+            kodstuga = get_kodstuga(utskick["kodstugor_id"])
+            for mottagare in kontaktpersoner.for_kodstuga(utskick["kodstugor_id"]):
+                message = kodstuga["epost_text"].replace(
+                    "%namn%", mottagare["deltagare_fornamn"]).replace(
+                    "%kodstuga%", mottagare["kodstugor_namn"]).replace(
+                    "%datum%", datum)
+                send_sms(mottagare["telefon"], message)
+            db.commit()
+        sleep(60*10)
+
+def send_email_reminders():
+    while True:
+        datum = arrow.utcnow().shift(hours=24).to('Europe/Stockholm').format('YYYY-MM-DD')
+        logger.info("Sending reminders for: " + datum)
+        found = db.cursor.execute('''
+            SELECT 
+                id,
+                kodstugor_id,
+                datum,
+                status
+            FROM 
+                kodstugor_datum
+            WHERE
+                datum = ?
+            ORDER BY
+                datum;
+            ''',(datum, ))
+        def to_headers(row):
+            ut = {}
+            for idx, col in enumerate(found.description):
+                ut[col[0]] = row[idx]
+            return ut
+        for utskick in list(map(to_headers,found.fetchall())):
+            kodstuga = get_kodstuga(utskick["kodstugor_id"])
+            for mottagare in kontaktpersoner.for_kodstuga(utskick["kodstugor_id"]):
+                link = "https://besk.kodcentrum.se/svar"
+                message = kodstuga["epost_text"].replace(
+                    "%namn%", mottagare["deltagare_fornamn"]).replace(
+                    "%kodstuga%", mottagare["kodstugor_namn"]).replace(
+                    "%datum%", datum).replace(
+                    "%länk%", link)
+                send_email(mottagare["epost"], kodstuga["epost_rubrik"], message)
+            db.commit()
+        sleep(60*10)

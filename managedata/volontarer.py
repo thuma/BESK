@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from managedata import db
-from tools import read_post_data, config
+from tools import read_post_data, config, Error400
 import json
 import phonenumbers
 import requests
@@ -125,9 +125,9 @@ def add_or_update_admin(request):
             phone_number = phonenumbers.parse(post_data["telefon"][0], "SE")
             phone_number_str = phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
         except:
-            raise Exception("Fyll i ett giltigt telefonummer.")
+            raise Error400("Fyll i ett giltigt telefonummer.")
         if not phonenumbers.is_valid_number(phone_number):
-            raise Exception("Fyll i ett giltigt telefonummer.")
+            raise Error400("Fyll i ett giltigt telefonummer.")
         if "id" in post_data:
             data = (
                 post_data["namn"][0],
@@ -165,7 +165,7 @@ def add_or_update_admin(request):
                             (?,?,?,?,?)
                     """, data)
             except db.sqlite3.IntegrityError:
-                 raise Exception("E-Postadressen finns redan.")
+                 raise Error400("E-Postadressen finns redan.")
     db.commit()
 
 def update_as_vol(request):
@@ -174,9 +174,9 @@ def update_as_vol(request):
         phone_number = phonenumbers.parse(post_data["telefon"][0], "SE")
         phone_number_str = phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
     except:
-        raise Exception("Fyll i ett giltigt telefonummer.")
+        raise Error400("Fyll i ett giltigt telefonummer.")
     if not phonenumbers.is_valid_number(phone_number):
-        raise Exception("Fyll i ett giltigt telefonummer.")
+        raise Error400("Fyll i ett giltigt telefonummer.")
     if "id" in post_data:
         data = (
             post_data["namn"][0],

@@ -7,6 +7,12 @@ from managedata import db
 import smtplib
 from email.message import EmailMessage
 import markdown
+import arrow
+import hashlib
+import requests
+from gevent import sleep
+import logging
+logger = logging.getLogger("tools")
 
 def static_file(filename):
     with open(filename, 'r') as content_file:
@@ -21,6 +27,9 @@ def static_file(filename):
                 out+=file[0]
         return out
 
+class Error400(Exception):
+    pass
+
 class Error404(Exception):
      pass
 
@@ -29,6 +38,7 @@ class Error403(Exception):
 
 class Error302(Exception):
     pass
+
 
 config = configparser.RawConfigParser()
 config.read('../BESK.ini')
@@ -63,15 +73,104 @@ def get_value(key):
     except:
         return ""
 
-def send_email(to, subject, message):
-    html = markdown.markdown(message)
-    msg = EmailMessage()
-    msg['Subject'] = subject
-    msg['From'] = "Kodcentrum <hej@kodcentrum.se>"
-    msg['To'] = to
-    msg.set_content(message)
-    msg.add_alternative(html, subtype='html')
+def send_sms(to, message):
+    datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
+    id = hashlib.sha512((to+message+datum).encode("utf-8")).hexdigest()
+    try:
+        db.cursor.execute('''
+            INSERT INTO 
+                mail_queue(id, date, till, message, status) 
+            VALUES
+                (?, ?, ?, ?, ?);
+            ''',
+            (id, datum, to, message, "köad" )
+        )
+        db.commit()
+    except db.sqlite3.IntegrityError:
+        logger.info("SMS redan i kö")
 
-    server = smtplib.SMTP('localhost')
-    server.send_message(msg)
-    server.quit()
+def send_sms_queue(to, message):
+    datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
+    id = hashlib.sha512((to+message+datum).encode("utf-8")).hexdigest()
+    all = db.cursor.execute("""
+        SELECT id FROM sent WHERE id = ?;''',
+     """, (id,))
+    if all.fetcone() is None:
+        pass
+    else:
+        return
+    
+    requests.post(
+        'https://api.46elks.com/a1/sms',
+        auth = (
+            config["46elks"]["username"],
+            config["46elks"]["password"]
+            ),
+        data = {
+            'from': 'Kodcentrum',
+            'to': to,
+            'message': message
+        }
+    )
+    db.cursor.execute('''
+        INSERT INTO sent(id, date, type, value)
+        VALUES(?, ?, ?, ?);''',
+          (id, datum, "sms", to + "\n" + message)
+        )
+    db.commit()
+
+
+def send_email(to, subject, message):
+    datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
+    id = hashlib.sha512((to+subject+message+datum).encode("utf-8")).hexdigest()
+    try:
+        db.cursor.execute('''
+            INSERT INTO 
+                sms_queue(id, date, till, message, status) 
+            VALUES
+                (?, ?, ?, ?);
+            ''',
+            (id, datum, to, message, "köad" )
+        )
+        db.commit()
+    except db.sqlite3.IntegrityError:
+        logger.info("Epost redan i kö.")
+
+def send_email_queue(to, subject, message):
+    datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
+    id = hashlib.sha512((to+subject+message+datum).encode("utf-8")).hexdigest()
+    all = db.cursor.execute("""
+        SELECT 
+            id, till, subject, message
+        FROM
+            mail_queue
+        WHERE
+            status = "köad";
+    """)
+    tosend = all.fetcone()
+    if tosend is None:
+        sleep(2)
+    else:
+        (id, to, subject, message) = tosend
+        html = markdown.markdown(message)
+        msg = EmailMessage()
+        msg['Subject'] = subject
+        msg['From'] = "Kodcentrum <hej@kodcentrum.se>"
+        msg['To'] = to
+        msg.set_content(message)
+        msg.add_alternative(html, subtype='html')
+        server = smtplib.SMTP('localhost')
+        server.send_message(msg)
+        server.quit()
+        db.cursor.execute("""
+            UPDATE 
+                mail_queue
+            SET
+                status = "skickad"
+            WHERE
+                id = ?;
+            """,
+            (id,)
+            )
+        db.commit()
+

@@ -24,7 +24,7 @@
             <td v-if="me.admin">{{kid.skola}}</td>
             <td v-if="me.admin">{{kid.klass}}</td>
             <td>
-                <div v-for="kontaktperson_id in kid.kontaktperson_id">{{kontaktperson_by_id(kontaktperson_id).fornamn}} {{kontaktperson_by_id(kontaktperson_id).efternamn}}</div>
+                <button type="button" v-on:click="show_kontaktperson(kontaktperson_by_id(kontaktperson_id))" class="btn btn-outline-secondary btn-sm" v-for="kontaktperson_id in kid.kontaktperson_id">{{kontaktperson_by_id(kontaktperson_id).fornamn}} {{kontaktperson_by_id(kontaktperson_id).efternamn}}</button>
             </td>
             <td v-if="me.admin">{{new Date(kid.datum*1000).toISOString().split('T')[0]}}</td>
             <td v-if="me.admin">

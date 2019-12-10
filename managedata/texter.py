@@ -35,11 +35,10 @@ def add_or_uppdate(request):
 
                 )
                 db.cursor.execute("""
-                    INSERT 
-                        INTO keyvalue 
-                            (id, text) 
-                        VALUES 
-                            (?,?)
+                    INSERT INTO
+                        keyvalue (id,text)
+                    VALUES 
+                        (?,?)
                     """, data)
         db.commit()
     return all(request)
@@ -60,7 +59,11 @@ def get_one(id):
         SELECT 
             id,
             text
-        FROM keyvalue WHERE id = ? LIMIT 1;
+        FROM
+            keyvalue
+        WHERE
+            id = ?
+        LIMIT 1;
      """, (id,))
     def to_headers(row):
         ut = {}
@@ -74,7 +77,8 @@ def all(request):
         SELECT 
             id,
             text
-        FROM keyvalue;
+        FROM
+            keyvalue;
      """)
     def to_headers(row):
         ut = {}
