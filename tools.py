@@ -118,6 +118,10 @@ def send_sms_queue():
                 'message': message
             }
         )
+        try:
+            sms_id = result.json()["id"]
+        except:
+            sms_id= "error"
         db.cursor.execute("""
             UPDATE 
                 sms_queue
@@ -127,7 +131,7 @@ def send_sms_queue():
             WHERE
                 id = ?;
             """,
-            (result.json()["id"], id)
+            (sms_id, id)
         )
         db.commit()
 
