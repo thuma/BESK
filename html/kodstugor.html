@@ -38,7 +38,7 @@
                 <label>Namn på kodstuga</label>
                 <input
                     name="namn"
-                    v-bind:value="edit.data.namn"
+                    v-model:value="edit.data.namn"
                     type="text"
                     required=""
                     class="form-control">
@@ -135,6 +135,7 @@
                 <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
                 <button v-else="" type="submit" class="btn btn-primary">Spara</button>
                 <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
+                <button v-on:click="edit.data.id=''" v-if="edit.data.id!==''" type="button" class="btn btn-secondary">Skapa en ny kodstuga med denna som mall</button>
             </div>
         </form>
     </div>
