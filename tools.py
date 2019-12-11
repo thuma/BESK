@@ -141,11 +141,11 @@ def send_email(to, subject, message):
     try:
         db.cursor.execute('''
             INSERT INTO 
-                mail_queue(id, date, till, message, status) 
+                mail_queue(id, date, till, subject, message, status) 
             VALUES
-                (?, ?, ?, ?, ?);
+                (?, ?, ?, ?, ?, ?);
             ''',
-            (id, datum, to, message, "köad" )
+            (id, datum, to, subject, message, "köad" )
         )
         db.commit()
     except db.sqlite3.IntegrityError:
