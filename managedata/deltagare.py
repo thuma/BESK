@@ -89,6 +89,7 @@ def add_or_uppdate(request):
                 post_data["efternamn"][0],
                 post_data["status"][0],
                 post_data["kon"][0],
+                post_data["foto"][0],
                 post_data["klass"][0],
                 post_data["skola"][0],
                 post_data["kodstuga"][0],
@@ -101,6 +102,7 @@ def add_or_uppdate(request):
                         efternamn = ?,
                         status = ?,
                         kon = ?,
+                        foto = ?,
                         klass = ?,
                         skola = ?,
                         kodstugor_id = ?
@@ -159,6 +161,7 @@ def all(request):
             deltagare.status AS status,
             deltagare.fornamn AS fornamn,
             deltagare.efternamn AS efternamn,
+            deltagare.foto AS foto,
             deltagare.kon AS kon,
             deltagare.skola AS skola,
             deltagare.klass AS klass,

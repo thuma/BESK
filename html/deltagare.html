@@ -7,6 +7,7 @@
             <th scope="col">Förnamn</th>
             <th scope="col">Efternamn</th>
             <th scope="col">Kön</th>
+            <th scope="col">Foto</th>
             <th scope="col" v-if="me.admin">Skola</th>
             <th scope="col" v-if="me.admin">Klass</th>
             <th scope="col">Målsman</th>
@@ -21,6 +22,7 @@
             <td>{{kid.fornamn}}</td>
             <td>{{kid.efternamn}}</td>
             <td>{{kid.kon}}</td>
+            <td>{{kid.foto}}</td>
             <td v-if="me.admin">{{kid.skola}}</td>
             <td v-if="me.admin">{{kid.klass}}</td>
             <td>
@@ -106,6 +108,14 @@
                     <option value="inbjuden">Inbjudan skickad</option>
                     <option value="avhopp">Avhopp</option>
                     <option value="ko">Kö till nästa termin</option>
+                </select>
+            </div>
+            <div class="form-group" v-if="me.admin">
+                <label>Foto</label>
+                <select name="foto" v-model:value="edit.data.foto" class="form-control">
+                    <option value="">Inget svar</option>
+                    <option value="ja">Ja</option>
+                    <option value="nej">Nej</option>
                 </select>
             </div>
             <div class="form-group">

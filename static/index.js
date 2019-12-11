@@ -156,7 +156,13 @@ var admin = new Vue({
             }
         },
         show_kontaktperson: function(kontaktperson){
-            swal(JSON.stringify(kontaktperson));
+            var div_data  = document.createElement("div");
+            div_data.innerHTML = "<strong>Namn:</strong> " + kontaktperson.fornamn + " " + kontaktperson.fornamn + "<br>" +
+                "<strong>E-Post:</strong> " + kontaktperson.epost + "<br>" +
+                "<strong>Telefon:</strong> " + kontaktperson.telefon;
+            swal({
+                content: div_data,
+            });
         },
         check_send: function (theform){
             next = this
