@@ -15,7 +15,7 @@
   </thead>
   <tbody>
     <tr v-for="stat in statistik">
-        <td>{{stat.id}}</td>
+        <td>{{kodstuga_name_by_id(stat.id)}}</td>
         <td>{{stat.deltagare}}</td>
         <td>{{stat.pojkar}}</td>
         <td>{{stat.flickor}}</td>
@@ -40,4 +40,3 @@
     </tr>
   </tfoot>
 </table>
-
