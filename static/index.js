@@ -208,6 +208,65 @@ var admin = new Vue({
         '/api/volontarer/slack',
         '/api/me'].forEach(this.get_data)
     },
+    computed: {
+        vald_kodstuga: function(){
+            var kodstuga_data = "";
+            var id = this.val_kodstuga
+            this.kodstugor.forEach(function(kodstuga){
+                if (kodstuga.id == id){
+                    kodstuga_data = kodstuga;
+                }
+            });
+            return kodstuga_data 
+        },
+        statistik: function(){
+            var kodstug_stats = []
+            var next = this;
+            this.kodstugor.forEach(function(kodstuga){
+                var data = {}
+                data.id = kodstuga.id
+                var deltagare_alla = next.deltagare.filter(deltagare => deltagare.kodstuga_id == kodstuga.id)
+                var närvaro_deltagare_f = deltagare_alla.filter(deltagare => deltagare.kon == "hon")
+                var närvaro_deltagare_p = deltagare_alla.filter(deltagare => deltagare.kon == "han")
+                var deltagare_ja = deltagare_alla.filter(deltagare => deltagare.status == "ja")
+                data.deltagare = deltagare_ja.length;
+                data.flickor = deltagare_ja.filter(deltagare => deltagare.kon == "hon").length;
+                data.pojkar = deltagare_ja.filter(deltagare => deltagare.kon == "han").length;
+                data.volontärer = next.volontärer.filter(volontär => volontär.kodstugor_id == kodstuga.id).length;
+                var närvaro_deltagare = deltagare_alla.map(deltagare_data => next.närvaro[deltagare_data.deltagare_id] ? next.närvaro[deltagare_data.deltagare_id] : {});
+                function datum_till_text(list, newitems) {
+                    var items = newitems;
+                    var tolist = Object.keys(newitems).map(titem => items[titem].status);
+                    return list.concat(tolist);
+                }
+                var närvaro_svar = närvaro_deltagare.reduce(datum_till_text, []).filter(svar => svar == "ja")
+                data.närvaro = närvaro_svar.length;
+                närvaro_deltagare_f = närvaro_deltagare_f.map(deltagare_data => next.närvaro[deltagare_data.deltagare_id] ? next.närvaro[deltagare_data.deltagare_id] : {});
+                närvaro_deltagare_p = närvaro_deltagare_p.map(deltagare_data => next.närvaro[deltagare_data.deltagare_id] ? next.närvaro[deltagare_data.deltagare_id] : {});
+                data.närvaro_flickor = närvaro_deltagare_f.reduce(datum_till_text, []).filter(svar => svar == "ja").length
+                data.närvaro_pojkar = närvaro_deltagare_p.reduce(datum_till_text, []).filter(svar => svar == "ja").length
+                data.antal_tillfällen = next.get_dates(kodstuga.id).length
+                kodstug_stats.push(data)
+            });
+            // Totalt & per kodstuga
+            return kodstug_stats 
+        },
+        statistik_tot: function(){
+            return this.statistik.reduce(function(total, one){
+                var ntotal = total;
+                var nione = one;
+                Object.keys(one).forEach(function(key){
+                    if (ntotal[key]) {
+                        ntotal[key] += nione[key];
+                    } else {
+                        ntotal[key] = nione[key];
+                    }
+                    
+                });
+                return ntotal;
+            },{})
+        }
+    },
     data: {
         markdown_to_html: new showdown.Converter(),
         page: "BESK",
@@ -224,6 +283,7 @@ var admin = new Vue({
         volontärer_slack: [],
         utskick: [],
         texter: [],
-        me: {}
+        me: {},
+        val_kodstuga: ""
     }
 })

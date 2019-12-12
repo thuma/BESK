@@ -1,0 +1,43 @@
+<h1 class="text-center">Statistik</h1>
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th scope="col">Kodstuga</th>
+      <th scope="col">Deltagare</th>
+      <th scope="col">Pojkar</th>
+      <th scope="col">Flickor</th>
+      <th scope="col">Volontärer</th>
+      <th scope="col">Närvaro</th>
+      <th scope="col">Närvaro Flickor</th>
+      <th scope="col">Närvaro Pojkar</th>
+      <th scope="col">Antal tillfällen</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="stat in statistik">
+        <td>{{stat.id}}</td>
+        <td>{{stat.deltagare}}</td>
+        <td>{{stat.pojkar}}</td>
+        <td>{{stat.flickor}}</td>
+        <td>{{stat.volontärer}}</td>
+        <td>{{stat.närvaro}}</td>
+        <td>{{stat.närvaro_flickor}}</td>
+        <td>{{stat.närvaro_pojkar}}</td>
+        <td>{{stat.antal_tillfällen}}</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+        <th>Totalt</th>
+        <th>{{statistik_tot.deltagare}}</th>
+        <th>{{statistik_tot.pojkar}}</th>
+        <th>{{statistik_tot.flickor}}</th>
+        <th>{{statistik_tot.volontärer}}</th>
+        <th>{{statistik_tot.närvaro}}</th>
+        <th>{{statistik_tot.närvaro_flickor}}</th>
+        <th>{{statistik_tot.närvaro_pojkar}}</th>
+        <th>{{statistik_tot.antal_tillfällen}}</th>
+    </tr>
+  </tfoot>
+</table>
+

@@ -2,17 +2,55 @@
 <table class="table table-sm" v-if="edit==''">
   <thead>
     <tr>
-      <th scope="col" v-if="me.admin">Kodstuga</th>
+      <th scope="col" v-if="me.admin">
+          <select v-model:value="val_kodstuga" class="form-control">
+              <option value="">Välj kodstuga...</option>
+              <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
+          </select>
+      </th>
       <th scope="col">Typ</th>
       <th scope="col">Ämne (Bara för E-Post)</th>
       <th scope="col">Text</th>
-      <th scope="col">Datum</th>
+      <th scope="col">Utskick sker</th>
       <th scope="col">Status</th>
       <th scope="col" v-if="me.admin">Redigera</th>
     </tr>
   </thead>
   <tbody>
-    <tr v-for="skick in utskick">
+    <tr v-if="vald_kodstuga.id" >
+        <td v-if="me.admin">{{vald_kodstuga.namn}}</td>
+        <td>sms</td>
+        <td></td>
+        <td><pre>{{vald_kodstuga.sms_text}}</pre></td>
+        <td>09:00 samma dag som varje tillfälle.</td>
+        <td></td>
+        <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
+            v-on:click="edit={'type':'utskick_sms_reminder','data':copy(vald_kodstuga)}">🖊</button>
+        </td>
+    </tr>
+    <tr v-if="vald_kodstuga.id" >
+        <td v-if="me.admin">{{vald_kodstuga.namn}}</td>
+        <td>e-post</td>
+        <td>{{vald_kodstuga.epost_rubrik}}</td>
+        <td v-html="markdown_to_html.makeHtml(vald_kodstuga.epost_text)"></td>
+        <td>09:00 dagen före varje tillfälle.</td>
+        <td></td>
+        <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
+            v-on:click="edit={'type':'utskick_epost_reminder','data':copy(vald_kodstuga)}">🖊</button>
+        </td>
+    </tr>
+    <tr v-if="vald_kodstuga.id" >
+        <td v-if="me.admin">{{vald_kodstuga.namn}}</td>
+        <td>e-post</td>
+        <td>{{vald_kodstuga.epost_rubrik_ja}}</td>
+        <td v-html="markdown_to_html.makeHtml(vald_kodstuga.epost_text_ja)"></td>
+        <td>När deltagaren tackar ja.</td>
+        <td></td>
+        <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
+            v-on:click="edit={'type':'utskick_valkommen','data':copy(vald_kodstuga)}">🖊</button>
+        </td>
+    </tr>
+    <tr v-for="skick in utskick" v-if="vald_kodstuga.id == skick.kodstugor_id">
         <td v-if="me.admin">{{kodstuga_name_by_id(skick.kodstugor_id)}}</td>
         <td>{{skick.typ}}</td>
         <td>{{skick.rubrik}}</td>
@@ -36,13 +74,22 @@
 <div v-if="edit.type=='utskick'" class="card">
     <div class="card-body">
         <form method="post" @submit="check_send" action="/api/utskick">
-            <input name="id" v-if="edit.data.id!==''"v-bind:value="edit.data.id" type="hidden">
+            <input name="id" v-if="edit.data.id!==''" v-bind:value="edit.data.id" type="hidden">
             <div class="form-group">
                 <label>Kodstuga</label>
-                <select name="kodstugor_id"  v-model:value="edit.data.kodstugor_id" class="form-control">
+                <select name="kodstugor_id" v-model:value="edit.data.kodstugor_id" class="form-control">
                     <option value="">Välj kodstuga...</option>
                     <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label>Datum för utskick</label>
+                <input 
+                    name="datum"
+                    v-model:value="edit.data.datum"
+                    type="date"
+                    required=""
+                    class="form-control">
             </div>
             <div class="form-group">
                 <label>Typ</label>
@@ -79,20 +126,159 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>Datum för utskick</label>
-                <input 
-                    name="datum"
-                    v-model:value="edit.data.datum"
-                    type="date"
-                    required=""
-                    class="form-control">
-            </div>
-            <div class="form-group">
-                <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
+                <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa som ny</button>
                 <button v-if="edit.data.status=='väntar'&&edit.data.id!==''" type="submit" class="btn btn-primary">Spara</button>
                 <button v-on:click="radera_utskick(edit.data.id)" type="button" class="btn btn-danger" v-if="me.admin && edit.data.id!==''" >Radera</button>
                 <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
                 <button v-on:click="edit.data.id=''" v-if="edit.data.id!==''" type="button" class="btn btn-secondary">Skapa ett nytt utskick med denna som mall</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div v-if="edit.type=='utskick_sms_reminder'" class="card">
+    <div class="card-body">
+        <form method="post" @submit="check_send" action="/api/kodstugor">
+            <input type="hidden" v-bind:value="edit.data.id" name="id" >
+            <input type="hidden" v-bind:value="edit.data.namn" name="namn">
+            <input type="hidden" v-bind:value="edit.data.epost_text" name="epost_text">
+            <input type="hidden" v-bind:value="edit.data.epost_rubrik" name="epost_rubrik">
+            <input type="hidden" v-bind:value="edit.data.epost_text_ja" name="epost_text_ja">
+            <input type="hidden" v-bind:value="edit.data.epost_rubrik_ja" name="epost_rubrik_ja">
+            <input type="hidden" v-bind:value="edit.data.open" name="open">
+            
+            <div class="form-group">
+                <label>Kodstuga</label>
+                {{ edit.data.namn }}
+            </div>
+            <div class="form-group">
+                <label>Tid för utskick</label>
+                09:00 samma dag vid varje tillfälle.
+            </div>
+            <div class="form-group">
+                <label>Typ</label>
+                SMS
+            </div>
+            <div class="form-group">
+                <label>Meddelande</label>
+                <textarea
+                    name="sms_text"
+                    v-model:value="edit.data.sms_text"
+                    required=""
+                    class="form-control"
+                    style="height: 300px;"
+                    ></textarea>
+                    Förhandsgranskning:
+                <div  class="card">
+                    <div class="card-body"><pre>{{edit.data.sms_text}}</pre></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Spara</button>
+                <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div v-if="edit.type=='utskick_epost_reminder'" class="card">
+    <div class="card-body">
+        <form method="post" @submit="check_send" action="/api/kodstugor">
+            <input type="hidden" v-bind:value="edit.data.id" name="id" >
+            <input type="hidden" v-bind:value="edit.data.namn" name="namn">
+            <input type="hidden" v-bind:value="edit.data.sms_text" name="sms_text">
+            <input type="hidden" v-bind:value="edit.data.epost_text_ja" name="epost_text_ja">
+            <input type="hidden" v-bind:value="edit.data.epost_rubrik_ja" name="epost_rubrik_ja">
+            <input type="hidden" v-bind:value="edit.data.open" name="open">
+            
+            <div class="form-group">
+                <label>Kodstuga</label>
+                {{ edit.data.namn }}
+            </div>
+            <div class="form-group">
+                <label>Tid för utskick</label>
+                09:00 samma dagen före varje tillfälle.
+            </div>
+            <div class="form-group">
+                <label>Typ</label>
+                e-post
+            </div>
+            <div class="form-group">
+                <label>Ämne</label>
+                <input 
+                    name="epost_rubrik"
+                    v-model:value="edit.data.epost_rubrik"
+                    type="text"
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Meddelande</label>
+                <textarea
+                    name="epost_text"
+                    v-model:value="edit.data.epost_text"
+                    required=""
+                    class="form-control"
+                    style="height: 300px;"
+                    ></textarea>
+                    Förhandsgranskning:
+                <div  class="card">
+                    <div class="card-body" v-html="markdown_to_html.makeHtml(edit.data.epost_text)"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Spara</button>
+                <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div v-if="edit.type=='utskick_valkommen'" class="card">
+    <div class="card-body">
+        <form method="post" @submit="check_send" action="/api/kodstugor">
+            <input type="hidden" v-bind:value="edit.data.id" name="id" >
+            <input type="hidden" v-bind:value="edit.data.name" name="name">
+            <input type="hidden" v-bind:value="edit.data.sms_text" name="sms_text">
+            <input type="hidden" v-bind:value="edit.data.epost_text_ja" name="epost_text_ja">
+            <input type="hidden" v-bind:value="edit.data.epost_rubrik_ja" name="epost_rubrik_ja">
+            <input type="hidden" v-bind:value="edit.data.open" name="open">
+            <div class="form-group">
+                <label>Kodstuga</label>
+                {{ edit.data.namn }}
+            </div>
+            <div class="form-group">
+                <label>Tid för utskick</label>
+                Skickas när deltagare tackar ja.
+            </div>
+            <div class="form-group">
+                <label>Typ</label>
+                e-post
+            </div>
+            <div class="form-group">
+                <label>Ämne</label>
+                <input 
+                    name="epost_rubrik_ja"
+                    v-model:value="edit.data.epost_rubrik_ja"
+                    type="text"
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Meddelande</label>
+                <textarea
+                    name="epost_text_ja"
+                    v-model:value="edit.data.epost_text_ja"
+                    required=""
+                    class="form-control"
+                    style="height: 300px;"
+                    ></textarea>
+                    Förhandsgranskning:
+                <div  class="card">
+                    <div class="card-body" v-html="markdown_to_html.makeHtml(edit.data.epost_text)"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Spara</button>
+                <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
             </div>
         </form>
     </div>

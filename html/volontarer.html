@@ -7,7 +7,6 @@
           <th scope="col">E-Post</th>
           <th scope="col">Telefon</th>
           <th scope="col" v-if="me.admin">Kodstuga</th>
-          <th scope="col" v-if="me.admin">Utdrag</th>
           <th scope="col" v-if="me.admin">Välj</th>
           <th scope="col">Redigera</th>
         </tr>
@@ -18,7 +17,6 @@
             <td>{{volontär.epost}}</td>
             <td>{{volontär.telefon}}</td>
             <td v-if="me.admin">{{kodstuga_name_by_id(volontär.kodstugor_id)}}</td>
-            <td v-if="me.admin">{{volontär.utdrag_datum}}</td>
             <td v-if="me.admin"><input type="checkbox" name="flytta" v-bind:value="volontär.id" v-model="volontär.selected"></td>
             <td><button class="btn btn-sm btn-outline-secondary"
                 v-on:click="edit={'type':'volontär','data':copy(volontär)}">🖊</button>
@@ -123,7 +121,7 @@
                     required=""
                     class="form-control">
             </div>
-            <div class="form-group" v-if="me.admin">
+            <!--<div class="form-group" v-if="me.admin">
                 <label>Utdrag gilltigt till</label>
                 <input 
                     name="utdrag_datum"
@@ -131,7 +129,7 @@
                     type="date"
                     required=""
                     class="form-control">
-            </div>
+            </div>-->
             <div class="form-group" v-if="me.admin">
                 <label>Kodstuga</label>
                 <select name="kodstugor_id" v-model:value="edit.data.kodstugor_id" class="form-control">
@@ -139,7 +137,7 @@
                 </select>
             </div>
             <div class="form-group">
-                <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
+                <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa som ny</button>
                 <button v-else="" type="submit" class="btn btn-primary">Spara</button>
                 <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
                 <button v-on:click="radera_volontär(edit.data.epost)" type="button" class="btn btn-danger" v-if="me.admin && edit.data.id!==''" >Radera</button>

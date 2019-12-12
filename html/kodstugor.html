@@ -3,9 +3,6 @@
   <thead>
     <tr>
       <th scope="col">Namn</th>
-      <th scope="col">SMS närvarofråga (12h före)</th>
-      <th scope="col">E-post närvarofråga (36h före)</th>
-      <th scope="col">Välkomstmeddelande</th>
       <th scope="col">Anmälan öppen</th>
       <th scope="col">Redigera</th>
     </tr>
@@ -13,9 +10,6 @@
   <tbody>
     <tr v-for="kodstuga in kodstugor">
         <td>{{kodstuga.namn}}</td>
-        <td><pre>{{kodstuga.sms_text}}</pre></td>
-        <td><b>Ämne:</b> {{kodstuga.epost_rubrik}}<div v-html="markdown_to_html.makeHtml(kodstuga.epost_text)"></div></td>
-        <td><b>Ämne:</b> {{kodstuga.epost_rubrik_ja}}<div v-html="markdown_to_html.makeHtml(kodstuga.epost_text_ja)"></div></td>
         <td>{{kodstuga.open}}</td>
         <td><button class="btn btn-sm btn-outline-secondary"
             v-on:click="edit={'type':'kodstuga','data':copy(kodstuga)}">🖊</button>
@@ -44,91 +38,17 @@
                     class="form-control">
             </div>
             <hr>
+            <input type="hidden" v-bind:value="edit.data.sms_text" name="sms_text">
+            <input type="hidden" v-bind:value="edit.data.epost_text" name="epost_text">
+            <input type="hidden" v-bind:value="edit.data.epost_rubrik" name="epost_rubrik">
+            <input type="hidden" v-bind:value="edit.data.epost_text_ja" name="epost_text_ja">
+            <input type="hidden" v-bind:value="edit.data.epost_rubrik_ja" name="epost_rubrik_ja">
             <div class="form-group">
                 <label>Ansökan öppen</label>
                 <select name="open" v-model:value="edit.data.open" class="form-control">
                     <option value="Ja">Ja</option>
                     <option value="Nej">Nej</option>
                 </select>
-            </div>
-            <hr>
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-group">
-                        <label>SMS närvarofråga (skickas 12h före varje kodstuga)</label>
-                        <textarea
-                            name="sms_text"
-                            v-model:value="edit.data.sms_text"
-                            required=""
-                            style="height: 240px;"
-                            class="form-control"></textarea>
-                        För att inte skicka SMS skriv "NEJ" i fältet.
-                    </div>
-                </div>
-                <div class="col-6">
-                    <label>Förhandsvisning</label>
-                    <div  class="card">
-                        <div class="card-body"><pre>{{edit.data.sms_text}}</pre></div>
-                    </div>
-                </div>
-            </div>
-            <hr>
-            <div class="form-group">
-                <label>E-post ämne (skickas 36h före varje kodstuga)</label>
-                <input
-                    name="epost_rubrik"
-                    v-model:value="edit.data.epost_rubrik"
-                    type="text"
-                    required=""
-                    class="form-control">
-            </div>
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-group">
-                        <label>E-Post meddelande</label>
-                        <textarea
-                            name="epost_text"
-                            v-model:value="edit.data.epost_text"
-                            required=""
-                            style="height: 240px;"
-                            class="form-control"></textarea>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <label>Förhandsvisning</label>
-                    <div  class="card">
-                        <div class="card-body" v-html="markdown_to_html.makeHtml(edit.data.epost_text)"></div>
-                    </div>
-                </div>
-            </div>
-            <hr>
-            <div class="form-group">
-                <label>Välkomstmeddelande ämne (Skickas när deltagaren tackar ja till inbjudan.) </label>
-                <input
-                    name="epost_rubrik_ja"
-                    v-model:value="edit.data.epost_rubrik_ja"
-                    type="text"
-                    required=""
-                    class="form-control">
-            </div>
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-group">
-                        <label>Välkomstepostmeddelande</label>
-                        <textarea
-                            name="epost_text_ja"
-                            v-model:value="edit.data.epost_text_ja"
-                            required=""
-                            style="height: 240px;"
-                            class="form-control"></textarea>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <label>Förhandsvisning</label>
-                    <div  class="card">
-                        <div class="card-body" v-html="markdown_to_html.makeHtml(edit.data.epost_text_ja)"></div>
-                    </div>
-                </div>
             </div>
             <hr>
             <div class="form-group">
