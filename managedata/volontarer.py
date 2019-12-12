@@ -108,7 +108,7 @@ def add_or_update_admin(request):
                 post_data["epost"][i],
                 phonenumber_to_format(post_data["telefon"][i]),
                 post_data["kodstugor_id"][0],
-                date_to_int(post_data["utdrag_datum"][i]),
+                arrow.get("2090-01-01").timestamp,
             )
             try:
                 db.cursor.execute("""
@@ -134,7 +134,7 @@ def add_or_update_admin(request):
                 post_data["epost"][0],
                 phone_number_str,
                 post_data["kodstugor_id"][0],
-                arrow.get(post_data["utdrag_datum"][0]).timestamp,
+                arrow.get("2090-01-01").timestamp,
                 post_data["id"][0]
             )
             db.cursor.execute("""
@@ -154,7 +154,7 @@ def add_or_update_admin(request):
                 post_data["epost"][0],
                 phone_number_str,
                 post_data["kodstugor_id"][0],
-                arrow.get(post_data["utdrag_datum"][0]).timestamp,
+                arrow.get("2090-01-01").timestamp,
             )
             try:
                 db.cursor.execute("""

@@ -59,6 +59,7 @@ def get_one(id):
             deltagare.kon AS kon,
             deltagare.skola AS skola,
             deltagare.klass AS klass,
+            deltagare.foto AS foto,
             GROUP_CONCAT(kontaktpersoner.id,",") AS kontaktperson_id
         FROM deltagare
         INNER JOIN kontaktpersoner_deltagare 
@@ -77,6 +78,8 @@ def get_one(id):
             ut[col[0]] = row[idx]
             if col[0] == "kontaktperson_id":
                 ut[col[0]] = ut[col[0]].split(',')
+            if ut[col[0]] == None:
+                ut[col[0]] = ""
         return ut
     return list(map(to_headers, all.fetchall()))[0]
     
@@ -183,6 +186,8 @@ def all(request):
             ut[col[0]] = row[idx]
             if col[0] == "kontaktperson_id":
                 ut[col[0]] = ut[col[0]].split(',')
+            if ut[col[0]] == None:
+                ut[col[0]] = ""
         return ut
 
     return {"deltagare":list(map(to_headers, all.fetchall()))}
