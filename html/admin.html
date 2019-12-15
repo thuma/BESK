@@ -1,0 +1,51 @@
+<h1 class="text-center">Administratörer</h1>
+<form method="POST" action="/api/admin" @submit="check_send" v-if="edit==''">
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th scope="col">E-Post</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="epost in admins">
+            <td>
+               {{ epost }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button type="button" class="btn btn-primary" v-on:click="edit={'type':'admins','data':copy(admins)}">Redigera</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+</form>
+
+<form method="POST" action="/api/admin" @submit="check_send" v-if="edit.type=='admins'">
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th scope="col">E-Post</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="(epost, epostnr) in edit.data">
+            <td>
+                <div class="input-group">
+                    <input class="form-control" name="admins" v-model:value="edit.data[epostnr]">
+                    <div class="input-group-append">
+                        <button class="btn btn-secondary" type="button" v-on:click="edit.data = edit.data.filter(myemail => myemail != epost);">Ta bort</button>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button type="button" class="btn btn-secondary" v-on:click="edit.data.push('')">Lägg till en rad</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<button type="submit" class="btn btn-primary">Spara</button>
+<button type="button" v-on:click="edit=''" class="btn btn-secondary">Avbryt</button>
+</form>

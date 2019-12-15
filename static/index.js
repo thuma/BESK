@@ -206,6 +206,7 @@ var admin = new Vue({
         '/api/narvaro',
         '/api/texter',
         '/api/volontarer/slack',
+        '/api/admin',
         '/api/me'].forEach(this.get_data)
     },
     computed: {
@@ -284,6 +285,7 @@ var admin = new Vue({
         utskick: [],
         texter: [],
         me: {},
+        admins: [],
         val_kodstuga: ""
     }
 })

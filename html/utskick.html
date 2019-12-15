@@ -126,7 +126,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa som ny</button>
+                <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Spara som ny</button>
                 <button v-if="edit.data.status=='väntar'&&edit.data.id!==''" type="submit" class="btn btn-primary">Spara</button>
                 <button v-on:click="radera_utskick(edit.data.id)" type="button" class="btn btn-danger" v-if="me.admin && edit.data.id!==''" >Radera</button>
                 <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>

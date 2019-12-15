@@ -56,7 +56,7 @@
                 <a class="nav-link" href="#" v-on:click="page='Statistik'">Statistik</a>
               </li>
               <li class="nav-item" v-if="me.admin">
-                <a class="nav-link" href="#" v-on:click="page='Admin'">Admin</a>
+                <a class="nav-link" href="#" v-on:click="page='Admin'">Administration</a>
               </li>
               <li class="nav-item" v-if="me.admin">
                 <a class="nav-link" href="#" v-on:click="page='Loggar'">Loggar</a>
@@ -115,6 +115,9 @@
         </div>
         <div v-if="page=='Statistik'">
             <?statistik.html?>
+        </div>
+        <div v-if="page=='Admin'">
+            <?admin.html?>
         </div>
     </div>
     <script src="index.js"></script>

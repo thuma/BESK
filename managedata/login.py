@@ -7,7 +7,7 @@ import configparser
 import uuid
 from time import time
 from managedata import db
-from tools import read_get_data, url_encode, Error302
+from tools import read_get_data, read_post_data, url_encode, Error302, Error400
 config = configparser.RawConfigParser()
 config.read('../BESK.ini')
 
@@ -32,6 +32,32 @@ def get_auth(session_id):
 
 def is_admin(user):
     return user in config['general']['admins']
+
+def handle_admins(request):
+    if request['REQUEST_METHOD'] == 'GET':
+        return get_admins(request)
+    if request['REQUEST_METHOD'] == 'POST':
+        return set_admins(request)
+    if request['REQUEST_METHOD'] == 'DELETE':
+        return get_admins(request)
+
+def get_admins(request):
+    config.read('../BESK.ini')
+    if not request["BESK_admin"]:
+        return {}
+    return {"admins":config['general']['admins'].split(",")}
+
+def set_admins(request):
+    if not request["BESK_admin"]:
+        return {}
+    post_data = read_post_data(request)
+    new_ini_string = ",".join(post_data["admins"])
+    if request["BESK_login"]["user"]["user"]["email"] not in new_ini_string:
+        raise Error400("Du kan inte ta bort dig själv.")
+    config['general']['admins'] = new_ini_string
+    with open('../BESK.ini', 'w') as configfile:
+        config.write(configfile)
+    return get_admins(request)
 
 def is_approved(user):
     now = int(time())

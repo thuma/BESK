@@ -130,6 +130,9 @@ def route(request):
                 "admin":request["BESK_admin"]
             }
         } 
+    
+    if request['PATH_INFO'] == '/admin':
+        return login.handle_admins(request) 
 
     if request['PATH_INFO'] == '/deltagare':
         return deltagare.handle(request) 
