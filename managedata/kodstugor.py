@@ -37,6 +37,7 @@ def active(request):
                 open
             FROM kodstugor;
          """);
+        admin = True;
     else:
         all = db.cursor.execute("""
             SELECT 
@@ -50,13 +51,14 @@ def active(request):
                 open
             FROM kodstugor WHERE open ='Ja';
          """);
+        admin = False;
 
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return {"kodstugor":list(map(to_headers, all.fetchall()))}
+    return {"admin":admin, "kodstugor":list(map(to_headers, all.fetchall()))}
 
 def get_kodstuga(kodstua_id):
     all = db.cursor.execute("""

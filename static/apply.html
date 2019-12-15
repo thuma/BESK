@@ -18,8 +18,9 @@
 <div class="container" id="applyform">
     <div class="card" v-if="success==false">
         <div class="card-body">
-            <h1 class="card-title">Formulär intresseanmälan kodstuga</h1>
-            <ul>
+            <h1 v-if="admin==false" class="card-title">Formulär intresseanmälan kodstuga</h1>
+            <h1 else="" class="card-title">Lägg till deltagare och målsman i kodstuga</h1>
+            <ul v-if="admin==false">
                 <li>Observera att Kodcentrum ger en <b>introduktion</b> till programmering och digitalt skapande.</li>
                 <li>Viktigt att tänka på är att Kodstugan är till för barn och unga <b>utan tidigare förkunskaper</b>. Vår erfarenhet är att deltagare som redan varit i kontakt med andra verktyg och programmeringsspråk, särskilt bland de äldre i målgruppen, inte stimuleras nog av vårt upplägg.</li>
                 <li>En del av upplägget bygger på att deltagare är <b>bekväma med att läsa instruktioner</b> till övningarna själva. Givetvis finns det volontärer på plats som guidar barnen i att lösa uppgifterna.</li>
@@ -32,6 +33,14 @@
                         <select class="form-control" name="kodstuga" required>
                             <option value="">Välj kodstuga...</option>
                             <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
+                        </select>
+                    </label>
+                </div>
+                <div v-if="admin==true" class="form-group">
+                    <label>Ska deltagaren/deltagarna bjudas in till kodstugan direkt?
+                    <select class="form-control" name="invite_now">
+                        <option value="nej">Nej</option>
+                        <option value="ja">Ja</option>
                         </select>
                     </label>
                 </div>
@@ -154,6 +163,7 @@
                 response.json().then(
                     function(data) {
                         main.kodstugor = data.kodstugor;
+                        main.admin = data.admin;
                     });
                 });
       },
@@ -190,6 +200,7 @@
       data: {
         kids: 1,
         adults: 1,
+        admin: false,
         kodstugor: [],
         loading: false,
         success: false

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from managedata import db, texter
+from managedata import db, texter, login
 from tools import send_email, read_post_data, Error400
 import uuid
 import json
@@ -21,7 +21,12 @@ def new(request):
         "kids":[],
         "adults":[]
         }
+    status = "ansökt"
     formdata = read_post_data(request)
+    if "invite_now" in formdata:
+        if login.is_admin(request["BESK_login"]["user"]["user"]["email"]) and formdata["invite_now"][0] == "ja":
+            status = "inbjudan"
+
     if "approve" not in formdata:
         raise Error400("Du måste acceptera Kodcentrums Integritetspolicy.")
     try:
@@ -55,7 +60,7 @@ def new(request):
             formdata["klass"][i],
             formdata["skola"][i],
             now,
-            "ansökt"
+            status
             )
         )
 
@@ -84,21 +89,21 @@ def new(request):
 
     for adult in data_to_db["adults"]:
         db.cursor.execute("INSERT INTO kontaktpersoner (id,fornamn,efternamn,epost,telefon) VALUES (?,?,?,?,?)",adult)
-    
-    for kid in data_to_db["kids"]:
-        db.cursor.execute("INSERT INTO deltagare (id,kodstugor_id,fornamn,efternamn,kon,klass,skola,datum,status) VALUES (?,?,?,?,?,?,?,?,?)",kid)
 
     for adult in data_to_db["adults"]:
         for kid in data_to_db["kids"]:
             db.cursor.execute("INSERT INTO kontaktpersoner_deltagare (kontaktpersoner_id, deltagare_id) VALUES (?,?)",(adult[0], kid[0]))
 
+    for kid in data_to_db["kids"]:
+        db.cursor.execute("INSERT INTO deltagare (id,kodstugor_id,fornamn,efternamn,kon,klass,skola,datum,status) VALUES (?,?,?,?,?,?,?,?,?)",kid)
+
     hittade = (formdata["hittade"][0],)
     db.cursor.execute("INSERT INTO hittade (hittade) VALUES (?)", hittade)
     db.commit()
+    if status == "ansökt":
+        mailmessage = texter.get_one("Intresse anmälan")["text"].replace("%kodstuga%",kodstuga)
+        mailsubject = "Tack för din intresseanmälan"
+        for email in formdata["email"]:
+            spawn(send_email, email, mailsubject, mailmessage)
 
-    mailmessage = texter.get_one("Intresse anmälan")["text"].replace("%kodstuga%",kodstuga)
-    mailsubject = "Tack för din intresseanmälan"
-    for email in formdata["email"]:
-        spawn(send_email, email, mailsubject, mailmessage)
-    
     return {"applied":data_to_db}

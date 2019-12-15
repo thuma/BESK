@@ -182,8 +182,8 @@ if __name__ == '__main__':
     def shutdown():
         print('Shutting down ...')
         server.close()
-        server.stop(timeout=60)
+        server.stop(timeout=4)
         exit(signal.SIGTERM)
     signal(signal.SIGTERM, shutdown)
     signal(signal.SIGINT, shutdown) #CTRL C
-    server.serve_forever(stop_timeout=60)
+    server.serve_forever(stop_timeout=4)
