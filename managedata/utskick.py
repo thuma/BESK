@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from managedata import db, kontaktpersoner
-from tools import read_post_data, send_email
+from tools import read_post_data, send_email, send_sms
 from gevent import sleep
 import time
 import json
@@ -130,7 +130,10 @@ def send_utskick():
                 message = utskick["text"].replace(
                     "%namn%", mottagare["deltagare_fornamn"]).replace(
                     "%kodstuga%", mottagare["kodstugor_namn"])
-                send_email(mottagare["epost"], utskick["rubrik"], message)
+                if utskick["typ"] == "sms":
+                    send_sms(mottagare["telefon"], message)
+                elif utskick["typ"] == "e-post":
+                    send_email(mottagare["epost"], utskick["rubrik"], message)
             db.cursor.execute('''
                     UPDATE 
                         utskick
