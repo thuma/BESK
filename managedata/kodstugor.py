@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from managedata import db, login
+from managedata import db, login, kontaktpersoner
 from tools import read_post_data
 import json
 
@@ -10,7 +10,18 @@ def handle(request):
     if request['REQUEST_METHOD'] == 'POST':
         return add_or_uppdate(request)
     if request['REQUEST_METHOD'] == 'DELETE':
-        return all(request)
+        return delete(request)
+
+def delete(request):
+    post_data = read_post_data(request)
+    if request["BESK_admin"] and len(kontaktpersoner.for_kodstuga(post_data['id'][0])) == 0:
+        db.cursor.execute("""
+            DELETE FROM 
+                kodstugor
+            WHERE 
+                id = ?
+         """,(post_data['id'][0],))
+    return all(request)
 
 def active(request):
     if request["BESK_login"]["user"] and login.is_admin(request["BESK_login"]["user"]["user"]["email"]):

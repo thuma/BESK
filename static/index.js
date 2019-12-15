@@ -18,6 +18,9 @@ var admin = new Vue({
         radera_utskick: function(id){
             this.delete_data('/api/utskick',"id="+encodeURIComponent(id))
         },
+        radera_kodstuga: function(id){
+            this.delete_data('/api/kodstugor',"id="+encodeURIComponent(id))
+        },
         delete_data: function(url, body){
             var next = this
             fetch(url, {
