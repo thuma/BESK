@@ -121,6 +121,7 @@
             <div class="form-group">
                 <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
                 <button v-else="" type="submit" class="btn btn-primary">Spara</button>
+                <button v-if="edit.data.id !== '' && edit.data.status=='nej'" type="button" class="btn btn-danger" v-on:click="radera_deltagare(edit.data.deltagare_id)">Radera</button>
                 <button v-on:click="edit=''" type="button" class="btn btn-secondary">Avbryt</button>
             </div>
         </form>

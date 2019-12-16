@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from managedata import db
+from managedata import db, kontaktpersoner
 from tools import read_post_data
 import uuid
 import json
@@ -12,7 +12,21 @@ def handle(request):
     if request['REQUEST_METHOD'] == 'POST':
         return add_or_uppdate(request)
     if request['REQUEST_METHOD'] == 'DELETE':
-        return all(request)
+        return delete(request)
+
+def delete(request):
+    if request["BESK_admin"]:
+        post_data = read_post_data(request)
+        db.cursor.execute("""
+            DELETE FROM 
+                deltagare
+            WHERE 
+                id = ?;
+            """, (post_data["id"][0],))
+        db.commit()
+    utdata = all(request)
+    utdata.update(kontaktpersoner.all(request))
+    return utdata
 
 def get_kodstuga(id):
     all = db.cursor.execute("""
