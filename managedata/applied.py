@@ -87,15 +87,15 @@ def new(request):
             )
         )
 
+    for kid in data_to_db["kids"]:
+        db.cursor.execute("INSERT INTO deltagare (id,kodstugor_id,fornamn,efternamn,kon,klass,skola,datum,status) VALUES (?,?,?,?,?,?,?,?,?)",kid)
+
     for adult in data_to_db["adults"]:
         db.cursor.execute("INSERT INTO kontaktpersoner (id,fornamn,efternamn,epost,telefon) VALUES (?,?,?,?,?)",adult)
 
     for adult in data_to_db["adults"]:
         for kid in data_to_db["kids"]:
             db.cursor.execute("INSERT INTO kontaktpersoner_deltagare (kontaktpersoner_id, deltagare_id) VALUES (?,?)",(adult[0], kid[0]))
-
-    for kid in data_to_db["kids"]:
-        db.cursor.execute("INSERT INTO deltagare (id,kodstugor_id,fornamn,efternamn,kon,klass,skola,datum,status) VALUES (?,?,?,?,?,?,?,?,?)",kid)
 
     hittade = (formdata["hittade"][0],)
     db.cursor.execute("INSERT INTO hittade (hittade) VALUES (?)", hittade)

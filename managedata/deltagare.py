@@ -5,6 +5,8 @@ from tools import read_post_data
 import uuid
 import json
 import phonenumbers
+import logging
+logger = logging.getLogger("deltagare")
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
@@ -19,11 +21,41 @@ def delete(request):
         post_data = read_post_data(request)
         db.cursor.execute("""
             DELETE FROM 
+                kontaktpersoner_deltagare
+            WHERE 
+                deltagare_id = ?;
+            """, (post_data["id"][0],))
+        db.cursor.execute("""
+            DELETE FROM 
                 deltagare
             WHERE 
                 id = ?;
             """, (post_data["id"][0],))
         db.commit()
+        o_kontakter = db.cursor.execute("""
+            SELECT
+                id
+            FROM
+                kontaktpersoner
+            WHERE  NOT EXISTS 
+                (SELECT
+                    1
+                FROM
+                    kontaktpersoner_deltagare
+                WHERE
+                    kontaktpersoner_deltagare.kontaktpersoner_id = kontaktpersoner.id
+                );
+            """)
+        for kontakt in o_kontakter.fetchall():
+            kontakt = kontakt[0]
+            db.cursor.execute("""
+                DELETE FROM 
+                    kontaktpersoner
+                WHERE 
+                    id = ?;
+                """, (kontakt,))
+        db.commit()
+        logger.info(o_kontakter.fetchall())
     utdata = all(request)
     utdata.update(kontaktpersoner.all(request))
     return utdata
