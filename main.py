@@ -178,12 +178,18 @@ if __name__ == '__main__':
     spawn(send_email_queue)
     spawn(send_sms_queue)
     green_pool = pool.Pool()
-    server = WSGIServer(('127.0.0.1', 9191), application, spawn=green_pool, log=logger, error_log=logger)
+    server = WSGIServer(
+        ('127.0.0.1', 9191),
+        application,
+        spawn=green_pool,
+        log=logger,
+        error_log=logger
+        )
     def shutdown():
         print('Shutting down ...')
         server.close()
         server.stop(timeout=4)
-        exit(signal.SIGTERM)
+        exit()
     signal(signal.SIGTERM, shutdown)
     signal(signal.SIGINT, shutdown) #CTRL C
     server.serve_forever(stop_timeout=4)
