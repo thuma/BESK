@@ -55,7 +55,6 @@ def delete(request):
                     id = ?;
                 """, (kontakt,))
         db.commit()
-        logger.info(o_kontakter.fetchall())
     utdata = all(request)
     utdata.update(kontaktpersoner.all(request))
     return utdata
