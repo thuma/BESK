@@ -6,4 +6,3 @@ mail -aFrom:hej@kodcentrum.se \
 -s "BESK Backup" backup@kodcentrum.se \
 -A "backup-$(date +%Y-%m-%d).sql.gz"
 rm "backup-$(date +%Y-%m-%d).sql.gz"
-rm "backup-$(date +%Y-%m-%d).sql"
