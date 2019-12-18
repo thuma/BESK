@@ -33,6 +33,14 @@ username=<46elks username>
 password=<46elks password>
 ```
 
+### Testing
+
+Use pytest to run tests on the project:
+
+```
+pytest
+```
+
 ## Production setup:
 
 * [Glesys](https://www.glesys.se) KVM server.
