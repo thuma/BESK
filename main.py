@@ -33,7 +33,8 @@ from managedata import (
     utskick,
     deltagare,
     narvaro,
-    texter
+    texter,
+    loggar
     )
 
 rotation_handler = TimedRotatingFileHandler('../BESK.log',
@@ -133,6 +134,9 @@ def route(request):
     
     if request['PATH_INFO'] == '/admin':
         return login.handle_admins(request) 
+
+    if request['PATH_INFO'] == '/loggar':
+        return loggar.handle(request) 
 
     if request['PATH_INFO'] == '/deltagare':
         return deltagare.handle(request) 

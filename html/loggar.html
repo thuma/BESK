@@ -1,5 +1,29 @@
 <h1 class="text-center">Loggar</h1>
 <div class="container">
-    
+    <ul class="list-group">
+        <li v-for="log in loggar" class="list-group-item">
+            <button 
+                v-on:click="get_data('/api/loggar?log='+encodeURIComponent(log))"
+                class="btn btn-secondary btn-sm">
+                {{log}}
+            </button>
+        </li>
+        <li class="list-group-item">
+            <button 
+                v-on:click="get_data('/api/loggar?log=sms')"
+                class="btn btn-secondary btn-sm">
+                SMS log
+            </button>
+        </li>
+        <li class="list-group-item">
+            <button 
+                v-on:click="get_data('/api/loggar?log=epost')"
+                class="btn btn-secondary btn-sm">
+                E-Post log
+            </button>
+        </li>
+    </ul>
+    <hr>
+    <div v-for="row in logdata" class="alert alert-info">{{row}}</div>
 </div>
 

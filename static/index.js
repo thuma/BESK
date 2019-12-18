@@ -213,7 +213,8 @@ var admin = new Vue({
         '/api/texter',
         '/api/volontarer/slack',
         '/api/admin',
-        '/api/me'].forEach(this.get_data)
+        '/api/me',
+        '/api/loggar'].forEach(this.get_data)
     },
     computed: {
         vald_kodstuga: function(){
@@ -292,6 +293,8 @@ var admin = new Vue({
         texter: [],
         me: {},
         admins: [],
+        loggar: [],
+        logdata: [],
         val_kodstuga: ""
     }
 })
