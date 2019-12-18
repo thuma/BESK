@@ -193,3 +193,12 @@ if __name__ == '__main__':
     signal(signal.SIGTERM, shutdown)
     signal(signal.SIGINT, shutdown) #CTRL C
     server.serve_forever(stop_timeout=4)
+else:
+    green_pool = pool.Pool()
+    server = WSGIServer(
+        ('127.0.0.1', 9292),
+        application,
+        spawn=green_pool,
+        log=logger,
+        error_log=logger
+        )
