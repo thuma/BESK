@@ -1,0 +1,11 @@
+[Unit]
+Description=BESK Server
+
+[Service]
+WorkingDirectory=/home/besk/BESK
+ExecStart=/home/besk/BESK/env/bin/python main.py
+User=besk
+Group=besk
+
+[Install]
+WantedBy=multi-user.target
