@@ -36,12 +36,14 @@ password=<46elks password>
 ## Production setup:
 
 * [Glesys](https://www.glesys.se) KVM server.
+* [Debian](https://www.debian.org/) as server OS.
 * [OpenSSH](https://www.openssh.com/) Remote access key auth only, no password.
 * [Postfix](http://www.postfix.org/) for mail sending, TLS enabled, local access only.
 * [Systemd](https://www.freedesktop.org/wiki/Software/systemd/) for running the BESK server.
 * [NGINX](https://nginx.org/en/) https and reverse proxy.
 * [Let’s Encrypt](https://letsencrypt.org/) for free SSL cert.
 * [Certbot](https://certbot.eff.org/) automatic update of SSL cert.
+* [Cron](https://www.gnu.org/software/mcron/) for automatic automatic backup.
 
 ## Built With
 
