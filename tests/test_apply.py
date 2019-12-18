@@ -2,25 +2,22 @@
 # -*- coding: utf-8 -*-
 import requests
 
-'''
-kodstuga=1
-barn_fornamn=Martin
-barn_efternamn=Thuresson
-klass=%C3%A5k%204
-skola=Test&kon=hon
-barn_fornamn=tesat
-barn_efternamn=test1a
-klass=%C3%A5k%204
-skola=Test
-kon=hen
-vuxen_fornamn=sdfsdf
-vuxen_efternamn=vbhjh
-email=martin.thure%40gmail.com
-telefon=0723175800
-vuxen_fornamn=jh
-vuxen_efternamn=vbhjh
-email=martin.thure%2B2%40gmail.com
-telefon=0723175801
-hittade=id2
-approve=ja
-'''
+def test_apply():
+    kodstugor = requests.get("http://127.0.0.1:9292/apply/kodstugor")
+    kodatuga = kodstugor.json()["kodstugor"][0]
+    data = {
+        "kodstuga":kodatuga["id"],
+        "barn_fornamn":["Martin","tesat"],
+        "barn_efternamn":["Thuresson","test1a"],
+        "klass":["åk 3","åk 4"],
+        "skola":["Test","Test"],
+        "kon":["hon","hen"],
+        "vuxen_fornamn":["sdfsdf","jh"],
+        "vuxen_efternamn":["vbhjh","vbhjh"],
+        "email":["martin.thure@gmail.com","martin.thure+2@gmail.com"],
+        "telefon":["0723175800","0723175801"],
+        "hittade":"id2",
+        "approve":"ja"
+    }
+    result = requests.post("http://127.0.0.1:9292/api/apply", data = data)
+    assert result.status_code == 200

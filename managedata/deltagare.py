@@ -21,6 +21,18 @@ def delete(request):
         post_data = read_post_data(request)
         db.cursor.execute("""
             DELETE FROM 
+                klick_svar
+            WHERE 
+                deltagare_id = ?;
+            """, (post_data["id"][0],))
+        db.cursor.execute("""
+            DELETE FROM 
+                deltagande_närvaro
+            WHERE 
+                deltagare_id = ?;
+            """, (post_data["id"][0],))
+        db.cursor.execute("""
+            DELETE FROM 
                 kontaktpersoner_deltagare
             WHERE 
                 deltagare_id = ?;
