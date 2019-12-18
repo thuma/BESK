@@ -23,14 +23,18 @@ pip install -r requirements.txt
 You need to set up a BESK.ini file:
 
 ```
+[general]
+admins = test@test.com
+
 [slack]
-redirect_uri=http://localhost:9191/login
-client_id=476744412819.789508806369
-client_secret=<slack secret key for login verification>
-token=<slack secret token for interactivity with slack>
+redirect_uri = http://localhost:9191/login
+client_id = <ID>
+client_secret = <SECRET>
+token = <TOKEN>
+
 [46elks]
-username=<46elks username>
-password=<46elks password>
+username = <USERNAME>
+password = <PASSWORD>
 ```
 
 ### Testing
