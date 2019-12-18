@@ -17,7 +17,10 @@ def all(request):
         else:
             return False
     def list_to_string(lista):
-        return ",".join(lista)
+        try:
+            return ",".join(lista)
+        except:
+            return lista
     if request["BESK_admin"]:
         files = list( filter( filterLogs, os.listdir("../") ) )
         data = read_get_data(request)
