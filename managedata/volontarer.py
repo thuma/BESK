@@ -58,10 +58,16 @@ def delete(request):
         post_data = read_post_data(request)
         db.cursor.execute("""
             DELETE FROM 
+                volontarer_plannering
+            WHERE 
+                volontarer_id = ?
+         """,(post_data['id'][0],))
+        db.cursor.execute("""
+            DELETE FROM 
                 volontarer
             WHERE 
-                epost = ?
-         """,(post_data['epost'][0],))
+                id = ?
+         """,(post_data['id'][0],))
     return all(request)
 
 slack_members = []

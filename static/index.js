@@ -24,6 +24,9 @@ var admin = new Vue({
         radera_deltagare: function(id){
             this.delete_data('/api/deltagare',"id="+encodeURIComponent(id))
         },
+        radera_volontär: function(id){
+            this.delete_data('/api/volontarer',"id="+encodeURIComponent(id))
+        },
         delete_data: function(url, body){
             var next = this
             fetch(url, {
@@ -54,9 +57,6 @@ var admin = new Vue({
         },
         copy: function(obj){
              return JSON.parse(JSON.stringify(obj));
-        },
-        radera_volontär: function(epost){
-            this.delete_data('/api/volontarer',"epost="+encodeURIComponent(epost))
         },
         volontär_finns: function(epost){
             var status = false
