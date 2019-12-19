@@ -295,6 +295,6 @@ var admin = new Vue({
         admins: [],
         loggar: [],
         logdata: [],
-        val_kodstuga: ""
+        val_kodstuga: "alla"
     }
 })

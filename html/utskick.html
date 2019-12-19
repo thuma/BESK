@@ -4,7 +4,7 @@
     <tr>
       <th scope="col" v-if="me.admin">
           <select v-model:value="val_kodstuga" class="form-control">
-              <option value="">Välj kodstuga...</option>
+              <option value="alla">Visa alla kodstugor</option>
               <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
           </select>
       </th>
@@ -17,51 +17,53 @@
     </tr>
   </thead>
   <tbody>
-    <tr v-if="vald_kodstuga.id" class="table-info">
-        <td v-if="me.admin">{{vald_kodstuga.namn}}</td>
-        <td>sms</td>
-        <td></td>
-        <td><pre>{{vald_kodstuga.sms_text}}</pre></td>
-        <td>09:00 samma dag som varje tillfälle.</td>
-        <td></td>
-        <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
-            v-on:click="edit={'type':'utskick_sms_reminder','data':copy(vald_kodstuga)}">🖊</button>
-        </td>
-    </tr>
-    <tr v-if="vald_kodstuga.id" class="table-info">
-        <td v-if="me.admin">{{vald_kodstuga.namn}}</td>
-        <td>e-post</td>
-        <td>{{vald_kodstuga.epost_rubrik}}</td>
-        <td v-html="markdown_to_html.makeHtml(vald_kodstuga.epost_text)"></td>
-        <td>09:00 dagen före varje tillfälle.</td>
-        <td></td>
-        <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
-            v-on:click="edit={'type':'utskick_epost_reminder','data':copy(vald_kodstuga)}">🖊</button>
-        </td>
-    </tr>
-    <tr v-if="vald_kodstuga.id" class="table-info">
-        <td v-if="me.admin">{{vald_kodstuga.namn}}</td>
-        <td>e-post</td>
-        <td>{{vald_kodstuga.epost_rubrik_ja}}</td>
-        <td v-html="markdown_to_html.makeHtml(vald_kodstuga.epost_text_ja)"></td>
-        <td>När deltagaren tackar ja.</td>
-        <td></td>
-        <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
-            v-on:click="edit={'type':'utskick_valkommen','data':copy(vald_kodstuga)}">🖊</button>
-        </td>
-    </tr>
-    <tr v-for="skick in utskick" v-if="vald_kodstuga.id == skick.kodstugor_id">
-        <td v-if="me.admin">{{kodstuga_name_by_id(skick.kodstugor_id)}}</td>
-        <td>{{skick.typ}}</td>
-        <td>{{skick.rubrik}}</td>
-        <td v-if="skick.typ=='e-post'" v-html="markdown_to_html.makeHtml(skick.text)"></td>
-        <td v-else=""><pre>{{skick.text}}</pre></td>
-        <td>{{skick.datum}}</td>
-        <td>{{skick.status}}</td>
-        <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
-            v-on:click="edit={'type':'utskick','data':copy(skick)}">🖊</button>
-        </td>
-    </tr>
+    <template v-for="kodstuga in kodstugor" v-if="val_kodstuga == kodstuga.id || val_kodstuga == 'alla'">
+        <tr class="table-info">
+            <td v-if="me.admin">{{kodstuga.namn}}</td>
+            <td>sms</td>
+            <td></td>
+            <td><pre>{{kodstuga.sms_text}}</pre></td>
+            <td>09:00 samma dag som varje tillfälle.</td>
+            <td></td>
+            <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
+                v-on:click="edit={'type':'utskick_sms_reminder','data':copy(kodstuga)}">🖊</button>
+            </td>
+        </tr>
+        <tr class="table-info">
+            <td v-if="me.admin">{{kodstuga.namn}}</td>
+            <td>e-post</td>
+            <td>{{kodstuga.epost_rubrik}}</td>
+            <td v-html="markdown_to_html.makeHtml(kodstuga.epost_text)"></td>
+            <td>09:00 dagen före varje tillfälle.</td>
+            <td></td>
+            <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
+                v-on:click="edit={'type':'utskick_epost_reminder','data':copy(kodstuga)}">🖊</button>
+            </td>
+        </tr>
+        <tr class="table-info">
+            <td v-if="me.admin">{{kodstuga.namn}}</td>
+            <td>e-post</td>
+            <td>{{kodstuga.epost_rubrik_ja}}</td>
+            <td v-html="markdown_to_html.makeHtml(kodstuga.epost_text_ja)"></td>
+            <td>När deltagaren tackar ja.</td>
+            <td></td>
+            <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
+                v-on:click="edit={'type':'utskick_valkommen','data':copy(kodstuga)}">🖊</button>
+            </td>
+        </tr>
+        <tr v-for="skick in utskick" v-if="kodstuga.id == skick.kodstugor_id">
+            <td v-if="me.admin">{{kodstuga_name_by_id(skick.kodstugor_id)}}</td>
+            <td>{{skick.typ}}</td>
+            <td>{{skick.rubrik}}</td>
+            <td v-if="skick.typ=='e-post'" v-html="markdown_to_html.makeHtml(skick.text)"></td>
+            <td v-else=""><pre>{{skick.text}}</pre></td>
+            <td>{{skick.datum}}</td>
+            <td>{{skick.status}}</td>
+            <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
+                v-on:click="edit={'type':'utskick','data':copy(skick)}">🖊</button>
+            </td>
+        </tr>
+    </template>
   </tbody>
 </table>
 <button 

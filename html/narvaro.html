@@ -1,5 +1,12 @@
 <h1 class="text-center">Närvaro barn</h1>
-<form method="post" @submit="check_send" action="/api/narvaro" v-for="kodstuga in kodstugor">
+<div v-if="me.admin">
+    Visa kodstuga:
+    <select v-model:value="val_kodstuga" class="form-control">
+        <option value="alla">Visa alla kodstugor</option>
+        <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
+    </select>
+</div>
+<form method="post" @submit="check_send" action="/api/narvaro" v-for="kodstuga in kodstugor" v-if="val_kodstuga=='alla' || kodstuga.id == val_kodstuga">
     <table class="table table-sm">
       <thead>
         <tr>

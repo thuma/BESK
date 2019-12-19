@@ -2,7 +2,12 @@
 <table class="table table-sm" v-if="edit==''">
     <thead>
         <tr>
-            <th scope="col" v-if="me.admin">Kodstuga</th>
+            <th scope="col" v-if="me.admin">
+                <select v-model:value="val_kodstuga" class="form-control">
+                    <option value="alla">Visa alla kodstugor</option>
+                    <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
+                </select>
+            </th>
             <th scope="col">Förnamn</th>
             <th scope="col">Efternamn</th>
             <th scope="col">E-Post</th>
@@ -12,7 +17,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr v-for="kontaktperson in kontaktpersoner">
+        <tr v-for="kontaktperson in kontaktpersoner" v-if="kontaktperson.kodstugor_id == val_kodstuga || val_kodstuga == 'alla'">
             <td v-if="me.admin">{{kodstuga_name_by_id(kontaktperson.kodstugor_id)}}</td>
             <td>{{kontaktperson.fornamn}}</td>
             <td>{{kontaktperson.efternamn}}</td>

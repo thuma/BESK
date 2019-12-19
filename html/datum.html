@@ -2,12 +2,17 @@
 <table class="table table-sm" v-if="edit==''">
   <thead>
     <tr>
-      <th scope="col">Kodstuga</th>
+      <th scope="col">
+            <select v-model:value="val_kodstuga" class="form-control">
+                <option value="alla">Visa alla kodstugor</option>
+                <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
+            </select>
+      </th>
       <th scope="col" colspan="11">Datum för kodstuge tillfällen och lov</th>
     </tr>
   </thead>
   <tbody>
-    <tr v-for="kodstuga in kodstugor">
+    <tr v-for="kodstuga in kodstugor" v-if="val_kodstuga=='alla' || kodstuga.id == val_kodstuga">
         <td>{{kodstuga.namn}}</td>
         <td v-for="date in get_dates(kodstuga.id)">{{date.datum}} <br>({{date.typ}})</td>
         <td><button class="btn btn-sm btn-outline-secondary"
