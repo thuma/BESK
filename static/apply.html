@@ -19,7 +19,7 @@
     <div class="card" v-if="success==false">
         <div class="card-body">
             <h1 v-if="admin==false" class="card-title">Formulär intresseanmälan kodstuga</h1>
-            <h1 else="" class="card-title">Lägg till deltagare och målsman i kodstuga</h1>
+            <h1 v-if="admin" class="card-title">Lägg till deltagare och målsman i kodstuga</h1>
             <ul v-if="admin==false">
                 <li>Observera att Kodcentrum ger en <b>introduktion</b> till programmering och digitalt skapande.</li>
                 <li>Viktigt att tänka på är att Kodstugan är till för barn och unga <b>utan tidigare förkunskaper</b>. Vår erfarenhet är att deltagare som redan varit i kontakt med andra verktyg och programmeringsspråk, särskilt bland de äldre i målgruppen, inte stimuleras nog av vårt upplägg.</li>
@@ -78,6 +78,23 @@
                                 <option value="hon">hon</option>
                                 <option value="han">han</option>
                                 <option value="hen">hen</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="form-group" v-if="admin==true">
+                        <small class="form-text text-muted">
+                            Då Kodcentrum kontinuerligt dokumenterar, kommunicerar och
+                            informerar om sin verksamhet behöver du ange om det är ok 
+                            att ditt barn syns på stillbilder och/eller filmat 
+                            material. Kodcentrum och/eller tredje part får använda 
+                            materialet för marknadsförings- och informationsändamål om
+                            Kodcentrum.
+                        </small>
+                        <label>Foto
+                            <select class="form-control" name="foto" required>
+                                <option value="">Välj...</option>
+                                <option value="nej">Jag accepterar inte</option>
+                                <option value="ja">Jag accepterar</option>
                             </select>
                         </label>
                     </div>

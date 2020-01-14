@@ -22,6 +22,7 @@ def new(request):
         "adults":[]
         }
     status = "ansökt"
+    foto = None
     formdata = read_post_data(request)
     if "invite_now" in formdata:
         if login.is_admin(request["BESK_login"]["user"]["user"]["email"]) and formdata["invite_now"][0] == "ja":
@@ -40,6 +41,12 @@ def new(request):
     now = int(time.time())
 
     for i, value in enumerate(formdata["barn_efternamn"]):
+        if "foto" in formdata and status == "inbjudan" and formdata["foto"][i] == "":
+            raise Error400("Välj foto eller ej.")
+        elif status == "inbjudan":
+            foto = formdata["foto"][i]
+        else:
+            foto = None
         if formdata["barn_fornamn"][i] == "":
             raise Error400("Fyll i förnamn för samtliga barn.")
         if formdata["barn_efternamn"][i] == "":
@@ -59,6 +66,7 @@ def new(request):
             formdata["kon"][i],
             formdata["klass"][i],
             formdata["skola"][i],
+            foto,
             now,
             status
             )
@@ -88,7 +96,7 @@ def new(request):
         )
 
     for kid in data_to_db["kids"]:
-        db.cursor.execute("INSERT INTO deltagare (id,kodstugor_id,fornamn,efternamn,kon,klass,skola,datum,status) VALUES (?,?,?,?,?,?,?,?,?)",kid)
+        db.cursor.execute("INSERT INTO deltagare (id,kodstugor_id,fornamn,efternamn,kon,klass,skola,foto,datum,status) VALUES (?,?,?,?,?,?,?,?,?,?)",kid)
 
     for adult in data_to_db["adults"]:
         db.cursor.execute("INSERT INTO kontaktpersoner (id,fornamn,efternamn,epost,telefon) VALUES (?,?,?,?,?)",adult)
