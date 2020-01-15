@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS deltagare (
   datum INTEGER,
   status TEXT,
   frannummer TEXT,
+  skonto TEXT,
+  slosen TEXT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id)
   ); 
 ''',

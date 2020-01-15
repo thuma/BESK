@@ -3,6 +3,8 @@
 from managedata import db, login, kontaktpersoner
 from tools import read_post_data
 import json
+import logging
+logger = logging.getLogger("kodstugor")
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
@@ -33,6 +35,7 @@ def delete(request):
             WHERE 
                 id = ?
          """,(post_data['id'][0],))
+        db.commit()
     return all(request)
 
 def active(request):

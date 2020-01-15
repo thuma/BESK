@@ -26,7 +26,7 @@ def test_update(as_admin):
     kodstuga = result.json()['kodstugor'][0]
     data = {
         "id" : kodstuga['id'],
-        "namn" : kodstuga['namn'] + str(random()),
+        "namn" : kodstuga['namn'],
         "sms_text" : kodstuga['sms_text'],
         "epost_text" : kodstuga['epost_text'],
         "epost_rubrik" : kodstuga['epost_rubrik'],
@@ -34,8 +34,6 @@ def test_update(as_admin):
         "epost_rubrik_ja" : kodstuga['epost_rubrik_ja'],
         "open": "Ja"
         }
-    if kodstuga["open"] == "Ja":
-        data["open"] = "Nej"
     result = as_admin.post("http://127.0.0.1:9292/api/kodstugor", data = data)
     for one in result.json()['kodstugor']:
         if one["id"] == data["id"]:
@@ -47,4 +45,4 @@ def test_delete(as_admin, as_volonar):
     for one in result.json()['kodstugor']:
         if one["namn"] == "Test_Kodstuga_Att_Radera":
             result2 = as_admin.delete("http://127.0.0.1:9292/api/kodstugor", data = {"id":one["id"]})
-    assert result2.status_code == 200
+            assert result2.status_code == 200
