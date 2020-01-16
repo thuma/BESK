@@ -59,24 +59,6 @@ def add_or_uppdate(request):
                         (?,?,?,?,?)
                 """, data)
         db.commit()
-    else:
-        data = (
-            post_data["fornamn"][0],
-            post_data["efternamn"][0],
-            post_data["epost"][0],
-            phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164),
-            post_data["id"][0]
-        )
-        db.cursor.execute("""
-            UPDATE kontaktpersoner
-                SET
-                    fornamn = ?,
-                    efternamn = ?,
-                    epost = ?,
-                    telefon = ?
-                WHERE
-                    id = ?
-            """, data)
     return all(request)
 
 def for_kodstuga(kodstugor_id):

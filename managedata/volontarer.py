@@ -17,6 +17,29 @@ def handle(request):
     if request['REQUEST_METHOD'] == 'DELETE':
         return delete(request)
 
+def get_by_id(volid):
+    all = db.cursor.execute("""
+        SELECT 
+            id,
+            kodstugor_id,
+            epost,
+            namn,
+            telefon
+        FROM
+            volontarer 
+        WHERE
+            id = ?
+        LIMIT 1""", (volid, ));
+    def to_headers(row):
+        ut = {}
+        for idx, col in enumerate(all.description):
+            if col[0] == "utdrag_datum" and isinstance(row[idx], int):
+                ut[col[0]] = arrow.Arrow.utcfromtimestamp(row[idx]).format("YYYY-MM-DD")
+            else:
+                ut[col[0]] = row[idx]
+        return ut
+    return to_headers(all.fetchone())
+
 def get_kodstuga(epost):
     all = db.cursor.execute("""
         SELECT 
@@ -61,13 +84,14 @@ def delete(request):
                 volontarer_plannering
             WHERE 
                 volontarer_id = ?
-         """,(post_data['id'][0],))
+            """,(post_data['id'][0],))
         db.cursor.execute("""
             DELETE FROM 
                 volontarer
             WHERE 
                 id = ?
-         """,(post_data['id'][0],))
+            """,(post_data['id'][0],))
+        db.commit()
     return all(request)
 
 slack_members = []
@@ -176,6 +200,8 @@ def add_or_update_admin(request):
 
 def update_as_vol(request):
     post_data = read_post_data(request)
+    if not get_by_id(post_data["id"][0])["epost"] == request["BESK_login"]["user"]["user"]["email"]:
+        return
     try:
         phone_number = phonenumbers.parse(post_data["telefon"][0], "SE")
         phone_number_str = phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
@@ -186,7 +212,6 @@ def update_as_vol(request):
     if "id" in post_data:
         data = (
             post_data["namn"][0],
-            post_data["epost"][0],
             phone_number_str,
             post_data["id"][0]
         )
@@ -194,7 +219,6 @@ def update_as_vol(request):
             UPDATE volontarer
                 SET
                     namn = ?,
-                    epost = ?,
                     telefon = ?
                 WHERE
                     id = ?

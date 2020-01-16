@@ -18,7 +18,7 @@
             <th scope="col">Målsman</th>
             <th scope="col" v-if="me.admin">Ansökte</th>
             <th scope="col" v-if="me.admin">Status</th>
-            <th scope="col">Redigera</th>
+            <th scope="col" v-if="me.admin">Redigera</th>
         </tr>
     </thead>
     <tbody>
@@ -42,7 +42,7 @@
                     {{kid.status}}
                 </label>
             </td>
-            <td><button type="button" class="btn btn-sm btn-outline-secondary"
+            <td v-if="me.admin"><button type="button" class="btn btn-sm btn-outline-secondary"
             v-on:click="edit={'type':'deltagare','data':copy(kid)}">🖊</button>
             </td>
         </tr>

@@ -187,25 +187,7 @@ def add_or_uppdate(request):
                     VALUES 
                         (?,?,?,?,?,?,?)
                 """, data)
-    else:
-        post_data = read_post_data(request)
-        data = (
-                post_data["fornamn"][0],
-                post_data["efternamn"][0],
-                post_data["id"][0],
-                request["BESK_kodstuga"]
-            )
-        db.cursor.execute("""
-                UPDATE deltagare
-                    SET
-                        fornamn = ?,
-                        efternamn = ?
-                    WHERE
-                        id = ?
-                    AND
-                        kodstugor_id = ?
-                """, data)
-    db.commit()
+        db.commit()
     return all(request)
 
 def all(request):
