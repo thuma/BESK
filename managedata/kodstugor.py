@@ -73,10 +73,11 @@ def active(request):
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
+    alla_kodstugor = list(map(to_headers, all.fetchall()))
     return {
         "admin":admin,
         "AnsökanInfo":texter.get_one("Info Vid Ansökan")["text"],
-        "kodstugor":list(map(to_headers, all.fetchall()))
+        "kodstugor":alla_kodstugor
         }
 
 def get_kodstuga(kodstua_id):
