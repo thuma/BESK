@@ -113,6 +113,8 @@ def get_one(id):
             deltagare.status AS status,
             deltagare.fornamn AS fornamn,
             deltagare.efternamn AS efternamn,
+            deltagare.skonto AS skonto,
+            deltagare.slosen AS slosen,
             deltagare.kon AS kon,
             deltagare.skola AS skola,
             deltagare.klass AS klass,
@@ -153,6 +155,8 @@ def add_or_uppdate(request):
                 post_data["klass"][0],
                 post_data["skola"][0],
                 post_data["kodstuga"][0],
+                post_data["skonto"][0],
+                post_data["slosen"][0],
                 post_data["id"][0]
             )
             db.cursor.execute("""
@@ -165,7 +169,9 @@ def add_or_uppdate(request):
                         foto = ?,
                         klass = ?,
                         skola = ?,
-                        kodstugor_id = ?
+                        kodstugor_id = ?,
+                        skonto = ?,
+                        slosen = ?
                     WHERE
                         id = ?
                 """, data)
@@ -178,14 +184,16 @@ def add_or_uppdate(request):
                 post_data["kon"][0],
                 post_data["klass"][0],
                 post_data["skola"][0],
-                post_data["kodstuga"][0]
+                post_data["kodstuga"][0],
+                post_data["skonto"][0],
+                post_data["slosen"][0],
             )
             db.cursor.execute("""
                 INSERT 
                     INTO deltagare 
-                        (id, fornamn, efternamn, status, kon, klass, skola,kodstugor_id) 
+                        (id, fornamn, efternamn, status, kon, klass, skola, kodstugor_id, skonto, slosen) 
                     VALUES 
-                        (?,?,?,?,?,?,?)
+                        (?,?,?,?,?,?,?,?,?)
                 """, data)
         db.commit()
     return all(request)
@@ -203,6 +211,8 @@ def all(request):
             deltagare.status AS status,
             deltagare.fornamn AS fornamn,
             deltagare.efternamn AS efternamn,
+            deltagare.skonto AS skonto,
+            deltagare.slosen AS slosen,
             deltagare.foto AS foto,
             deltagare.kon AS kon,
             deltagare.skola AS skola,

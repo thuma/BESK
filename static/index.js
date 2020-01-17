@@ -161,6 +161,14 @@ var admin = new Vue({
                 return {'btn-outline-warning':true}
             }
         },
+        show_skonto: function(skonto, slosen){
+            var div_data  = document.createElement("div");
+            div_data.innerHTML = "<strong>Konto:</strong> " + skonto + "<br>" +
+                "<strong>Lösenord:</strong> " + slosen;
+            swal({
+                content: div_data,
+            });
+        },
         show_kontaktperson: function(kontaktperson){
             var div_data  = document.createElement("div");
             div_data.innerHTML = "<strong>Namn:</strong> " + kontaktperson.fornamn + " " + kontaktperson.fornamn + "<br>" +
