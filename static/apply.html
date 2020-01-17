@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <title>BESK - Kodcentrum</title>
@@ -20,13 +21,8 @@
         <div class="card-body">
             <h1 v-if="admin==false" class="card-title">Formulär intresseanmälan kodstuga</h1>
             <h1 v-if="admin" class="card-title">Lägg till deltagare och målsman i kodstuga</h1>
-            <ul v-if="admin==false">
-                <li>Observera att Kodcentrum ger en <b>introduktion</b> till programmering och digitalt skapande.</li>
-                <li>Viktigt att tänka på är att Kodstugan är till för barn och unga <b>utan tidigare förkunskaper</b>. Vår erfarenhet är att deltagare som redan varit i kontakt med andra verktyg och programmeringsspråk, särskilt bland de äldre i målgruppen, inte stimuleras nog av vårt upplägg.</li>
-                <li>En del av upplägget bygger på att deltagare är <b>bekväma med att läsa instruktioner</b> till övningarna själva. Givetvis finns det volontärer på plats som guidar barnen i att lösa uppgifterna.</li>
-                <li>All programmering sker i Scratch (<a href="https://scratch.mit.edu/">https://scratch.mit.edu/</a>) och en del datorfria lekar förekommer för att förmedla den grundläggande logiken.</li>
-                <li>Detta är en intresseanmälan, det finns ett begränsat antal platser i kodstugan och vi eftersträvar en jämn könsfördelning vilket innebär att <b>ditt barn inte är garanterad en plats</b>.</li>
-            </ul>
+            <span v-if="admin==false" v-html="markdown_to_html.makeHtml(AnsökanInfo)">
+            </span>
             <form method="POST" id="formrequest">
                 <div class="form-group">
                     <label>Mitt barn är ny till programmering och är intresserad av denna kodstuga
@@ -181,6 +177,7 @@
                     function(data) {
                         main.kodstugor = data.kodstugor;
                         main.admin = data.admin;
+                        main.AnsökanInfo = data.AnsökanInfo;
                     });
                 });
       },
@@ -215,12 +212,14 @@
         },
       },
       data: {
+        markdown_to_html: new showdown.Converter(),
         kids: 1,
         adults: 1,
         admin: false,
         kodstugor: [],
         loading: false,
-        success: false
+        success: false,
+        AnsaökanInfo: ""
       }
     })
     </script>

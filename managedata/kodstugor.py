@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from managedata import db, login, kontaktpersoner
+from managedata import db, login, kontaktpersoner, texter
 from tools import read_post_data
 import json
 import logging
@@ -73,7 +73,11 @@ def active(request):
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return {"admin":admin, "kodstugor":list(map(to_headers, all.fetchall()))}
+    return {
+        "admin":admin,
+        "AnsökanInfo":texter.get_one("Info Vid Ansökan")["text"],
+        "kodstugor":list(map(to_headers, all.fetchall()))
+        }
 
 def get_kodstuga(kodstua_id):
     all = db.cursor.execute("""
