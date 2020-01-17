@@ -133,7 +133,7 @@
                 <hr>
                 <div class="form-group">
                     <label>Hur hörde du talas om att Kodcentrum har kodstugor?
-                    <select class="form-control" name="hittade">
+                    <select class="form-control" v-model:value="hittade">
                         <option value="id1" selected>Genom skolan</option>
                         <option value="id2">Tips från en vän</option>
                         <option value="id3">På sociala medier</option>
@@ -141,6 +141,10 @@
                         <option value="id5">Hittade information Kodcentrums hemsida</option>
                         <option value="id6">Annat</option>
                     </select>
+                    <input v-if="hittade !== 'id6'" type="hidden" name="hittade" v-model:value="hittade">
+                    </label>
+                    <label v-if="hittade=='id6'">Beskriv med egna ord:
+                        <input type="text" class="form-control" name="hittade" required>
                     </label>
                 </div>
                 <div class="form-group">
@@ -215,6 +219,7 @@
         markdown_to_html: new showdown.Converter(),
         kids: 1,
         adults: 1,
+        hittade:"id1",
         admin: false,
         kodstugor: [],
         loading: false,
