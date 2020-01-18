@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from managedata import db
-from tools import read_post_data, config, Error400
+from managedata import db, texter
+from tools import read_post_data, config, Error400, send_email
 import json
 import phonenumbers
 import requests
@@ -131,6 +131,7 @@ def add_or_update_admin(request):
                     WHERE
                         id = ?
                 """, (post_data["kodstugor_id"][0], flytta_id))
+            db.commit()
     elif "flera" in post_data:
         for i, namn in enumerate(post_data["namn"]):
             data = (
@@ -148,6 +149,9 @@ def add_or_update_admin(request):
                         VALUES 
                             (?,?,?,?,?)
                     """, data)
+                
+                db.commit()
+                send_email(post_data["epost"][i], "BESK-konto aktiverat", texter.get_one("BESK-konto aktiverat")["text"])
             except db.sqlite3.IntegrityError:
                 pass
     else:
@@ -178,6 +182,7 @@ def add_or_update_admin(request):
                     WHERE
                         id = ?
                 """, data)
+            db.commit()
         else:
             data = (
                 post_data["namn"][0],
@@ -194,9 +199,10 @@ def add_or_update_admin(request):
                         VALUES 
                             (?,?,?,?,?)
                     """, data)
+                db.commit()
+                send_email(post_data["epost"][0], "BESK-konto aktiverat", texter.get_one("BESK-konto aktiverat")["text"])
             except db.sqlite3.IntegrityError:
                  raise Error400("E-Postadressen finns redan.")
-    db.commit()
 
 def update_as_vol(request):
     post_data = read_post_data(request)
