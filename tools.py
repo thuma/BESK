@@ -88,52 +88,58 @@ def send_sms(to, message):
         db.commit()
     except db.sqlite3.IntegrityError:
         logger.info("SMS redan i kö")
+    except:
+        logger.error("SMS kunde inte skickas till: "+to, exc_info=1)
 
 def send_sms_queue():
     while True:
-        sleep(2)
-        datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
-        all = db.cursor.execute("""
-            SELECT 
-                id, till, message
-            FROM
-                sms_queue
-            WHERE
-                status = "köad";
-        """)
-        tosend = all.fetchone()
-        if tosend is None:
-            continue
-        (id, to, message) = tosend
-
-        result = requests.post(
-            'https://api.46elks.com/a1/sms',
-            auth = (
-                config["46elks"]["username"],
-                config["46elks"]["password"]
-                ),
-            data = {
-                'from': 'Kodcentrum',
-                'to': to,
-                'message': message
-            }
-        )
         try:
-            sms_id = result.json()["id"]
+            sleep(2)
+            datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
+            all = db.cursor.execute("""
+                SELECT 
+                    id, till, message
+                FROM
+                    sms_queue
+                WHERE
+                    status = "köad";
+            """)
+            tosend = all.fetchone()
+            if tosend is None:
+                continue
+            (id, to, message) = tosend
+
+            result = requests.post(
+                'https://api.46elks.com/a1/sms',
+                auth = (
+                    config["46elks"]["username"],
+                    config["46elks"]["password"]
+                    ),
+                data = {
+                    'from': 'Kodcentrum',
+                    'to': to,
+                    'message': message
+                }
+            )
+            try:
+                sms_id = result.json()["id"]
+            except:
+                sms_id= "error"
+            db.cursor.execute("""
+                UPDATE 
+                    sms_queue
+                SET
+                    status = "skickad",
+                    sms_id = ?
+                WHERE
+                    id = ?;
+                """,
+                (sms_id, id)
+            )
+            db.commit()
         except:
-            sms_id= "error"
-        db.cursor.execute("""
-            UPDATE 
-                sms_queue
-            SET
-                status = "skickad",
-                sms_id = ?
-            WHERE
-                id = ?;
-            """,
-            (sms_id, id)
-        )
-        db.commit()
+            logger.error("Epost kunde inte skickas från kön.", exc_info=1)
+            sleep(3600)
 
 def send_email(to, subject, message):
     datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
@@ -150,48 +156,54 @@ def send_email(to, subject, message):
         db.commit()
     except db.sqlite3.IntegrityError:
         logger.info("Epost redan i kö.")
+    except:
+        logger.error("Epost kunde inte skickas till: "+to, exc_info=1)
 
 def send_email_queue():
     while True:
-        sleep(2)
-        datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
-        all = db.cursor.execute("""
-            SELECT 
-                id, till, subject, message
-            FROM
-                mail_queue
-            WHERE
-                status = "köad";
-        """)
-        tosend = all.fetchone()
-        if tosend is None:
-            continue
-
-        (id, to, subject, message) = tosend
-        html = markdown.markdown(message)
-        msg = EmailMessage()
-        msg['Subject'] = subject
-        msg['From'] = "Kodcentrum <hej@kodcentrum.se>"
-        msg['To'] = to
-        msg.set_content(message)
-        msg.add_alternative(html, subtype='html')
         try:
-            server = smtplib.SMTP('localhost')
-            server.send_message(msg)
-            server.quit()
+            sleep(2)
+            datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
+            all = db.cursor.execute("""
+                SELECT 
+                    id, till, subject, message
+                FROM
+                    mail_queue
+                WHERE
+                    status = "köad";
+            """)
+            tosend = all.fetchone()
+            if tosend is None:
+                continue
+
+            (id, to, subject, message) = tosend
+            html = markdown.markdown(message)
+            msg = EmailMessage()
+            msg['Subject'] = subject
+            msg['From'] = "Kodcentrum <hej@kodcentrum.se>"
+            msg['To'] = to
+            msg.set_content(message)
+            msg.add_alternative(html, subtype='html')
+            try:
+                server = smtplib.SMTP('localhost')
+                server.send_message(msg)
+                server.quit()
+            except:
+                logger.error("SMTP send failed.")
+                sleep(60*10)
+                continue
+            db.cursor.execute("""
+                UPDATE 
+                    mail_queue
+                SET
+                    status = "skickad"
+                WHERE
+                    id = ?;
+                """,
+                (id,)
+                )
+            db.commit()
         except:
-            logger.error("SMTP send failed.")
-            sleep(60*10)
-            continue
-        db.cursor.execute("""
-            UPDATE 
-                mail_queue
-            SET
-                status = "skickad"
-            WHERE
-                id = ?;
-            """,
-            (id,)
-            )
-        db.commit()
+            logger.error("Epost kunde inte skickas från kön.", exc_info=1)
+            sleep(3600)
 

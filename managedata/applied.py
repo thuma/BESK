@@ -112,6 +112,6 @@ def new(request):
         mailmessage = texter.get_one("Intresse anmälan")["text"].replace("%kodstuga%",kodstuga)
         mailsubject = "Tack för din intresseanmälan"
         for email in formdata["email"]:
-            spawn(send_email, email, mailsubject, mailmessage)
+            send_email(email, mailsubject, mailmessage)
 
     return {"applied":data_to_db}
