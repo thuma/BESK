@@ -45,6 +45,12 @@ Use pytest to run tests on the project:
 pytest
 ```
 
+## Deploy
+
+```
+./deploy.sh
+```
+
 ## Production setup:
 
 * [Glesys](https://www.glesys.se) KVM server.
