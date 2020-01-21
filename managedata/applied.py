@@ -22,10 +22,13 @@ def new(request):
         "adults":[]
         }
     status = "ansökt"
-    foto = None
     formdata = read_post_data(request)
+    if request["BESK_login"]["user"]:
+        user_is_admin = login.is_admin(request["BESK_login"]["user"]["user"]["email"])
+    else:
+        user_is_admin = False
     if "invite_now" in formdata:
-        if login.is_admin(request["BESK_login"]["user"]["user"]["email"]) and formdata["invite_now"][0] == "ja":
+        if user_is_admin and formdata["invite_now"][0] == "ja":
             status = "inbjudan"
 
     if "approve" not in formdata:
@@ -41,9 +44,7 @@ def new(request):
     now = int(time.time())
 
     for i, value in enumerate(formdata["barn_efternamn"]):
-        if "foto" in formdata and status == "inbjudan" and formdata["foto"][i] == "":
-            raise Error400("Välj foto eller ej.")
-        elif status == "inbjudan":
+        if user_is_admin:
             foto = formdata["foto"][i]
         else:
             foto = None
