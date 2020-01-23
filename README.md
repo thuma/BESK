@@ -64,6 +64,11 @@ pytest
 * [Cron](https://www.gnu.org/software/mcron/) for automatic automatic backup.
 
 ## Production server
+
+```
+ansible-playbook besk.yml -i hosts --ask-become-pass
+```
+
 <p>
 Glesys stöttar Kodcentrum med en VPS för BESK.
 Glesys erbjuder IT-infrastruktur som tjänst (IaaS) inom branscher med höga 

@@ -1,0 +1,57 @@
+---
+- hosts: all
+  remote_user: besk
+  tasks:
+  - name: Install nginx
+    become: yes
+    apt:
+      name: nginx
+      update_cache: yes
+      state: present
+  - name: Install certbot
+    become: yes
+    apt:
+      name: certbot
+      state: present
+  - name: Install certbot for NGINX
+    become: yes
+    apt:
+      name: python-certbot-nginx
+      state: present
+  - name: Install Postfix
+    become: yes
+    apt:
+      name: postfix
+      state: present
+  - name: Add backup to Cron
+    cron:
+        name: "Backup"
+        minute: "23"
+        hour: "1"
+        job: "cd /home/besk/; ./BESK/backup.sh"
+  - name: Install GIT
+    become: yes
+    apt:
+      name: git
+      state: present
+  - name: Install Python3
+    become: yes
+    apt:
+      name: python3
+      state: present
+  - name: Install Virtualenv
+    become: yes
+    apt:
+      name: python3-virtualenv
+      state: present
+  - name: requirements.txt
+    copy:
+      src: ../requirements.txt
+      dest: /home/besk/requirements.txt
+      owner: besk
+      group: besk
+      mode: '0644'
+  - name: Make Virtualenv
+    pip:
+        requirements: /home/besk/requirements.txt
+        virtualenv: /home/besk/BESK/env
