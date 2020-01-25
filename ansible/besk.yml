@@ -29,6 +29,14 @@
     apt:
       name: postfix
       state: present
+  - name: Postfix Conf
+    become: yes
+    copy:
+      src: postfix-main.cf
+      dest: /etc/postfix/main.cf
+      owner: root
+      group: root
+      mode: '0644'
   - name: Add backup to Cron
     cron:
       name: "Backup"
