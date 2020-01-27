@@ -69,3 +69,17 @@
     pip:
       requirements: /home/besk/requirements.txt
       virtualenv: /home/besk/BESK/env
+  - name: Add BESK systemctl service
+    become: yes
+    copy:
+      src: ../besk.service
+      dest: /etc/systemd/system/
+      owner: root
+      group: root
+      mode: '0644'
+  - name: Enable BESK for autmatic start on boot
+    become: yes
+    systemd:
+      name: besk
+      enabled: yes
+      daemon_reload: yes
