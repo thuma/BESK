@@ -83,3 +83,12 @@
       name: besk
       enabled: yes
       daemon_reload: yes
+  - name: Add NGINX conf file
+    become: yes
+    copy:
+      force: no
+      src: besk.kocentrum.se.conf
+      dest: /etc/nginx/sites-enabled/besk.kocentrum.se.conf
+      owner: root
+      group: root
+      mode: '0644'
