@@ -9,6 +9,8 @@ Handle applications for and attendance on the Kodcentrum kodstugor.
 Clone and run the main file:
 
 ```
+git clone git@github.com:thuma/BESK.git
+cd BESK
 python main.py
 ```
 
@@ -66,7 +68,8 @@ pytest
 ## Production server
 
 ```
-ansible-playbook besk.yml -i hosts --ask-become-pass
+cd ansible
+ansible-playbook besk.yml
 ```
 
 <p>
