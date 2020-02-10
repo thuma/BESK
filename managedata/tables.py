@@ -136,9 +136,21 @@ CREATE TABLE IF NOT EXISTS auth (
 ''',
 '''
 CREATE TABLE IF NOT EXISTS keyvalue (
-  id TEXT PRIMARY KEY,
+  id TEXT UNIQUE PRIMARY KEY,
   text TEXT
   );
+''',
+'''
+INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Intresse anmälan", "")
+''',
+'''
+INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Erbjudande om plats", "")
+''',
+'''
+INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Info Vid Ansökan", "")
+''',
+'''
+INSERT OR IGNORE INTO keyvalue(id, text) VALUES("BESK-konto aktiverat", "")
 ''',
 '''
 CREATE TABLE IF NOT EXISTS mail_queue (
