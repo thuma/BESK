@@ -118,13 +118,25 @@ CREATE TABLE IF NOT EXISTS volontarer (
   );
 ''',
 '''
+CREATE TABLE IF NOT EXISTS volontarer_roller (
+  id INTEGER PRIMARY KEY,
+  volontarer_id INT,
+  kodstugor_id INT,
+  roll TEXT,
+  FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id),
+  FOREIGN KEY(volontarer_id) REFERENCES volontarer(id)
+  );
+''',
+'''
 CREATE TABLE IF NOT EXISTS volontarer_plannering (
   id INTEGER PRIMARY KEY,
   datum TEXT,
   volontarer_id INT,
+  kodstugor_id INT,
   status TEXT,
   kommentar TEXT,
-  FOREIGN KEY(volontarer_id) REFERENCES volontarer(id)
+  FOREIGN KEY(volontarer_id) REFERENCES volontarer(id),
+  FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id)
   );
 ''',
 '''
