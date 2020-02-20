@@ -21,7 +21,17 @@ def all(request):
     if request["BESK_admin"]:
         where = ""
     else:
-        where = "WHERE kodstugor_id = " + str(request["BESK_kodstuga"])
+        where = """
+            WHERE 
+                kodstugor_id
+            IN (
+                SELECT 
+                    kodstugor_id 
+                FROM 
+                    volontarer_roller
+                WHERE 
+                    volontarer_id = %s
+            ) """ % request["BESK_volontarer_id"]
     all = db.cursor.execute("""
         SELECT 
             id,
@@ -33,12 +43,10 @@ def all(request):
             status
         FROM
             utskick 
-        """ + 
-        where + 
-        """
+        %s
         ORDER BY
             kodstugor_id;
-        """);
+        """ % where);
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):

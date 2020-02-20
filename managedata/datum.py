@@ -20,7 +20,18 @@ def all(request):
     if request["BESK_admin"]:
         where = ""
     else:
-        where = "WHERE kodstugor_id = " + str(request["BESK_kodstuga"])
+        where = """
+            WHERE
+                kodstugor_id
+            IN (
+                SELECT 
+                    kodstugor_id 
+                FROM 
+                    volontarer_roller
+                WHERE 
+                    volontarer_id = %s
+            );""" % request["BESK_volontarer_id"]
+
     all = db.cursor.execute("""
         SELECT 
             kodstugor_id,

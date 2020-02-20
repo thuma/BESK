@@ -55,7 +55,19 @@ def all(request):
     if request["BESK_admin"]:
         where = ""
     else:
-        where = "WHERE deltagare.status = 'ja' AND deltagare.kodstugor_id = " + str(request["BESK_kodstuga"])
+        where = """
+            WHERE 
+                deltagare.status = 'ja' 
+            AND 
+                deltagare.kodstugor_id
+            IN (
+                SELECT 
+                    kodstugor_id 
+                FROM 
+                    volontarer_roller
+                WHERE 
+                    volontarer_id = %s
+            );""" % request["BESK_volontarer_id"]
     all = db.cursor.execute("""
         SELECT 
             deltagande_närvaro.id as id,

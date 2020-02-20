@@ -135,7 +135,19 @@ def all(request):
     if request["BESK_admin"]:
         where = ""
     else:
-        where = "WHERE deltagare.status = 'ja' AND kodstugor.id = " + str(request["BESK_kodstuga"])
+        where = """
+            WHERE 
+                deltagare.status = 'ja' 
+            AND 
+                kodstugor.id
+            IN (
+                SELECT 
+                    kodstugor_id 
+                FROM 
+                    volontarer_roller
+                WHERE 
+                    volontarer_id = %s
+            )""" % request["BESK_volontarer_id"]
     all = db.cursor.execute("""
         SELECT 
             kontaktpersoner.id AS id,
@@ -152,10 +164,10 @@ def all(request):
            ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id
         INNER JOIN kodstugor
            ON deltagare.kodstugor_id=kodstugor.id
-        """ + where + """
+        %s
         GROUP BY kontaktpersoner.id
         ORDER BY kodstugor.id, deltagare.datum;
-     """)
+     """ % where)
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):

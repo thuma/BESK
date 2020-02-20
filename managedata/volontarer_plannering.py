@@ -57,12 +57,16 @@ def all(request):
         where = ""
     else:
         where = """
-            INNER JOIN 
-                volontarer 
-            ON
-                volontarer.id = volontarer_plannering.volontarer_id
-            WHERE
-                volontarer.kodstugor_id = """ + str(request["BESK_kodstuga"])
+            WHERE 
+                volontarer_plannering.kodstugor_id
+            IN (
+                SELECT 
+                    kodstugor_id 
+                FROM 
+                    volontarer_roller
+                WHERE 
+                    volontarer_id = %s
+            );""" % request["BESK_volontarer_id"]
     all = db.cursor.execute("""
         SELECT 
             volontarer_plannering.id as id,

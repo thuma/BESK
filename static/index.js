@@ -104,6 +104,10 @@ var admin = new Vue({
             )
             return name
         },
+        kodstuga_names_by_ids: function(ids){
+            names = this.kodstugor.filter(kodstuga => ids.indexOf(kodstuga.id.toString()) > -1);
+            return names.map(name => name.namn).join(", ");
+        },
         get_dates: function(id){
             return this.kodstugor_datum.filter(one_date => one_date.kodstugor_id == id)
         },

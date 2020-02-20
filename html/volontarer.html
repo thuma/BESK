@@ -18,12 +18,12 @@
       </thead>
       <tbody>
         <tr v-for="volontär in volontärer" v-if="volontär.kodstugor_id == val_kodstuga || val_kodstuga=='alla'">
-            <td v-if="me.admin">{{kodstuga_name_by_id(volontär.kodstugor_id)}}</td>
+            <td v-if="me.admin">{{kodstuga_names_by_ids(volontär.kodstugor_id)}}</td>
             <td>{{volontär.namn}}</td>
             <td>{{volontär.epost}}</td>
             <td>{{volontär.telefon}}</td>
             <td v-if="me.admin"><input type="checkbox" name="flytta" v-bind:value="volontär.id" v-model="volontär.selected"></td>
-            <td v-if="me.admin || volontär.epost == me.epost"><button class="btn btn-sm btn-outline-secondary"
+            <td v-if="me.admin || volontär.epost == me.epost"><button type="button" class="btn btn-sm btn-outline-secondary"
                 v-on:click="edit={'type':'volontär','data':copy(volontär)}">🖊</button>
             </td>
         </tr>
@@ -34,7 +34,7 @@
             <button 
             class="btn btn-primary"
             v-if="edit==''"
-            v-on:click="edit={'type':'volontär','data':{'id':'','namn':'','epost':'','telefon':'','kodstugor_id':''}}"
+            v-on:click="edit={'type':'volontär','data':{'id':'','namn':'','epost':'','telefon':'','kodstugor_id':[],'roller':[]}}"
             type="button">
                 Skapa ny
             </button>
@@ -136,10 +136,19 @@
                     class="form-control">
             </div>-->
             <div class="form-group" v-if="me.admin">
-                <label>Kodstuga</label>
-                <select name="kodstugor_id" v-model:value="edit.data.kodstugor_id" class="form-control">
-                    <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
-                </select>
+                <label>Kodstugor och Roller</label>
+                <div v-for="(kodstugor_id, kodstugor_id_index) in edit.data.kodstugor_id" class="input-group">
+                    <div class="input-group-prepend">
+                        <select name="kodstugor_id" v-model:value="edit.data.kodstugor_id[kodstugor_id_index]" class="custom-select">
+                            <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
+                        </select>
+                    </div>
+                    <select name="roll" v-model:value="edit.data.roller[kodstugor_id_index]" class="custom-select">
+                        <option value="volontär">Volontär</option>
+                    </select>
+                </div>
+                <button class="btn btn-secondary" type="button" v-on:click="edit.data.kodstugor_id.push('0'), edit.data.roller.push('volontär')">Lägg till</button>
+                <button class="btn btn-secondary" type="button" v-on:click="edit.data.kodstugor_id.pop(), edit.data.roller.pop()">Ta bort</button>
             </div>
             <div class="form-group">
                 <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Spara som ny</button>

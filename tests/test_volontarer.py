@@ -9,7 +9,8 @@ def test_add(as_admin, as_volonar):
         "namn": "Test_Volontär_Att_Radera",
         "epost":"test-running-remove"+str(random())+"@none.com",
         "telefon":"0723175800",
-        "kodstugor_id":kodstuga["id"]
+        "kodstugor_id":kodstuga["id"],
+        "roll":"volontärer"
         }
     result = as_admin.post("http://127.0.0.1:9292/api/volontarer", data = data)
     assert result.status_code == 200
@@ -33,7 +34,8 @@ def test_update(as_admin, as_volonar):
             "epost":"ändrad"+str(random())+"@gmail.com",
             "telefon":"+46723175708",
             "id":volontar["id"],
-            "kodstugor_id":volontar["kodstugor_id"]
+            "kodstugor_id":volontar["kodstugor_id"],
+            "roll":"volontärer"
             }
             result2 = as_admin.post("http://127.0.0.1:9292/api/volontarer", data = data)
             assert result2.status_code == 200

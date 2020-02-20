@@ -107,7 +107,7 @@ def route(request):
     if not request["BESK_admin"]:
         if not login.is_approved(request["BESK_login"]["user"]["user"]["email"]):
             raise Error403("Your account has expired.")
-        request["BESK_kodstuga"] = volontarer.get_kodstuga(request["BESK_login"]["user"]["user"]["email"])
+        request["BESK_volontarer_id"] = volontarer.get_id(request["BESK_login"]["user"]["user"]["email"])
 
     if request['PATH_INFO'] == '/':
         return static_file('static/start.html')
