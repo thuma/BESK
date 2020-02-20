@@ -32,16 +32,22 @@ def add_or_uppdate(request):
         else:
             data = (
                 post_data["volontarer_id"][i],
+                post_data["kodstugor_id"][i],
                 post_data["datum"][i],
                 post_data["status"][i],
                 post_data["kommentar"][i],
             )
             db.cursor.execute("""
                 INSERT 
-                    INTO volontarer_plannering 
-                        (volontarer_id, datum, status, kommentar) 
+                    INTO volontarer_plannering (
+                        volontarer_id,
+                        kodstugor_id,
+                        datum,
+                        status,
+                        kommentar
+                        ) 
                     VALUES 
-                        (?,?,?,?)
+                        (?,?,?,?,?)
                 """, data)
     db.commit()
     return all(request)
@@ -61,6 +67,7 @@ def all(request):
         SELECT 
             volontarer_plannering.id as id,
             volontarer_plannering.volontarer_id as volontarer_id,
+            volontarer_plannering.kodstugor_id as kodstugor_id,
             volontarer_plannering.datum as datum,
             volontarer_plannering.status as status,
             volontarer_plannering.kommentar as kommentar
@@ -71,11 +78,5 @@ def all(request):
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    by_volontarer_id = {}
 
-    for date in map(to_headers, all.fetchall()):
-        if date['volontarer_id'] not in by_volontarer_id:
-            by_volontarer_id[date['volontarer_id']] = {}
-        by_volontarer_id[date['volontarer_id']][date['datum']] = {"kommentar":date["kommentar"],"status":date["status"],"id":date["id"]}
-
-    return {"volontarer_plannering":by_volontarer_id,"volontarer_redigerade":{}}
+    return {"volontarer_plannering":list(map(to_headers, all.fetchall())), "volontarer_redigerade":{}}

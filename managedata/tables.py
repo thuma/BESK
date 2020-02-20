@@ -4,6 +4,7 @@
 tables = ['''
   CREATE TABLE IF NOT EXISTS kodstugor (
   id INTEGER PRIMARY KEY,
+  typ TEXT,
   namn TEXT,
   sms_text TEXT,
   epost_text TEXT,

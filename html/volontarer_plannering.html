@@ -24,6 +24,10 @@
                             type="hidden"
                             name="id"
                             v-model:value="volontarer_redigerade[volotär.id+date.datum]['id']">
+                        <input
+                            type="hidden"
+                            name="kodstugor_id"
+                            v-model:value="kodstuga.id">
                         <input type="hidden" name="datum" v-bind:value="date.datum">
                         <input type="hidden" name="volontarer_id" v-bind:value="volotär.id">
                         <div class="input-group">

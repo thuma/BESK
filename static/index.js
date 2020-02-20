@@ -105,10 +105,7 @@ var admin = new Vue({
             return name
         },
         get_dates: function(id){
-            if(!this.kodstugor_datum[id]){
-              this.$set(this.kodstugor_datum, id, []);
-            }
-            return this.kodstugor_datum[id]
+            return this.kodstugor_datum.filter(one_date => one_date.kodstugor_id == id)
         },
         next_date: function(list){
             if(list.slice(-1)[0]){
@@ -120,22 +117,24 @@ var admin = new Vue({
             }
         }, 
         get_data_volontar_at_date: function(id, date){
-            if(this.volontarer_plannering[id] == undefined){
-                return {"status":"Ja", "id":0, "kommentar":""}
-            } else if (this.volontarer_plannering[id][date] == undefined){
-                return {"status":"Ja", "id":0, "kommentar":""}
-            } else {
-                return this.volontarer_plannering[id][date]
-            }
+            found_vol_data = this.volontarer_plannering.find(
+                vol_data => 
+                    vol_data.volontarer_id == id &&
+                    vol_data.datum == date);
+            if (found_vol_data) {
+                return found_vol_data
+            } 
+            return {"status":"Ja", "id":0, "kommentar":""}
         },
         get_data_for_deltagare_at_date: function(id, date){
-            if(this.närvaro[id] == undefined){
-                return {"status":"","id":0}
-            } else if (this.närvaro[id][date] == undefined){
-                return {"status":"","id":0}
-            } else {
-                return this.närvaro[id][date]
-            }
+            found_deltagare_data = this.närvaro.find(
+                delt_data => 
+                    delt_data.deltagare_id == id &&
+                    delt_data.datum == date);
+            if (found_deltagare_data) {
+                return found_deltagare_data
+            } 
+            return {"status":"","id":0}
         },
         är_ja: function(data, id, date){
             return this.get_data_volontar_at_date(id, date)['status'].toUpperCase().includes("JA")
@@ -241,30 +240,49 @@ var admin = new Vue({
             this.kodstugor.forEach(function(kodstuga){
                 var data = {}
                 data.id = kodstuga.id
-                var deltagare_alla = next.deltagare.filter(deltagare => deltagare.kodstuga_id == kodstuga.id)
-                var närvaro_deltagare_f = deltagare_alla.filter(deltagare => deltagare.kon == "hon")
-                var närvaro_deltagare_p = deltagare_alla.filter(deltagare => deltagare.kon == "han")
-                var deltagare_ja = deltagare_alla.filter(deltagare => deltagare.status == "ja")
+                var deltagare_alla = next.deltagare.filter(
+                    deltagare => deltagare.kodstuga_id == kodstuga.id
+                    );
+                var närvaro_deltagare_f = deltagare_alla.filter(
+                    deltagare => deltagare.kon == "hon"
+                    );
+                var närvaro_deltagare_p = deltagare_alla.filter(
+                    deltagare => deltagare.kon == "han"
+                    );
+                var deltagare_ja = deltagare_alla.filter(
+                    deltagare => deltagare.status == "ja"
+                    );
                 data.deltagare = deltagare_ja.length;
-                data.flickor = deltagare_ja.filter(deltagare => deltagare.kon == "hon").length;
-                data.pojkar = deltagare_ja.filter(deltagare => deltagare.kon == "han").length;
-                data.volontärer = next.volontärer.filter(volontär => volontär.kodstugor_id == kodstuga.id).length;
-                var närvaro_deltagare = deltagare_alla.map(deltagare_data => next.närvaro[deltagare_data.deltagare_id] ? next.närvaro[deltagare_data.deltagare_id] : {});
-                function datum_till_text(list, newitems) {
-                    var items = newitems;
-                    var tolist = Object.keys(newitems).map(titem => items[titem].status);
-                    return list.concat(tolist);
-                }
-                var närvaro_svar = närvaro_deltagare.reduce(datum_till_text, []).filter(svar => svar == "ja")
-                data.närvaro = närvaro_svar.length;
-                närvaro_deltagare_f = närvaro_deltagare_f.map(deltagare_data => next.närvaro[deltagare_data.deltagare_id] ? next.närvaro[deltagare_data.deltagare_id] : {});
-                närvaro_deltagare_p = närvaro_deltagare_p.map(deltagare_data => next.närvaro[deltagare_data.deltagare_id] ? next.närvaro[deltagare_data.deltagare_id] : {});
-                data.närvaro_flickor = närvaro_deltagare_f.reduce(datum_till_text, []).filter(svar => svar == "ja").length
-                data.närvaro_pojkar = närvaro_deltagare_p.reduce(datum_till_text, []).filter(svar => svar == "ja").length
+                data.flickor = deltagare_ja.filter(
+                    deltagare => deltagare.kon == "hon"
+                    ).length;
+                data.pojkar = deltagare_ja.filter(
+                    deltagare => deltagare.kon == "han"
+                    ).length;
+                data.volontärer = next.volontärer.filter(
+                    volontär => volontär.kodstugor_id == kodstuga.id
+                    ).length;
+                närvaro_lista = next.närvaro.filter(
+                    svar => svar.status == "ja"
+                    &&
+                    deltagare_alla.find(
+                        deltagare => deltagare.deltagare_id == svar.deltagare_id
+                        )
+                    );
+                data.närvaro = närvaro_lista.length;
+                data.närvaro_flickor = närvaro_lista.filter(
+                    närvaro => närvaro_deltagare_f.find(
+                        deltagare => deltagare.deltagare_id == närvaro.deltagare_id
+                        )
+                    ).length;
+                data.närvaro_pojkar = närvaro_lista.filter(
+                    närvaro => närvaro_deltagare_p.find(
+                        deltagare => deltagare.deltagare_id == närvaro.deltagare_id
+                        )
+                    ).length;
                 data.antal_tillfällen = next.get_dates(kodstuga.id).length
                 kodstug_stats.push(data)
             });
-            // Totalt & per kodstuga
             return kodstug_stats 
         },
         statistik_tot: function(){
@@ -287,14 +305,14 @@ var admin = new Vue({
         markdown_to_html: new showdown.Converter(),
         page: "BESK",
         deltagare: [],
-        närvaro: {},
+        närvaro: [],
         närvaro_redigerade: {},
         kodstugor: [],
-        kodstugor_datum: {},
+        kodstugor_datum: [],
         edit: "",
         kontaktpersoner: [],
         volontärer: [],
-        volontarer_plannering: {},
+        volontarer_plannering: [],
         volontarer_redigerade: {},
         volontärer_slack: [],
         utskick: [],

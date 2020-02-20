@@ -34,14 +34,7 @@ def all(request):
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    datum_id = {}
-    for one_datum in list(map(to_headers, all.fetchall())):
-        if not one_datum["kodstugor_id"] in datum_id:
-            datum_id[one_datum["kodstugor_id"]] = [one_datum]
-        else:
-            datum_id[one_datum["kodstugor_id"]].append(one_datum)
-
-    return {"kodstugor_datum":datum_id}
+    return {"kodstugor_datum":list(map(to_headers, all.fetchall()))}
     
 def set(request):
     if request["BESK_admin"]:

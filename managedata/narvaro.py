@@ -75,11 +75,4 @@ def all(request):
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    by_volontarer_id = {}
-
-    for date in map(to_headers, all.fetchall()):
-        if date['deltagare_id'] not in by_volontarer_id:
-            by_volontarer_id[date['deltagare_id']] = {}
-        by_volontarer_id[date['deltagare_id']][date['datum']] = {"status":date["status"],"id":date["id"]}
-
-    return {"närvaro":by_volontarer_id,"närvaro_redigerade":{}}
+    return {"närvaro":list(map(to_headers, all.fetchall())),"närvaro_redigerade":{}}

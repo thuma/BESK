@@ -14,7 +14,7 @@
   <tbody>
     <tr v-for="kodstuga in kodstugor" v-if="val_kodstuga=='alla' || kodstuga.id == val_kodstuga">
         <td>{{kodstuga.namn}}</td>
-        <td v-for="date in get_dates(kodstuga.id)">{{date.datum}} <br>({{date.typ}})</td>
+        <td v-for="date in kodstugor_datum" v-if="date.kodstugor_id == kodstuga.id">{{date.datum}} <br>({{date.typ}})</td>
         <td><button class="btn btn-sm btn-outline-secondary"
             v-on:click="edit={'type':'date','datum':copy(get_dates(kodstuga.id)),'data':copy(kodstuga)}">🖊</button>
         </td>
