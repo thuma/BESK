@@ -1,6 +1,5 @@
 <h1 class="text-center">Närvaro deltagare</h1>
-<div v-if="me.admin">
-    Visa kodstuga:
+<div>
     <select v-model:value="val_kodstuga" class="form-control">
         <option value="alla">Visa alla kodstugor</option>
         <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>

@@ -2,7 +2,7 @@
 <table class="table table-sm" v-if="edit==''">
   <thead>
     <tr>
-      <th scope="col" v-if="me.admin">
+      <th scope="col">
           <select v-model:value="val_kodstuga" class="form-control">
               <option value="alla">Visa alla kodstugor</option>
               <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
@@ -19,7 +19,7 @@
   <tbody>
     <template v-for="kodstuga in kodstugor" v-if="val_kodstuga == kodstuga.id || val_kodstuga == 'alla'">
         <tr class="table-info">
-            <td v-if="me.admin">{{kodstuga.namn}}</td>
+            <td>{{kodstuga.namn}}</td>
             <td>sms</td>
             <td></td>
             <td><pre>{{kodstuga.sms_text}}</pre></td>
@@ -30,7 +30,7 @@
             </td>
         </tr>
         <tr class="table-info">
-            <td v-if="me.admin">{{kodstuga.namn}}</td>
+            <td>{{kodstuga.namn}}</td>
             <td>e-post</td>
             <td>{{kodstuga.epost_rubrik}}</td>
             <td v-html="markdown_to_html.makeHtml(kodstuga.epost_text)"></td>
@@ -41,7 +41,7 @@
             </td>
         </tr>
         <tr class="table-info">
-            <td v-if="me.admin">{{kodstuga.namn}}</td>
+            <td>{{kodstuga.namn}}</td>
             <td>e-post</td>
             <td>{{kodstuga.epost_rubrik_ja}}</td>
             <td v-html="markdown_to_html.makeHtml(kodstuga.epost_text_ja)"></td>
@@ -52,7 +52,7 @@
             </td>
         </tr>
         <tr v-for="skick in utskick" v-if="kodstuga.id == skick.kodstugor_id">
-            <td v-if="me.admin">{{kodstuga_name_by_id(skick.kodstugor_id)}}</td>
+            <td>{{kodstuga_name_by_id(skick.kodstugor_id)}}</td>
             <td>{{skick.typ}}</td>
             <td>{{skick.rubrik}}</td>
             <td v-if="skick.typ=='e-post'" v-html="markdown_to_html.makeHtml(skick.text)"></td>

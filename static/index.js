@@ -120,11 +120,13 @@ var admin = new Vue({
                 return {'datum':'','typ':'kodstuga'}
             }
         }, 
-        get_data_volontar_at_date: function(id, date){
+        get_data_volontar_at_date: function(id, date, kodstuga){
             found_vol_data = this.volontarer_plannering.find(
                 vol_data => 
                     vol_data.volontarer_id == id &&
-                    vol_data.datum == date);
+                    vol_data.datum == date &&
+                    vol_data.kodstugor_id == kodstuga
+                    );
             if (found_vol_data) {
                 return found_vol_data
             } 
@@ -140,16 +142,16 @@ var admin = new Vue({
             } 
             return {"status":"","id":0}
         },
-        är_ja: function(data, id, date){
-            return this.get_data_volontar_at_date(id, date)['status'].toUpperCase().includes("JA")
+        är_ja: function(data, id, date, kodstuga){
+            return this.get_data_volontar_at_date(id, date, kodstuga)['status'].toUpperCase().includes("JA")
         },
-        är_nej: function(data, id, date){
-            return this.get_data_volontar_at_date(id, date)['status'].toUpperCase().includes("NEJ")
+        är_nej: function(data, id, date, kodstuga){
+            return this.get_data_volontar_at_date(id, date, kodstuga)['status'].toUpperCase().includes("NEJ")
         },
-        button_color_volontär: function(data, id, date){
-            if (this.är_nej(data, id, date)){
+        button_color_volontär: function(data, id, date, kodstuga){
+            if (this.är_nej(data, id, date, kodstuga)){
                 return {'btn-outline-danger':true}
-            } else if (this.är_ja(data, id, date)){
+            } else if (this.är_ja(data, id, date, kodstuga)){
                 return {'btn-outline-success':true}
             } else {
                 return {'btn-outline-warning':true}

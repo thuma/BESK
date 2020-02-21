@@ -3,7 +3,7 @@
 <table class="table table-sm">
     <thead>
         <tr>
-            <th scope="col" v-if="me.admin">
+            <th scope="col">
                 <select v-model:value="val_kodstuga" class="form-control">
                     <option value="alla">Visa alla kodstugor</option>
                     <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
@@ -24,7 +24,7 @@
     </thead>
     <tbody>
         <tr v-for="kid in deltagare" v-if="kid.kodstuga_id == val_kodstuga || val_kodstuga=='alla'">
-            <td v-if="me.admin">{{kodstuga_name_by_id(kid.kodstuga_id)}}</td>
+            <td>{{kodstuga_name_by_id(kid.kodstuga_id)}}</td>
             <td>{{kid.fornamn}}</td>
             <td>{{kid.efternamn}}</td>
             <td>
