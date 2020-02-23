@@ -3,6 +3,7 @@
   <thead>
     <tr>
       <th scope="col">Namn</th>
+      <th scope="col">Typ av Kodstuga</th>
       <th scope="col">Anmälan öppen</th>
       <th scope="col">Redigera</th>
     </tr>
@@ -10,6 +11,7 @@
   <tbody>
     <tr v-for="kodstuga in kodstugor">
         <td>{{kodstuga.namn}}</td>
+        <td>{{kodstuga.typ}}</td>
         <td>{{kodstuga.open}}</td>
         <td><button class="btn btn-sm btn-outline-secondary"
             v-on:click="edit={'type':'kodstuga','data':copy(kodstuga)}">🖊</button>
@@ -48,6 +50,15 @@
                 <select name="open" v-model:value="edit.data.open" class="form-control">
                     <option value="Ja">Ja</option>
                     <option value="Nej">Nej</option>
+                </select>
+            </div>
+            <hr>
+            <div class="form-group">
+                <label>Typ</label>
+                <select name="typ" v-model:value="edit.data.typ" class="form-control">
+                    <option value="Kodstuga">Kodstuga</option>
+                    <option value="Lärarkodstuga">Lärarkodstuga</option>
+                    <option value="Digital Labs">Digital Labs</option>
                 </select>
             </div>
             <hr>

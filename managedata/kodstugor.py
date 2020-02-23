@@ -49,6 +49,7 @@ def active(request):
                 epost_text,
                 epost_text_ja,
                 epost_rubrik_ja,
+                typ,
                 open
             FROM kodstugor;
          """);
@@ -63,6 +64,7 @@ def active(request):
                 epost_text,
                 epost_text_ja,
                 epost_rubrik_ja,
+                typ,
                 open
             FROM kodstugor WHERE open ='Ja';
          """);
@@ -90,6 +92,7 @@ def get_kodstuga(kodstua_id):
             epost_text,
             epost_text_ja,
             epost_rubrik_ja,
+            typ,
             open
         FROM
             kodstugor
@@ -127,6 +130,7 @@ def all(request):
             epost_text,
             epost_text_ja,
             epost_rubrik_ja,
+            typ,
             open
         FROM kodstugor
      """ + where);
@@ -148,6 +152,7 @@ def add_or_uppdate(request):
                 post_data["epost_rubrik"][0],
                 post_data["epost_text_ja"][0],
                 post_data["epost_rubrik_ja"][0],
+                post_data["typ"][0],
                 post_data["open"][0],
                 post_data["id"][0]
             )
@@ -160,6 +165,7 @@ def add_or_uppdate(request):
                         epost_rubrik = ?,
                         epost_text_ja = ?,
                         epost_rubrik_ja = ?,
+                        typ = ?,
                         open = ?
                     WHERE
                         id = ?
@@ -172,14 +178,15 @@ def add_or_uppdate(request):
                 post_data["epost_rubrik"][0],
                 post_data["epost_text_ja"][0],
                 post_data["epost_rubrik_ja"][0],
+                post_data["typ"][0],
                 post_data["open"][0],
             )
             db.cursor.execute("""
                 INSERT 
                     INTO kodstugor 
-                        (namn, sms_text, epost_text, epost_rubrik, epost_text_ja, epost_rubrik_ja, open) 
+                        (namn, sms_text, epost_text, epost_rubrik, epost_text_ja, epost_rubrik_ja, typ, open) 
                     VALUES 
-                        (?,?,?,?,?,?,?)
+                        (?,?,?,?,?,?,?,?)
                 """, data)
         db.commit()
     return all(request)

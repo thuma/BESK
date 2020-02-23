@@ -10,6 +10,7 @@ def test_add(as_admin, as_volonar):
         "epost_rubrik":"",
         "epost_text_ja":"",
         "epost_rubrik_ja":"",
+        "typ": "Kodstuga",
         "open":"Nej"
         }
     result = as_admin.post("http://127.0.0.1:9292/api/kodstugor", data = data)
@@ -24,6 +25,8 @@ def test_list(as_admin):
 def test_update(as_admin):
     result = as_admin.get("http://127.0.0.1:9292/api/kodstugor")
     kodstuga = result.json()['kodstugor'][0]
+    if 'typ' not in kodstuga:
+        kodstuga['typ'] = "Kodstuga"
     data = {
         "id" : kodstuga['id'],
         "namn" : kodstuga['namn'],
@@ -32,6 +35,7 @@ def test_update(as_admin):
         "epost_rubrik" : kodstuga['epost_rubrik'],
         "epost_text_ja" : kodstuga['epost_text_ja'],
         "epost_rubrik_ja" : kodstuga['epost_rubrik_ja'],
+        "typ": kodstuga['typ'],
         "open": "Ja"
         }
     result = as_admin.post("http://127.0.0.1:9292/api/kodstugor", data = data)
