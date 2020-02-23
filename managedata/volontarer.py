@@ -257,14 +257,17 @@ def add_or_update_admin(request):
                 """, data)
             db.commit()
             roll_list = []
-            for form_index, value in enumerate(post_data["kodstugor_id"]):
-                roll_list.append(
-                    {
-                    "kodstugor_id": value,
-                    "roll": post_data["roller"][form_index]
-                    }
-                );
-            add_or_update_roller(roll_list, post_data["id"][0])
+            if  "kodstugor_id" in post_data:
+                for form_index, value in enumerate(post_data["kodstugor_id"]):
+                    roll_list.append(
+                        {
+                        "kodstugor_id": value,
+                        "roll": post_data["roller"][form_index]
+                        }
+                    );
+                add_or_update_roller(roll_list, post_data["id"][0])
+            else:
+                add_or_update_roller([], post_data["id"][0])
         else:
             data = (
                 post_data["namn"][0],
@@ -283,14 +286,15 @@ def add_or_update_admin(request):
                 db.commit()
                 send_email(post_data["epost"][0], "BESK-konto aktiverat", texter.get_one("BESK-konto aktiverat")["text"])
                 roll_list = []
-                for form_index, value in enumerate(post_data["kodstugor_id"]):
-                    roll_list.append(
-                        {
-                        "kodstugor_id": value,
-                        "roll": post_data["roller"][form_index]
-                        }
-                    );
-                add_or_update_roller(roll_list, get_id(post_data["epost"][0]))
+                if "kodstugor_id" in post_data:
+                    for form_index, value in enumerate(post_data["kodstugor_id"]):
+                        roll_list.append(
+                            {
+                            "kodstugor_id": value,
+                            "roll": post_data["roller"][form_index]
+                            }
+                        );
+                    add_or_update_roller(roll_list, get_id(post_data["epost"][0]))
             except db.sqlite3.IntegrityError:
                  raise Error400("E-Postadressen finns redan.")
 
