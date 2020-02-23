@@ -10,7 +10,7 @@ def test_add(as_admin, as_volonar):
         "epost":"test-running-remove"+str(random())+"@none.com",
         "telefon":"0723175800",
         "kodstugor_id":kodstuga["id"],
-        "roll":"volontärer"
+        "roller":"volontär"
         }
     result = as_admin.post("http://127.0.0.1:9292/api/volontarer", data = data)
     assert result.status_code == 200
@@ -19,6 +19,48 @@ def test_add(as_admin, as_volonar):
         if volontar["namn"] == "Test_Volontär_Att_Radera":
             found = True
     assert found
+
+def test_add_many(as_admin, as_volonar):
+    result = as_admin.get("http://127.0.0.1:9292/api/kodstugor")
+    kodstuga = result.json()['kodstugor'][0]
+    data = {
+        "namn": ["Test_Volontär_Att_Radera","Test_Volontär_Att_Radera"],
+        "epost":["test-running-remove"+str(random())+"@none.com","test-running-remove"+str(random())+"@none.com"],
+        "telefon":["0723175899","0723175898"],
+        "kodstugor_id":kodstuga["id"],
+        "flera":"yes"
+        }
+    result = as_admin.post("http://127.0.0.1:9292/api/volontarer", data = data)
+    assert result.status_code == 200
+    found1 = False
+    found2 = False
+    for volontar in result.json()['volontärer']:
+        if volontar["telefon"] == "+46723175899":
+            found1 = True
+        if volontar["telefon"] == "+46723175898":
+            found2 = True
+    assert found1
+    assert found1
+
+def test_add_to_kodstuga(as_admin, as_volonar):
+    result = as_admin.get("http://127.0.0.1:9292/api/kodstugor")
+    kodstuga = result.json()['kodstugor'][1]["id"]
+    result = as_admin.get("http://127.0.0.1:9292/api/volontarer")
+
+    flytta = []
+    for volontar in result.json()['volontärer']:
+        if volontar["namn"] == "Test_Volontär_Att_Radera":
+            flytta.append(volontar["id"])
+        data = {
+            "flytta":flytta,
+            "kodstugor_id":kodstuga
+        }
+    result = as_admin.post("http://127.0.0.1:9292/api/volontarer", data = data)
+    assert result.status_code == 200
+
+    for volontar in result.json()['volontärer']:
+        if volontar["id"] in  flytta:
+            assert kodstuga in volontar["kodstugor_id"]
 
 def test_list(as_admin, as_volonar):
     result = as_admin.get("http://127.0.0.1:9292/api/kodstugor")
@@ -35,7 +77,7 @@ def test_update(as_admin, as_volonar):
             "telefon":"+46723175708",
             "id":volontar["id"],
             "kodstugor_id":volontar["kodstugor_id"],
-            "roll":"volontärer"
+            "roller":volontar["roller"]
             }
             result2 = as_admin.post("http://127.0.0.1:9292/api/volontarer", data = data)
             assert result2.status_code == 200

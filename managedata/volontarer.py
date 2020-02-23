@@ -261,7 +261,7 @@ def add_or_update_admin(request):
                 roll_list.append(
                     {
                     "kodstugor_id": value,
-                    "roll": post_data["roll"][form_index]
+                    "roll": post_data["roller"][form_index]
                     }
                 );
             add_or_update_roller(roll_list, post_data["id"][0])
@@ -287,7 +287,7 @@ def add_or_update_admin(request):
                     roll_list.append(
                         {
                         "kodstugor_id": value,
-                        "roll": post_data["roll"][form_index]
+                        "roll": post_data["roller"][form_index]
                         }
                     );
                 add_or_update_roller(roll_list, get_id(post_data["epost"][0]))
