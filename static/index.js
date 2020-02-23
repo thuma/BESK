@@ -105,7 +105,7 @@ var admin = new Vue({
             return name
         },
         kodstuga_names_by_ids: function(ids){
-            names = this.kodstugor.filter(kodstuga => ids.indexOf(kodstuga.id.toString()) > -1);
+            names = this.kodstugor.filter(kodstuga => ids.indexOf(kodstuga.id) > -1);
             return names.map(name => name.namn).join(", ");
         },
         get_dates: function(id){
@@ -266,7 +266,7 @@ var admin = new Vue({
                     deltagare => deltagare.kon == "han"
                     ).length;
                 data.volontärer = next.volontärer.filter(
-                    volontär => volontär.kodstugor_id == kodstuga.id
+                    volontär => volontär.kodstugor_id.indexOf(kodstuga.id) > -1
                     ).length;
                 närvaro_lista = next.närvaro.filter(
                     svar => svar.status == "ja"

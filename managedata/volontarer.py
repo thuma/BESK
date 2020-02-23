@@ -101,7 +101,7 @@ def all(request):
                 ut[col[0]] = arrow.Arrow.utcfromtimestamp(row[idx]).format("YYYY-MM-DD")
             elif col[0] == "kodstugor_id":
                 try:
-                    ut[col[0]] = row[idx].split(",")
+                    ut[col[0]] = list(map(int, row[idx].split(",")))
                 except:
                     ut[col[0]] = []
             elif col[0] == "roller":
@@ -164,6 +164,19 @@ def date_to_int(date_text):
 def int_to_date(int):
     return datetime.datetime.utcfromtimestamp(int).strftime('%Y-%m-%d')
 
+def add_roller(kodstugor_id, roll, volontarer_id):
+    db.cursor.execute("""
+        INSERT INTO
+            volontarer_roller (
+                kodstugor_id,
+                roll,
+                volontarer_id
+            )
+        VALUES
+            (?, ?, ?);
+        """, (kodstugor_id, roll, volontarer_id))
+    db.commit()
+
 def add_or_update_roller(kodstugor_roll_list, volontarer_id):
     db.cursor.execute("""
         DELETE FROM
@@ -189,13 +202,7 @@ def add_or_update_admin(request):
     post_data = read_post_data(request)
     if "flytta" in post_data:
         for flytta_id in post_data["flytta"]:
-            roll_list.append(
-                    {
-                    "kodstugor_id": post_data["kodstugor_id"][0],
-                    "roll": "volontär"
-                    }
-                );
-            add_or_update_roller(roll_list, flytta_id)
+            add_roller(post_data["kodstugor_id"][0], "volontär", flytta_id)
     elif "flera" in post_data:
         for i, namn in enumerate(post_data["namn"]):
             data = (
@@ -214,6 +221,11 @@ def add_or_update_admin(request):
                     """, data)
                 
                 db.commit()
+                add_roller(
+                    post_data["kodstugor_id"][0],
+                    "volontär",
+                    get_id(post_data["epost"][i])
+                    )
                 send_email(post_data["epost"][i], "BESK-konto aktiverat", texter.get_one("BESK-konto aktiverat")["text"])
             except db.sqlite3.IntegrityError:
                 pass

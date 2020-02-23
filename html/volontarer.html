@@ -17,7 +17,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="volontär in volontärer" v-if="volontär.kodstugor_id == val_kodstuga || val_kodstuga=='alla'">
+        <tr v-for="volontär in volontärer" v-if="volontär.kodstugor_id.indexOf(val_kodstuga) > -1 || val_kodstuga=='alla'">
             <td>{{kodstuga_names_by_ids(volontär.kodstugor_id)}}</td>
             <td>{{volontär.namn}}</td>
             <td>{{volontär.epost}}</td>
@@ -44,7 +44,7 @@
         <div class="col-sm">
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <button class="btn btn-primary">Flytta valda volontärer till kodstugan:</button>
+                    <button class="btn btn-primary">Lägg till valda volontärer till kodstugan:</button>
                 </div>
                 <select name="kodstugor_id" class="custom-select">
                     <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
