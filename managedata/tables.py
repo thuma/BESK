@@ -110,12 +110,10 @@ CREATE INDEX IF NOT EXISTS utskick_kodstugor_id ON utskick(kodstugor_id);
 '''
 CREATE TABLE IF NOT EXISTS volontarer (
   id INTEGER PRIMARY KEY,
-  kodstugor_id INT,
   epost TEXT UNIQUE,
   namn TEXT,
   telefon TEXT,
-  utdrag_datum INT,
-  FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id)
+  utdrag_datum INT
   );
 ''',
 '''

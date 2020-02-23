@@ -46,10 +46,10 @@
                             class="form-control">
                     </div>
                     <div v-else="">
-                        <button v-bind:class="button_color_volontär(volontarer_plannering, volotär.id, date.datum, kodstuga.id)" type="button" class="btn btn-sm btn-block" v-on:click="$set(volontarer_redigerade, volotär.id+date.datum, copy(get_data_volontar_at_date(volotär.id, date.datum, kodstuga.id)))">
-                        {{ get_data_volontar_at_date(volotär.id, date.datum, kodstuga.id)["status"] }}&nbsp;
+                        <button v-bind:class="button_color_volontär(volontarer_plannering, volotär, date.datum, kodstuga.id)" type="button" class="btn btn-sm btn-block" v-on:click="$set(volontarer_redigerade, volotär.id+date.datum, copy(get_data_volontar_at_date(volotär, date.datum, kodstuga.id)))">
+                        {{ get_data_volontar_at_date(volotär, date.datum, kodstuga.id)["status"] }}&nbsp;
                         </button>
-                        {{ get_data_volontar_at_date(volotär.id, date.datum, kodstuga.id)["kommentar"] }}
+                        {{ get_data_volontar_at_date(volotär, date.datum, kodstuga.id)["kommentar"] }}
                     </div>
                 </td>
             </tr>
