@@ -93,6 +93,8 @@ def all(request):
         %s
         GROUP BY
             volontarer.id
+        ORDER BY
+            kodstugor_id
     """ % where );
     def to_headers(row):
         ut = {}

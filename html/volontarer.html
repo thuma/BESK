@@ -9,6 +9,7 @@
                     <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
                 </select>
           </th>
+          <th scope="col">Roller</th>
           <th scope="col">Namn</th>
           <th scope="col">E-Post</th>
           <th scope="col">Telefon</th>
@@ -19,6 +20,7 @@
       <tbody>
         <tr v-for="volontär in volontärer" v-if="volontär.kodstugor_id.indexOf(val_kodstuga) > -1 || val_kodstuga=='alla'">
             <td>{{kodstuga_names_by_ids(volontär.kodstugor_id)}}</td>
+            <td>{{volontär.roller.join(", ")}}</td>
             <td>{{volontär.namn}}</td>
             <td>{{volontär.epost}}</td>
             <td>{{volontär.telefon}}</td>
