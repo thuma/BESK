@@ -64,6 +64,7 @@ def send_invites():
         found = db.cursor.execute('''
             SELECT
                 kodstugor.namn AS kodstuga,
+                kodstugor.typ AS kodstuga_typ,
                 deltagare.id AS deltagare_id,
                 deltagare.status AS deltagare_status,
                 deltagare.fornamn AS deltagare_fornamn,
@@ -90,7 +91,7 @@ def send_invites():
                 deltagare_id = row["deltagare_id"]
             if row["deltagare_id"] != deltagare_id:
                 break
-            message = texter.get_one("Erbjudande om plats")["text"]
+            message = texter.get_one("Erbjudande om plats " + row["kodstuga_typ"])["text"]
             link = "https://besk.kodcentrum.se/reply?id="+row["deltagare_id"]
             message = message.replace(
                 "%namn%",row["deltagare_fornamn"]).replace(

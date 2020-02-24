@@ -35,10 +35,10 @@ def new(request):
         raise Error400("Du måste acceptera Kodcentrums Integritetspolicy.")
     try:
         kodstugaid = formdata["kodstuga"][0]
-        kodstuga = db.cursor.execute("""
-            SELECT namn
+        (kodstuga, kodstuga_typ) = db.cursor.execute("""
+            SELECT namn, typ
             FROM kodstugor WHERE id = ?;
-        """,(kodstugaid,)).fetchall()[0][0]
+        """,(kodstugaid,)).fetchone()
     except:
          raise Error400("Välj en kodstuga.")
     now = int(time.time())
@@ -110,7 +110,7 @@ def new(request):
     db.cursor.execute("INSERT INTO hittade (hittade) VALUES (?)", hittade)
     db.commit()
     if status == "ansökt":
-        mailmessage = texter.get_one("Intresse anmälan")["text"].replace("%kodstuga%",kodstuga)
+        mailmessage = texter.get_one("Intresseanmälan " + kodstuga_typ)["text"].replace("%kodstuga%",kodstuga)
         mailsubject = "Tack för din intresseanmälan"
         for email in formdata["email"]:
             send_email(email, mailsubject, mailmessage)

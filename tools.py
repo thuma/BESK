@@ -74,6 +74,8 @@ def get_value(key):
         return ""
 
 def send_sms(to, message):
+    if len(message.strip()) < 4:
+        return
     datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
     id = hashlib.sha512((to+message+datum).encode("utf-8")).hexdigest()
     try:
@@ -142,6 +144,8 @@ def send_sms_queue():
             sleep(3600)
 
 def send_email(to, subject, message):
+    if len(message.strip()) < 4:
+        return
     datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
     id = hashlib.sha512((to+subject+message+datum).encode("utf-8")).hexdigest()
     try:
