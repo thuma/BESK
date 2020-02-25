@@ -193,7 +193,7 @@ def send_email_queue():
                 server.send_message(msg)
                 server.quit()
             except:
-                logger.error("SMTP send failed.", exc_info=1)
+                logger.error("SMTP send failed to: "+ to, exc_info=1)
                 sleep(60*10)
                 continue
             db.cursor.execute("""
