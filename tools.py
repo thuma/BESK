@@ -192,6 +192,19 @@ def send_email_queue():
                 server = smtplib.SMTP('localhost')
                 server.send_message(msg)
                 server.quit()
+            except smtplib.SMTPRecipientsRefused:
+                db.cursor.execute("""
+                UPDATE 
+                    mail_queue
+                SET
+                    status = "kunde inte skickas"
+                WHERE
+                    id = ?;
+                """,
+                (id,)
+                )
+                db.commit()
+                continue
             except:
                 logger.error("SMTP send failed to: "+ to, exc_info=1)
                 sleep(60*10)
