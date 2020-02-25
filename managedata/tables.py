@@ -152,10 +152,22 @@ CREATE TABLE IF NOT EXISTS keyvalue (
   );
 ''',
 '''
-INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Intresse anmälan", "")
+INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Intresseanmälan Kodstuga", "Vi har mottagit din intresseanmälan till Kodstugan på %kodstuga%.")
 ''',
 '''
-INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Erbjudande om plats", "")
+INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Erbjudande om plats Kodstuga", "Vi kan med glädje meddela att vi har en plats att erbjuda %namn% på %kodstuga%!")
+''',
+'''
+INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Intresseanmälan Lärarkodstuga", "Vi har mottagit din intresseanmälan till Lärarkodstuga på %kodstuga%.")
+''',
+'''
+INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Erbjudande om plats Lärarkodstuga", "Vi kan med glädje meddela att vi har en plats att erbjuda %namn% på %kodstuga%!")
+''',
+'''
+INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Intresseanmälan Digital Labs", "Vi har mottagit din intresseanmälan till Digital Labs på %kodstuga%.")
+''',
+'''
+INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Erbjudande om plats Digital Labs", "Vi kan med glädje meddela att vi har en plats att erbjuda %namn% på %kodstuga%!")
 ''',
 '''
 INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Info Vid Ansökan", "")

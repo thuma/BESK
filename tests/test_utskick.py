@@ -76,11 +76,39 @@ def test_add(as_admin, as_volonar):
     assert found == 2
     found_l = 0
     for logrow in result.json()["logdata"]:
-        if data["email"][0] in logrow:
+        if data_l["email"][0] in logrow:
             found_l = found_l + 1
-        elif data["email"][1] in logrow:
+        elif data_l["email"][1] in logrow:
             found_l = found_l + 1
     assert found_l == 2
+
+    deltagare = as_admin.get("http://127.0.0.1:9292/api/deltagare").json()["deltagare"]
+    invites = []
+    for delt in deltagare:
+        if ( delt["fornamn"] == "Test_deltagare_to_be_deleted" or
+            delt["fornamn"] == "Test2_deltagare_to_be_deleted" ):
+            invites.append(delt["deltagare_id"])
+    assert len(invites) == 4
+    invite_result = as_admin.post("http://127.0.0.1:9292/api/invite", data = {"invite": invites})
+    assert invite_result.status_code == 200
+    sleep(10)
+    emaillist = as_admin.get("http://127.0.0.1:9292/api/loggar?log=epost").json()["logdata"]
+    found_v = 0
+    found_l = 0
+    listinfo = []
+    for logrow in emaillist:
+        if data["email"][0] in logrow and "Erbjudande om plats" in logrow:
+            found_v = found_v + 1
+            listinfo.append(logrow)
+        elif data["email"][1] in logrow and "Erbjudande om plats" in logrow:
+            found_v = found_v + 1
+            listinfo.append(logrow)
+        elif data_l["email"][0] in logrow and "Erbjudande om plats" in logrow:
+            found_l = found_l + 1
+        elif data_l["email"][1] in logrow and "Erbjudande om plats" in logrow:
+            found_l = found_l + 1
+    assert found_v == 4
+    assert found_l == 4
 
 def test_delete_deltagare(as_admin):
     deltagare = as_admin.get("http://127.0.0.1:9292/api/deltagare")
