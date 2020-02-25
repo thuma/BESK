@@ -13,6 +13,7 @@ def do_something(request):
 
 def finalizer_function():
     main.server.stop()
+    main.send_pool.kill()
 
 admin = False
 @pytest.fixture
