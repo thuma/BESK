@@ -33,7 +33,43 @@ def as_admin():
 
 vol = False
 @pytest.fixture
-def as_volonar():
+def as_volonar(as_admin):
+    volontärer = as_admin.get("http://127.0.0.1:9292/api/volontarer").json()["volontärer"]
+    found = False
+    for volontär in volontärer:
+        if volontär["epost"] == "vtest@test.com":
+            found = True
+    if not found:
+        result = as_admin.get("http://127.0.0.1:9292/api/kodstugor")
+        kodstugor = result.json()['kodstugor']
+        kodstuga = False
+        for en_kodstuga in kodstugor:
+            if en_kodstuga["namn"] == "Test_Kodstuga":
+                kodstuga = en_kodstuga
+        
+        if not kodstuga:
+            data = {
+                "namn": "Test_Kodstuga",
+                "sms_text":"Påminnelse %namn% %datum%",
+                "epost_text":"Påminnelse %namn% %datum% %kodstuga%",
+                "epost_rubrik":"Påminnelse",
+                "epost_text_ja":"Välkommen %namn% address etc.",
+                "epost_rubrik_ja":"Välkommen",
+                "typ": "Kodstuga",
+                "open":"Ja"
+                }
+            result = as_admin.post("http://127.0.0.1:9292/api/kodstugor", data = data)
+            for en_kodstuga in result.json()['kodstugor']:
+                if en_kodstuga["namn"] == "Test_Kodstuga":
+                    kodstuga = en_kodstuga
+        data = {
+            "namn": "Test_Volontär",
+            "epost":"vtest@test.com",
+            "telefon":"+46723175800",
+            "kodstugor_id":kodstuga["id"],
+            "roller":"volontär"
+            }
+        result = as_admin.post("http://127.0.0.1:9292/api/volontarer", data = data)
     global vol
     if not vol:
         email_data = {"user":{"email":"vtest@test.com"}}

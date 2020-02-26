@@ -44,7 +44,7 @@ def test_add_many(as_admin, as_volonar):
 
 def test_add_to_kodstuga(as_admin, as_volonar):
     result = as_admin.get("http://127.0.0.1:9292/api/kodstugor")
-    kodstuga = result.json()['kodstugor'][1]["id"]
+    kodstuga = result.json()['kodstugor'][0]["id"]
     result = as_admin.get("http://127.0.0.1:9292/api/volontarer")
 
     flytta = []
