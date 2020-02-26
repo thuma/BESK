@@ -4,7 +4,7 @@ from gevent import sleep
 import requests
 import uuid
 
-def test_add(as_admin, as_volonar):
+def test_add(as_admin, as_volontär):
     data = {
         "namn": "Test_Kodstuga_Att_Radera_Vanlig",
         "sms_text":"NEJ",
@@ -120,7 +120,7 @@ def test_delete_deltagare(as_admin):
             deleted_count = deleted_count + 1
     assert deleted_count == 4
 
-def test_delete(as_admin, as_volonar):
+def test_delete(as_admin, as_volontär):
     result = as_admin.get("http://127.0.0.1:9292/api/kodstugor")
     for one in result.json()['kodstugor']:
         if one["namn"] == "Test_Kodstuga_Att_Radera_Lärare" or one["namn"] == "Test_Kodstuga_Att_Radera_Vanlig":

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from random import random
 
-def test_add(as_admin, as_volonar):
+def test_add(as_admin, as_volontär):
     result = as_admin.get("http://127.0.0.1:9292/api/kodstugor")
     kodstuga = result.json()['kodstugor'][0]
     data = {
@@ -20,7 +20,7 @@ def test_add(as_admin, as_volonar):
             found = True
     assert found
 
-def test_add_many(as_admin, as_volonar):
+def test_add_many(as_admin, as_volontär):
     result = as_admin.get("http://127.0.0.1:9292/api/kodstugor")
     kodstuga = result.json()['kodstugor'][0]
     data = {
@@ -42,7 +42,7 @@ def test_add_many(as_admin, as_volonar):
     assert found1
     assert found1
 
-def test_add_to_kodstuga(as_admin, as_volonar):
+def test_add_to_kodstuga(as_admin, as_volontär):
     result = as_admin.get("http://127.0.0.1:9292/api/kodstugor")
     kodstuga = result.json()['kodstugor'][0]["id"]
     result = as_admin.get("http://127.0.0.1:9292/api/volontarer")
@@ -62,12 +62,12 @@ def test_add_to_kodstuga(as_admin, as_volonar):
         if volontar["id"] in  flytta:
             assert kodstuga in volontar["kodstugor_id"]
 
-def test_list(as_admin, as_volonar):
+def test_list(as_admin, as_volontär):
     result = as_admin.get("http://127.0.0.1:9292/api/kodstugor")
     assert result.status_code == 200
     assert result.json()['kodstugor'][0]['id'] > 0
 
-def test_update(as_admin, as_volonar):
+def test_update(as_admin, as_volontär):
     result = as_admin.get("http://127.0.0.1:9292/api/volontarer")
     for volontar in result.json()['volontärer']:
         if volontar["namn"] == "Test_Volontär_Att_Radera":
@@ -86,13 +86,13 @@ def test_update(as_admin, as_volonar):
                     assert one["epost"] == data["epost"]
                     assert one["telefon"] == data["telefon"]
 
-def test_delete(as_admin, as_volonar):
-    result = as_volonar.get("http://127.0.0.1:9292/api/volontarer")
+def test_delete(as_admin, as_volontär):
+    result = as_volontär.get("http://127.0.0.1:9292/api/volontarer")
     for volontar in result.json()['volontärer']:
         if volontar["namn"] == "Test_Volontär_Att_Radera":
-            result2 = as_volonar.delete("http://127.0.0.1:9292/api/volontarer", data = {"id":volontar["id"]})
+            result2 = as_volontär.delete("http://127.0.0.1:9292/api/volontarer", data = {"id":volontar["id"]})
             assert result2.status_code == 200
-    result = as_volonar.get("http://127.0.0.1:9292/api/volontarer")
+    result = as_volontär.get("http://127.0.0.1:9292/api/volontarer")
     found = False
     for volontar in result.json()['volontärer']:
         if volontar["namn"] == "Test_Volontär_Att_Radera":

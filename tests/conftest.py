@@ -33,7 +33,7 @@ def as_admin():
 
 vol = False
 @pytest.fixture
-def as_volonar(as_admin):
+def as_volontär(as_admin):
     volontärer = as_admin.get("http://127.0.0.1:9292/api/volontarer").json()["volontärer"]
     found = False
     for volontär in volontärer:

@@ -24,7 +24,7 @@ endpoints200 = [
     '/apply/kodstugor'
     ]
 
-def test_all_api(as_admin, as_volonar):
+def test_all_api(as_admin, as_volontär):
     for path in endpoints:
         data = {}
         result = requests.post("http://127.0.0.1:9292/api"+path, data = data)
@@ -32,29 +32,29 @@ def test_all_api(as_admin, as_volonar):
         result = requests.get("http://127.0.0.1:9292/api"+path)
         assert result.status_code == 403
         
-def test_all_200(as_admin, as_volonar):
+def test_all_200(as_admin, as_volontär):
     for path in endpoints200:
         result = requests.get("http://127.0.0.1:9292"+path)
         assert result.status_code == 200
         result = as_admin.get("http://127.0.0.1:9292"+path)
         assert result.status_code == 200
-        result = as_volonar.get("http://127.0.0.1:9292"+path)
+        result = as_volontär.get("http://127.0.0.1:9292"+path)
         assert result.status_code == 200
         
-def test_all_302(as_admin, as_volonar):
+def test_all_302(as_admin, as_volontär):
     for path in ['/login']:
         result = requests.get("http://127.0.0.1:9292"+path, allow_redirects=False)
         assert result.status_code == 302
         result = as_admin.get("http://127.0.0.1:9292"+path, allow_redirects=False)
         assert result.status_code == 302
-        result = as_volonar.get("http://127.0.0.1:9292"+path, allow_redirects=False)
+        result = as_volontär.get("http://127.0.0.1:9292"+path, allow_redirects=False)
         assert result.status_code == 302
 
-def test_all_200or302(as_admin, as_volonar):
+def test_all_200or302(as_admin, as_volontär):
     for path in ['/']:
         result = requests.get("http://127.0.0.1:9292"+path, allow_redirects=False)
         assert result.status_code == 302
         result = as_admin.get("http://127.0.0.1:9292"+path, allow_redirects=False)
         assert result.status_code == 200
-        result = as_volonar.get("http://127.0.0.1:9292"+path, allow_redirects=False)
+        result = as_volontär.get("http://127.0.0.1:9292"+path, allow_redirects=False)
         assert result.status_code == 200
