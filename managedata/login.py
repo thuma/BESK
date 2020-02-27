@@ -81,6 +81,10 @@ def get_session_token(request):
 
 def start(request):
     session = get_session_token(request)
+    if "http://localhost" not in config['slack']['redirect_uri'] :
+        is_secure = "; Secure"
+    else:
+        is_secure = ""
     auth_start_url = "https://slack.com/oauth/authorize"+\
         "?scope=identity.basic%20identity.email"+\
         "&client_id=476744412819.789508806369"+\
@@ -91,7 +95,7 @@ def start(request):
         raise Error302(
             "302 Found",
             [
-                ("Set-Cookie", "session_token="+session_token+"; HttpOnly"), # TODO add Secure
+                ("Set-Cookie", "session_token="+session_token+"; HttpOnly" + is_secure),
                 ("Location", auth_start_url)
             ]
         )
