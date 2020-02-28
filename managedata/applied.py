@@ -28,8 +28,10 @@ def new(request):
     else:
         user_is_admin = False
     if "invite_now" in formdata:
-        if user_is_admin and formdata["invite_now"][0] == "ja":
+        if user_is_admin and formdata["invite_now"][0] == "inbjudan":
             status = "inbjudan"
+        if user_is_admin and formdata["invite_now"][0] == "ja":
+            status = "ja"
 
     if "approve" not in formdata:
         raise Error400("Du måste acceptera Kodcentrums Integritetspolicy.")
