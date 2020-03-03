@@ -3,6 +3,7 @@
     <table class="table table-sm">
       <thead>
         <tr>
+          <th>Nr</th>
           <th scope="col">
                 <select v-model:value="val_kodstuga" class="form-control">
                     <option value="alla">Visa alla kodstugor</option>
@@ -18,7 +19,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="volontär in volontärer" v-if="volontär.kodstugor_id.indexOf(val_kodstuga) > -1 || val_kodstuga=='alla'">
+        <tr v-for="(volontär, nr ) in valda_volontärer">
+            <td>{{nr + 1}}</td>
             <td>{{kodstuga_names_by_ids(volontär.kodstugor_id)}}</td>
             <td>{{volontär.roller.join(", ")}}</td>
             <td>{{volontär.namn}}</td>

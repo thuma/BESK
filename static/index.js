@@ -233,6 +233,32 @@ var admin = new Vue({
         '/api/loggar'].forEach(this.get_data)
     },
     computed: {
+        valda_deltagare: function(){
+            if (this.val_kodstuga == 'alla'){
+                return this.deltagare
+            } else {
+                val_kodstuga = this.val_kodstuga
+                return this.deltagare.filter(kid => kid.kodstuga_id == val_kodstuga);
+            }
+        },
+        valda_volontärer: function(){
+            if (this.val_kodstuga == 'alla'){
+                return this.volontärer
+            } else {
+                val_kodstuga = this.val_kodstuga
+                return this.volontärer.filter(
+                    volontär => volontär.kodstugor_id.indexOf(val_kodstuga) > -1);
+            }
+        },
+        valda_kontaktpersoner: function(){
+            if (this.val_kodstuga == 'alla'){
+                return this.kontaktpersoner
+            } else {
+                val_kodstuga = this.val_kodstuga
+                return this.kontaktpersoner.filter(
+                    kontaktperson => kontaktperson.kodstugor_id == val_kodstuga);
+            }
+        },
         vald_kodstuga: function(){
             var kodstuga_data = "";
             var id = this.val_kodstuga

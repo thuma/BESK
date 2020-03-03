@@ -2,6 +2,7 @@
 <table class="table table-sm" v-if="edit==''">
     <thead>
         <tr>
+            <th>Nr</th>
             <th scope="col" v-if="me.admin">
                 <select v-model:value="val_kodstuga" class="form-control">
                     <option value="alla">Visa alla kodstugor</option>
@@ -17,7 +18,8 @@
         </tr>
     </thead>
     <tbody>
-        <tr v-for="kontaktperson in kontaktpersoner" v-if="kontaktperson.kodstugor_id == val_kodstuga || val_kodstuga == 'alla'">
+        <tr v-for="(kontaktperson, nr) in valda_kontaktpersoner">
+            <td>{{nr + 1}}</td>
             <td v-if="me.admin">{{kodstuga_name_by_id(kontaktperson.kodstugor_id)}}</td>
             <td>{{kontaktperson.fornamn}}</td>
             <td>{{kontaktperson.efternamn}}</td>
