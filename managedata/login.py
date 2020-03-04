@@ -23,10 +23,12 @@ def set_auth(session_id, userdata):
     db.commit()
 
 def get_auth(session_id):
+    if len(session_id) < 32:
+        return False
     now = int(time())
     result = db.cursor.execute('''SELECT user_data FROM auth WHERE session_id=? AND vailid > ?;''', (session_id, now))
     try:
-        return json.loads(result.fetchall()[0][0])
+        return json.loads(result.fetchone()[0])
     except:
         return False
 
@@ -69,7 +71,10 @@ def is_approved(user):
 
 def get_login_status(request):
     session = get_session_token(request)
-    return {"user":get_auth(session)}
+    if session:
+        return {"user":get_auth(session)}
+    else:
+        return {"user":False}
 
 def get_session_token(request):
     if 'HTTP_COOKIE' in request:
