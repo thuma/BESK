@@ -12,6 +12,8 @@ config = configparser.RawConfigParser()
 config.read('../BESK.ini')
 
 def set_auth(session_id, userdata):
+    if not session_id or len(session_id) < 31:
+        return
     user_serial_data = json.dumps(userdata)
     expire = int(time()) + (3600 * 12)
     db.cursor.execute('''
