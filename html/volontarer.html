@@ -152,6 +152,9 @@
                     <select name="roller" v-model:value="edit.data.roller[kodstugor_id_index]" class="custom-select">
                         <option value="volontär">Volontär</option>
                         <option value="övervakare">Övervakare</option>
+                        <option value="volontärsamordnare">Volontärsamordnare</option>
+                        <option value="trygghetsombud">Trygghetsombud</option>
+                        <option value="lokalansvarig">Lokalansvarig</option>
                     </select>
                 </div>
                 <button class="btn btn-secondary" type="button" v-on:click="edit.data.kodstugor_id.push('0'), edit.data.roller.push('volontär')">Lägg till</button>
