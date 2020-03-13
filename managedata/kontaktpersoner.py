@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from managedata import db
+from managedata import db, deltagare
 from tools import read_post_data, Error400
 import uuid
 import json
@@ -82,7 +82,10 @@ def add_or_uppdate(request):
                         (?,?)
                 """, (deltagare_id, data[0]))
         db.commit()
-    return all(request)
+        
+    kontaktpersoner = all(request)
+    kontaktpersoner.update(deltagare.all(request))
+    return kontaktpersoner
 
 def for_kodstuga(kodstugor_id):
     all = db.cursor.execute("""

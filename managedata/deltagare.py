@@ -223,7 +223,9 @@ def add_or_uppdate(request):
                         (?,?)
                 """, (data[0], kontaktperson_id))
         db.commit()
-    return all(request)
+    deltagare = all(request)
+    deltagare.update(kontaktpersoner.all(request))
+    return deltagare
 
 def all(request):
     if request["BESK_admin"]:
