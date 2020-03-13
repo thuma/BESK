@@ -121,11 +121,11 @@ def get_one(id):
             deltagare.foto AS foto,
             GROUP_CONCAT(kontaktpersoner.id,",") AS kontaktperson_id
         FROM deltagare
-        INNER JOIN kontaktpersoner_deltagare 
+        LEFT OUTER JOIN kontaktpersoner_deltagare 
             ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
-        INNER JOIN kontaktpersoner
+        LEFT OUTER JOIN kontaktpersoner
            ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id
-        INNER JOIN kodstugor
+        LEFT OUTER JOIN kodstugor
            ON deltagare.kodstugor_id=kodstugor.id
         WHERE deltagare.id = ?
         GROUP BY deltagare.id
@@ -136,7 +136,10 @@ def get_one(id):
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
             if col[0] == "kontaktperson_id":
-                ut[col[0]] = ut[col[0]].split(',')
+                if ut[col[0]] == None:
+                    ut[col[0]] = []
+                else:
+                    ut[col[0]] = ut[col[0]].split(',')
             if ut[col[0]] == None:
                 ut[col[0]] = ""
         return ut
@@ -145,6 +148,8 @@ def get_one(id):
 def add_or_uppdate(request):
     if request["BESK_admin"]:
         post_data = read_post_data(request)
+        if "kontaktperson_id" not in post_data:
+            post_data["kontaktperson_id"] = []
         if "id" in post_data:
             data = (
                 post_data["fornamn"][0],
@@ -175,6 +180,20 @@ def add_or_uppdate(request):
                     WHERE
                         id = ?
                 """, data)
+            db.cursor.execute("""
+                DELETE FROM 
+                    kontaktpersoner_deltagare
+                WHERE 
+                    deltagare_id = ?
+                """, (post_data["id"][0], ))
+            for kontaktperson_id in post_data["kontaktperson_id"]:
+                db.cursor.execute("""
+                INSERT 
+                    INTO kontaktpersoner_deltagare
+                        (deltagare_id, kontaktpersoner_id) 
+                    VALUES 
+                        (?,?)
+                """, (post_data["id"][0], kontaktperson_id))
         else:
             data = (
                 uuid.uuid4().hex,
@@ -193,8 +212,16 @@ def add_or_uppdate(request):
                     INTO deltagare 
                         (id, fornamn, efternamn, status, kon, klass, skola, kodstugor_id, skonto, slosen) 
                     VALUES 
-                        (?,?,?,?,?,?,?,?,?)
+                        (?,?,?,?,?,?,?,?,?,?)
                 """, data)
+            for kontaktperson_id in post_data["kontaktperson_id"]:
+                db.cursor.execute("""
+                INSERT 
+                    INTO kontaktpersoner_deltagare
+                        (deltagare_id, kontaktpersoner_id) 
+                    VALUES 
+                        (?,?)
+                """, (data[0], kontaktperson_id))
         db.commit()
     return all(request)
 
@@ -232,11 +259,11 @@ def all(request):
             deltagare.klass AS klass,
             GROUP_CONCAT(kontaktpersoner.id,",") AS kontaktperson_id
         FROM deltagare
-        INNER JOIN kontaktpersoner_deltagare 
+        LEFT OUTER JOIN kontaktpersoner_deltagare 
             ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
-        INNER JOIN kontaktpersoner
+        LEFT OUTER JOIN kontaktpersoner
            ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id
-        INNER JOIN kodstugor
+        LEFT OUTER JOIN kodstugor
            ON deltagare.kodstugor_id=kodstugor.id
         %s
         GROUP BY deltagare.id
@@ -247,7 +274,10 @@ def all(request):
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
             if col[0] == "kontaktperson_id":
-                ut[col[0]] = ut[col[0]].split(',')
+                if ut[col[0]] == None:
+                    ut[col[0]] = []
+                else:
+                    ut[col[0]] = ut[col[0]].split(',')
             if ut[col[0]] == None:
                 ut[col[0]] = ""
         return ut

@@ -339,7 +339,9 @@ var admin = new Vue({
     data: {
         markdown_to_html: new showdown.Converter(),
         page: "BESK",
+        vald_kontakt: "",
         deltagare: [],
+        vald_deltagare: "",
         närvaro: [],
         närvaro_redigerade: {},
         kodstugor: [],

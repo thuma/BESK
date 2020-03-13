@@ -3,7 +3,7 @@
     <thead>
         <tr>
             <th>Nr</th>
-            <th scope="col" v-if="me.admin">
+            <th scope="col">
                 <select v-model:value="val_kodstuga" class="form-control">
                     <option value="alla">Visa alla kodstugor</option>
                     <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
@@ -20,7 +20,7 @@
     <tbody>
         <tr v-for="(kontaktperson, nr) in valda_kontaktpersoner">
             <td>{{nr + 1}}</td>
-            <td v-if="me.admin">{{kodstuga_name_by_id(kontaktperson.kodstugor_id)}}</td>
+            <td>{{kodstuga_name_by_id(kontaktperson.kodstugor_id)}}</td>
             <td>{{kontaktperson.fornamn}}</td>
             <td>{{kontaktperson.efternamn}}</td>
             <td>{{kontaktperson.epost}}</td>
@@ -33,10 +33,17 @@
         </tr>
     </tbody>
 </table>
+<button 
+    class="btn btn-primary"
+    v-if="edit==''"
+    v-on:click="edit={'type':'kontaktperson','data':{'id':'','fornamn':'','efternamn':'','epost':'','telefon':'','deltagare_id':[]}}"
+    >
+    Skapa ny
+</button>
 <div v-if="edit.type=='kontaktperson'" class="card">
     <div class="card-body">
         <form method="post" @submit="check_send" action="/api/kontaktpersoner">
-            <input name="id" v-if="edit.data.id!==''" v-bind:value="edit.data.id" type="hidden">
+            <input v-if="edit.data.id !== ''" name="id" v-bind:value="edit.data.id" type="hidden">
             <div class="form-group">
                 <label>Förnamn</label>
                 <input
@@ -73,6 +80,25 @@
                     required=""
                     class="form-control">
             </div>
+            <div class="form-group" v-if="me.admin">
+                <label>Deltagare</label>
+                <div class="input-group" v-for="deltagare_id in edit.data.deltagare_id">
+                        <input class="form-control" disabled v-bind:value="deltagare_by_id(deltagare_id).fornamn+' '+deltagare_by_id(deltagare_id).efternamn">
+                        <input type="hidden" name="deltagare_id" v-bind:value="deltagare_id">
+                    <div class="input-group-append">
+                        <button class="btn btn-secondary" type="button" v-on:click="edit.data.deltagare_id = edit.data.deltagare_id.filter(id => deltagare_id !== id) ">Ta bort</button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <select class="custom-select" v-model:value="vald_deltagare">
+                        <option value="">Välj...</option>
+                        <option v-for="en_deltagare in valda_deltagare" v-bind:value="en_deltagare.deltagare_id">{{en_deltagare.fornamn}} {{en_deltagare.efternamn}}</option>
+                    </select>
+                    <div class="input-group-append" v-if="vald_deltagare!==''">
+                        <button class="btn btn-secondary" type="button" v-on:click="edit.data.deltagare_id.push(vald_deltagare); vald_deltagare = ''">Lägg till</button>
+                    </div>
+                </div>
+            </div> 
             <div class="form-group">
                 <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
                 <button v-else="" type="submit" class="btn btn-primary">Spara</button>

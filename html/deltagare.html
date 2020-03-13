@@ -56,7 +56,10 @@
         </tr>
     </tbody>
 </table>
-<button type="submit" class="btn btn-primary" v-if="me.admin">Skicka inbjudan till valda deltagare</button> <a target="_blank" href="/apply" class="btn btn-secondary" v-if="me.admin">Formulär intresseanmälan kodstuga</a>
+<button type="submit" class="btn btn-primary" v-if="me.admin">Skicka inbjudan till valda deltagare</button>
+<a target="_blank" href="/apply" class="btn btn-secondary" v-if="me.admin">Formulär intresseanmälan kodstuga</a>
+<button type="button" class="btn btn-secondary" v-if="me.admin" v-on:click="edit={'type':'deltagare','data':{'kodstuga_id':'','id':'','fornamn':'','efternamn':'','skonto':'','slosen':'','kon':'han','skola':'','klass':'åk 4','status':'ansökt','foto':'','kontaktperson_id':[]}}">Skapa ny</button>
+
 </form>
 <div v-if="edit.type=='deltagare'" class="card">
     <div class="card-body">
@@ -64,7 +67,7 @@
             <input name="id" v-if="edit.data.id!==''" v-bind:value="edit.data.deltagare_id" type="hidden">
             <div class="form-group" v-if="me.admin">
                 <label>Kodstuga</label>
-                <select name="kodstuga" v-bind:value="edit.data.kodstuga_id" class="form-control">
+                <select name="kodstuga" v-model:value="edit.data.kodstuga_id" class="form-control">
                     <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
                 </select>
             </div>
@@ -146,6 +149,25 @@
                     <option value="ja">Ja</option>
                     <option value="nej">Nej</option>
                 </select>
+            </div>
+            <div class="form-group" v-if="me.admin">
+                <label>Målsman</label>
+                <div class="input-group" v-for="kontaktperson_id in edit.data.kontaktperson_id">
+                        <input class="form-control" disabled v-bind:value="kontaktperson_by_id(kontaktperson_id).fornamn + ' ' + kontaktperson_by_id(kontaktperson_id).efternamn">
+                        <input type="hidden" name="kontaktperson_id" v-bind:value="kontaktperson_id">
+                    <div class="input-group-append">
+                        <button class="btn btn-secondary" type="button" v-on:click="edit.data.kontaktperson_id = edit.data.kontaktperson_id.filter(id => kontaktperson_id !== id) ">Ta bort</button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <select class="custom-select" v-model:value="vald_kontakt">
+                        <option value="">Välj...</option>
+                        <option v-for="kontakt in valda_kontaktpersoner" v-bind:value="kontakt.id">{{kontakt.fornamn}} {{kontakt.efternamn}}</option>
+                    </select>
+                    <div class="input-group-append" v-if="vald_kontakt!==''">
+                        <button class="btn btn-secondary" type="button" v-on:click="edit.data.kontaktperson_id.push(vald_kontakt); vald_kontakt = ''">Lägg till</button>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <button v-if="edit.data.id==''" type="submit" class="btn btn-primary">Skapa ny</button>
