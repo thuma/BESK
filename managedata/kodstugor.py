@@ -18,21 +18,33 @@ def delete(request):
     post_data = read_post_data(request)
     if request["BESK_admin"] and len(kontaktpersoner.for_kodstuga(post_data['id'][0])) == 0:
         db.cursor.execute("""
-            DELETE FROM 
+            DELETE FROM
                 utskick
-            WHERE 
+            WHERE
                 kodstugor_id = ?
          """,(post_data['id'][0],))
         db.cursor.execute("""
-            DELETE FROM 
+            DELETE FROM
                 kodstugor_datum
-            WHERE 
+            WHERE
                 kodstugor_id = ?
          """,(post_data['id'][0],))
         db.cursor.execute("""
-            DELETE FROM 
+            DELETE FROM
+                volontarer_plannering
+            WHERE
+                kodstugor_id = ?
+         """,(post_data['id'][0],))
+        db.cursor.execute("""
+            DELETE FROM
+                volontarer_roller
+            WHERE
+                kodstugor_id = ?
+         """,(post_data['id'][0],))
+        db.cursor.execute("""
+            DELETE FROM
                 kodstugor
-            WHERE 
+            WHERE
                 id = ?
          """,(post_data['id'][0],))
         db.commit()

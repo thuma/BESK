@@ -20,27 +20,27 @@ def delete(request):
     if request["BESK_admin"]:
         post_data = read_post_data(request)
         db.cursor.execute("""
-            DELETE FROM 
+            DELETE FROM
                 klick_svar
             WHERE 
                 deltagare_id = ?;
             """, (post_data["id"][0],))
         db.cursor.execute("""
-            DELETE FROM 
+            DELETE FROM
                 deltagande_närvaro
             WHERE 
                 deltagare_id = ?;
             """, (post_data["id"][0],))
         db.cursor.execute("""
-            DELETE FROM 
+            DELETE FROM
                 kontaktpersoner_deltagare
-            WHERE 
+            WHERE
                 deltagare_id = ?;
             """, (post_data["id"][0],))
         db.cursor.execute("""
-            DELETE FROM 
+            DELETE FROM
                 deltagare
-            WHERE 
+            WHERE
                 id = ?;
             """, (post_data["id"][0],))
         db.commit()

@@ -1,6 +1,18 @@
 var admin = new Vue({
     el: '#admin',
     methods: {
+        is_old_kodstuga: function(id){
+            if (admin.get_dates(id).length > 0) {
+                last_date = new Date(admin.get_dates(id).pop().datum)
+                console.log(last_date)
+                if (last_date < new Date()){
+                    return true
+                }
+            } else {
+                return true
+            }
+            return false
+        },
         get_data: function(url){
             var main = this;
             fetch(url).then(
