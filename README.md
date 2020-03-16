@@ -34,6 +34,10 @@ client_id = <ID>
 client_secret = <SECRET>
 token = <TOKEN>
 
+[office365]
+email=<FROM EMAIL>
+password=<PASSWORD>
+
 [46elks]
 username = <USERNAME>
 password = <PASSWORD>
