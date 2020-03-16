@@ -163,6 +163,39 @@ def send_email(to, subject, message):
     except:
         logger.error("Epost kunde inte skickas till: "+to, exc_info=1)
 
+
+def send_mail_to_office365(to, subject, message):
+    html = markdown.markdown(message)
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = "Kodcentrum <hej@kodcentrum.se>"
+    msg['To'] = to
+    msg.set_content(message)
+    msg.add_alternative(html, subtype='html')
+    try:
+        server = smtplib.SMTP('smtp.office365.com',587)
+        server.ehlo()
+        server.starttls()
+        server.login(config["office365"]["email"], config["office365"]["password"])
+        server.send_message(msg)
+        server.quit()
+        return True
+    except smtplib.SMTPNotSupportedError:
+        logger.error("SMTPNotSupportedError to: "+ to, exc_info=1)
+        return False
+    except smtplib.SMTPDataError:
+        logger.error("SMTPDataError to: "+ to, exc_info=1)
+        return False
+    except smtplib.SMTPRecipientsRefused:
+        logger.error("SMTPRecipientsRefused to: "+ to, exc_info=1)
+        return False
+    except smtplib.SMTPSenderRefused:
+        logger.error("SMTPSenderRefused to: "+ to, exc_info=1)
+        return False
+    except:
+        logger.error("SMTP send failed to: "+ to, exc_info=1)
+        return "retry"
+
 def send_email_queue():
     while True:
         try:
@@ -181,18 +214,8 @@ def send_email_queue():
                 continue
 
             (id, to, subject, message) = tosend
-            html = markdown.markdown(message)
-            msg = EmailMessage()
-            msg['Subject'] = subject
-            msg['From'] = "Kodcentrum <hej@kodcentrum.se>"
-            msg['To'] = to
-            msg.set_content(message)
-            msg.add_alternative(html, subtype='html')
-            try:
-                server = smtplib.SMTP('localhost')
-                server.send_message(msg)
-                server.quit()
-            except smtplib.SMTPRecipientsRefused:
+            mail_sent = send_mail_to_office365(to, subject, message)
+            if mail_sent == False:
                 db.cursor.execute("""
                 UPDATE 
                     mail_queue
@@ -205,21 +228,21 @@ def send_email_queue():
                 )
                 db.commit()
                 continue
-            except:
-                logger.error("SMTP send failed to: "+ to, exc_info=1)
-                sleep(60*10)
+            elif mail_sent == "retry":
+                sleep(3600)
                 continue
-            db.cursor.execute("""
-                UPDATE 
-                    mail_queue
-                SET
-                    status = "skickad"
-                WHERE
-                    id = ?;
-                """,
-                (id,)
-                )
-            db.commit()
+            else:
+                db.cursor.execute("""
+                    UPDATE 
+                        mail_queue
+                    SET
+                        status = "skickad"
+                    WHERE
+                        id = ?;
+                    """,
+                    (id,)
+                    )
+                db.commit()
         except:
             logger.error("Epost kunde inte skickas från kön.", exc_info=1)
             sleep(3600)
