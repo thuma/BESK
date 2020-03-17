@@ -26,22 +26,39 @@ You need to set up a BESK.ini file:
 
 ```
 [general]
-admins = test@test.com
+admins = test@test.com,<YOUR-EMAIL>
 
 [slack]
 redirect_uri = http://localhost:9191/login
-client_id = <ID>
-client_secret = <SECRET>
-token = <TOKEN>
+client_id = <SLACK_CLIENT_ID>
+client_secret = <SLACK_SECRET>
+token = <SLACK_TOKEN>
 
 [office365]
-email=<FROM EMAIL>
-password=<PASSWORD>
+email=<FROM_EMAIL>
+password=<O365_PASSWORD>
 
 [46elks]
-username = <USERNAME>
-password = <PASSWORD>
+username = <46ELKS_API_USERNAME>
+password = <46ELKS_API_PASSWORD>
 ```
+
+For local testing you need to fill out:
+
+<YOUR-EMAIL>, the email you use to login to slack.
+
+<SLACK_CLIENT_ID> & <SLACK_SECRET>,
+    1. Create an app for slack at [https://api.slack.com/apps](https://api.slack.com/apps).
+    2. Click **Create New App** then select **Kodecetrum Sverige** as **Development Slack Workspace**.
+    3. Add premisions this is done by **Add features and functionality** and then **Permissions**,
+    4. Add **http://localhost:9191/login** to **Redirect URLs**.
+    5. **Add Scopes** for **Bot Token Scopes**  add the scopes **users:read**, **users:read.email**.
+    6. Finaly klick **Install App to Workspace**, confirm and get the <SLACK_TOKEN> from the field.
+
+<46ELKS_API_USERNAME> & <46ELKS_API_PASSWORD>
+Get account for [46elks](https://46elks.com) and get the API password and user name.
+
+For local testing just leave <FROM_EMAIL> & <O365_PASSWORD> they are not needed for local testing. 
 
 ### Testing
 

@@ -94,7 +94,7 @@ def start(request):
         is_secure = ""
     auth_start_url = "https://slack.com/oauth/authorize"+\
         "?scope=identity.basic%20identity.email"+\
-        "&client_id=476744412819.789508806369"+\
+        "&client_id="+url_encode(config['slack']['client_id'])+\
         "&redirect_uri="+url_encode(config['slack']['redirect_uri'])+\
         "&team=TE0MWC4Q3"
     if not session:
