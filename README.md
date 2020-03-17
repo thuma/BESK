@@ -22,7 +22,7 @@ You need to get the python modules in the requirements.txt file:
 pip install -r requirements.txt
 ```
 
-You need to set up a BESK.ini file:
+You need to set up a BESK.ini file in the parent (../) folder of the BESK system:
 
 ```
 [general]
