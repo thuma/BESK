@@ -26,7 +26,7 @@ You need to set up a BESK.ini file:
 
 ```
 [general]
-admins = test@test.com,<YOUR-EMAIL>
+admins = test@test.com,<YOUR_EMAIL>
 
 [slack]
 redirect_uri = http://localhost:9191/login
@@ -45,7 +45,7 @@ password = <46ELKS_API_PASSWORD>
 
 For local testing you need to fill out:
 
-<YOUR-EMAIL>, the email you use to login to slack.
+<YOUR_EMAIL>, the email you use to login to slack.
 
 <SLACK_CLIENT_ID> & <SLACK_SECRET>,
     1. Create an app for slack at [https://api.slack.com/apps](https://api.slack.com/apps).
