@@ -43,19 +43,10 @@ logging.basicConfig(handlers=[rotation_handler], level=logging.INFO)
 logger = logging.getLogger('server')
 
 
-def generator():
-    # TODO: what is this for? It does not seem to be used
-    yield "string"
-
-
 def convert(data):
     if isinstance(data, dict):
         return json.dumps(data).encode("utf-8")
-    if isinstance(data, str):
-        return data.encode("utf-8")
-    if isinstance(data, list):
-        return json.dumps(data).encode("utf-8")
-    # TODO: can data be any thing else than dict, str or list?
+    return data.encode("utf-8")
 
 
 def application(request, response):

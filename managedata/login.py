@@ -154,30 +154,3 @@ def validate(request):
     except Exception:
         return start(request)
 
-
-def auth(email):
-    verify = '../freja.cert'
-    cert = '../BESK.cert'
-    data = {
-        "userInfoType": "EMAIL",
-        "userInfo": email,
-        "attributesToReturn": [],
-        "minRegistrationLevel": "BASIC"
-    }
-    data = base64.b64encode(json.dumps(data))
-    result = requests.post(
-        'https://services.test.frejaeid.com/authentication/1.0/initAuthentication',
-        data={"initAuthRequest": data},
-        verify=verify,
-        cert=cert
-    )
-    # TODO: where is authList coming from?
-    authList[email] = result.json()  # noqa: F821
-    authdata = base64.b64encode(json.dumps(authList[email]))  # noqa: F821
-
-    result2 = requests.post(
-        'https://services.test.frejaeid.com/authentication/1.0/getOneResult',
-        data={"getOneAuthResultRequest": authdata},
-        verify=verify,
-        cert=cert)
-    return result2.json()["status"]
