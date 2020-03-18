@@ -143,7 +143,7 @@ def send_utskick():
             for idx, col in enumerate(found.description):
                 ut[col[0]] = row[idx]
             return ut
-        for utskick in list(map(to_headers, found.fetchall())):
+        for utskick in map(to_headers, found.fetchall()):
             for mottagare in kontaktpersoner.for_kodstuga(utskick["kodstugor_id"]):
                 message = utskick["text"].replace(
                     "%namn%", mottagare["deltagare_fornamn"]).replace(

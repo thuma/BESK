@@ -76,10 +76,7 @@ def set_admins(request):
 def is_approved(user):
     now = int(time())
     result = db.cursor.execute('''SELECT epost FROM volontarer WHERE epost=? AND utdrag_datum > ?;''', (user, now))
-    if result.fetchone() is None:
-        return False
-    else:
-        return True
+    return result.fetchone() is not None
 
 
 def get_login_status(request):
@@ -152,8 +149,8 @@ def validate(request):
                 ("Location", "/")
             ]
         )
-    except Error302 as e:
-        raise e
+    except Error302 as err:
+        raise err
     except Exception:
         return start(request)
 

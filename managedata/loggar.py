@@ -9,16 +9,12 @@ from tools import Error400, read_get_data
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
         return all(request)
-    else:
-        Error400("Du kan bara visa loggar inte ändra")
+    Error400("Du kan bara visa loggar inte ändra")
 
 
 def all(request):
-    def filterLogs(file):
-        if("BESK.log" in file):
-            return True
-        else:
-            return False
+    def filter_logs(file):
+        return "BESK.log" in file
 
     def list_to_string(lista):
         try:
@@ -26,7 +22,7 @@ def all(request):
         except:  # noqa: E772
             return lista
     if request["BESK_admin"]:
-        files = list(filter(filterLogs, os.listdir("../")))
+        files = list(filter(filter_logs, os.listdir("../")))
         data = read_get_data(request)
         text = ""
         if "log" in data:

@@ -16,6 +16,7 @@ def handle(request):
         return new(request)
     if request['REQUEST_METHOD'] == 'DELETE':
         return {}
+    return {}
 
 
 def new(request):
@@ -47,7 +48,7 @@ def new(request):
         raise Error400("Välj en kodstuga.")
     now = int(time.time())
 
-    for i, value in enumerate(formdata["barn_efternamn"]):
+    for i, _ in enumerate(formdata["barn_efternamn"]):
         if user_is_admin:
             foto = formdata["foto"][i]
         else:

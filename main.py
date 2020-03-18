@@ -55,6 +55,7 @@ def convert(data):
         return data.encode("utf-8")
     if isinstance(data, list):
         return json.dumps(data).encode("utf-8")
+    # TODO: can data be any thing else than dict, str or list?
 
 
 def application(request, response):
@@ -104,8 +105,7 @@ def route(request):
 
     if not request["BESK_login"]["user"]:
         raise Error403("You need to login at https://besk.kodcentrum.se/")
-    else:
-        request["BESK_admin"] = login.is_admin(request["BESK_login"]["user"]["user"]["email"])
+    request["BESK_admin"] = login.is_admin(request["BESK_login"]["user"]["user"]["email"])
 
     if not request["BESK_admin"]:
         if not login.is_approved(request["BESK_login"]["user"]["user"]["email"]):

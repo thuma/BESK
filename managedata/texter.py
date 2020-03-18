@@ -77,7 +77,7 @@ def get_one(id):
     return to_headers(one.fetchone())
 
 
-def all(request):
+def all(_):
     all = db.cursor.execute("""
         SELECT
             id,

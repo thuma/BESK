@@ -86,11 +86,11 @@ def get_value(key):
         return ""
 
 
-def send_sms(to, message):
+def send_sms(receiver, message):
     if len(message.strip()) < 4:
         return
     datum = arrow.utcnow().to('Europe/Stockholm').format("YYYY-MM-DD")
-    id = hashlib.sha512((to + message + datum).encode("utf-8")).hexdigest()
+    id = hashlib.sha512((receiver + message + datum).encode("utf-8")).hexdigest()
     try:
         db.cursor.execute('''
             INSERT INTO
@@ -98,12 +98,12 @@ def send_sms(to, message):
             VALUES
                 (?, ?, ?, ?, ?);
             ''',
-                          (id, datum, to, message, "köad"))
+                          (id, datum, receiver, message, "köad"))
         db.commit()
     except db.sqlite3.IntegrityError:
         logger.info("SMS redan i kö")
     except:  # noqa: E772
-        logger.error("SMS kunde inte skickas till: " + to, exc_info=1)
+        logger.error("SMS kunde inte skickas till: " + receiver, exc_info=1)
 
 
 def send_sms_queue():
@@ -238,20 +238,20 @@ def send_email_queue():
                                   (id,))
                 db.commit()
                 continue
-            elif mail_sent == "retry":
+            if mail_sent == "retry":
                 sleep(3600)
                 continue
-            else:
-                db.cursor.execute("""
-                    UPDATE
-                        mail_queue
-                    SET
-                        status = "skickad"
-                    WHERE
-                        id = ?;
-                    """,
-                                  (id,))
-                db.commit()
+            db.cursor.execute("""
+                UPDATE
+                    mail_queue
+                SET
+                    status = "skickad"
+                WHERE
+                    id = ?;
+                """,
+                              (id,)
+                              )
+            db.commit()
         except:   # noqa: E772
             logger.error("Epost kunde inte skickas från kön.", exc_info=1)
             sleep(3600)
