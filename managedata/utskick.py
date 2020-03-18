@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import time
+import logging
+
+from gevent import sleep
+import arrow
+
 from managedata import db, kontaktpersoner
 from tools import read_post_data, send_email, send_sms
-from gevent import sleep
-import time
-import json
-import arrow
-import logging
+
+
 logger = logging.getLogger("utskick")
+
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
@@ -17,23 +21,24 @@ def handle(request):
     if request['REQUEST_METHOD'] == 'DELETE':
         return delete(request)
 
+
 def all(request):
     if request["BESK_admin"]:
         where = ""
     else:
         where = """
-            WHERE 
+            WHERE
                 kodstugor_id
             IN (
-                SELECT 
-                    kodstugor_id 
-                FROM 
+                SELECT
+                    kodstugor_id
+                FROM
                     volontarer_roller
-                WHERE 
+                WHERE
                     volontarer_id = %s
             ) """ % request["BESK_volontarer_id"]
     all = db.cursor.execute("""
-        SELECT 
+        SELECT
             id,
             kodstugor_id,
             typ,
@@ -42,11 +47,12 @@ def all(request):
             datum,
             status
         FROM
-            utskick 
+            utskick
         %s
         ORDER BY
             kodstugor_id;
-        """ % where);
+        """ % where)
+
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
@@ -54,18 +60,20 @@ def all(request):
             if col[0] == "datum":
                 ut[col[0]] = arrow.Arrow.utcfromtimestamp(row[idx]).format("YYYY-MM-DD")
         return ut
-    return {"utskick":list(map(to_headers, all.fetchall()))}
+    return {"utskick": list(map(to_headers, all.fetchall()))}
+
 
 def delete(request):
     if request["BESK_admin"]:
         post_data = read_post_data(request)
         db.cursor.execute("""
-            DELETE FROM 
+            DELETE FROM
                 utskick
-            WHERE 
+            WHERE
                 id = ?
-         """,(post_data['id'][0],))
+         """, (post_data['id'][0],))
     return all(request)
+
 
 def add_or_uppdate(request):
     if request["BESK_admin"]:
@@ -99,19 +107,20 @@ def add_or_uppdate(request):
                 arrow.get(post_data["datum"][0]).timestamp,
             )
             db.cursor.execute("""
-                INSERT 
+                INSERT
                     INTO utskick
-                        (kodstugor_id, typ, rubrik, text, datum, status) 
-                    VALUES 
+                        (kodstugor_id, typ, rubrik, text, datum, status)
+                    VALUES
                         (?,?,?,?,?,"väntar")
                 """, data)
         db.commit()
     return all(request)
 
+
 def send_utskick():
     while True:
         found = db.cursor.execute('''
-            SELECT 
+            SELECT
                 id,
                 kodstugor_id,
                 typ,
@@ -119,21 +128,22 @@ def send_utskick():
                 text,
                 datum,
                 status
-            FROM 
-                utskick 
+            FROM
+                utskick
             WHERE
                 datum < ?
             AND
                 status = "väntar"
             ORDER BY
                 datum;
-            ''',(int(time.time()),))
+            ''', (int(time.time()),))
+
         def to_headers(row):
             ut = {}
             for idx, col in enumerate(found.description):
                 ut[col[0]] = row[idx]
             return ut
-        for utskick in list(map(to_headers,found.fetchall())):
+        for utskick in list(map(to_headers, found.fetchall())):
             for mottagare in kontaktpersoner.for_kodstuga(utskick["kodstugor_id"]):
                 message = utskick["text"].replace(
                     "%namn%", mottagare["deltagare_fornamn"]).replace(
@@ -143,13 +153,13 @@ def send_utskick():
                 elif utskick["typ"] == "e-post":
                     send_email(mottagare["epost"], utskick["rubrik"], message)
             db.cursor.execute('''
-                    UPDATE 
+                    UPDATE
                         utskick
-                    SET 
+                    SET
                         status = "skickad"
                     WHERE
                         id = ?;
-            ''',(utskick["id"],))
+            ''', (utskick["id"],))
             db.commit()
         now = arrow.utcnow().timestamp
         then = arrow.utcnow().shift(hours=24).replace(hour=9, minute=30).timestamp

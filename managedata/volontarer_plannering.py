@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from managedata import db
 from tools import read_post_data
-import json
+
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
@@ -11,6 +11,7 @@ def handle(request):
         return add_or_uppdate(request)
     if request['REQUEST_METHOD'] == 'DELETE':
         return all(request)
+
 
 def add_or_uppdate(request):
     post_data = read_post_data(request)
@@ -38,37 +39,38 @@ def add_or_uppdate(request):
                 post_data["kommentar"][i],
             )
             db.cursor.execute("""
-                INSERT 
+                INSERT
                     INTO volontarer_plannering (
                         volontarer_id,
                         kodstugor_id,
                         datum,
                         status,
                         kommentar
-                        ) 
-                    VALUES 
+                        )
+                    VALUES
                         (?,?,?,?,?)
                 """, data)
     db.commit()
     return all(request)
+
 
 def all(request):
     if request["BESK_admin"]:
         where = ""
     else:
         where = """
-            WHERE 
+            WHERE
                 volontarer_plannering.kodstugor_id
             IN (
-                SELECT 
-                    kodstugor_id 
-                FROM 
+                SELECT
+                    kodstugor_id
+                FROM
                     volontarer_roller
-                WHERE 
+                WHERE
                     volontarer_id = %s
             );""" % request["BESK_volontarer_id"]
     all = db.cursor.execute("""
-        SELECT 
+        SELECT
             volontarer_plannering.id as id,
             volontarer_plannering.volontarer_id as volontarer_id,
             volontarer_plannering.kodstugor_id as kodstugor_id,
@@ -77,10 +79,11 @@ def all(request):
             volontarer_plannering.kommentar as kommentar
         FROM volontarer_plannering
      """ + where)
+
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
 
-    return {"volontarer_plannering":list(map(to_headers, all.fetchall())), "volontarer_redigerade":{}}
+    return {"volontarer_plannering": list(map(to_headers, all.fetchall())), "volontarer_redigerade": {}}

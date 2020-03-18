@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from managedata import db
 from tools import read_post_data
-import json
+
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
@@ -11,6 +11,7 @@ def handle(request):
         return add_or_uppdate(request)
     if request['REQUEST_METHOD'] == 'DELETE':
         return delete(request)
+
 
 def add_or_uppdate(request):
     if request["BESK_admin"]:
@@ -37,26 +38,28 @@ def add_or_uppdate(request):
                 db.cursor.execute("""
                     INSERT INTO
                         keyvalue (id,text)
-                    VALUES 
+                    VALUES
                         (?,?)
                     """, data)
         db.commit()
     return all(request)
 
+
 def delete(request):
     if request["BESK_admin"]:
         post_data = read_post_data(request)
         db.cursor.execute("""
-            DELETE FROM 
+            DELETE FROM
                 keyvalue
-            WHERE 
+            WHERE
                 id = ?
-         """,(post_data['id'][0],))
+         """, (post_data['id'][0],))
     return all(request)
+
 
 def get_one(id):
     one = db.cursor.execute("""
-        SELECT 
+        SELECT
             id,
             text
         FROM
@@ -65,6 +68,7 @@ def get_one(id):
             id = ?
         LIMIT 1;
      """, (id,))
+
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(one.description):
@@ -72,17 +76,19 @@ def get_one(id):
         return ut
     return to_headers(one.fetchone())
 
+
 def all(request):
     all = db.cursor.execute("""
-        SELECT 
+        SELECT
             id,
             text
         FROM
             keyvalue;
      """)
+
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return {"texter":list(map(to_headers, all.fetchall()))}
+    return {"texter": list(map(to_headers, all.fetchall()))}

@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import uuid
+import time
+
+import phonenumbers
+
 from managedata import db, texter, login
 from tools import send_email, read_post_data, Error400
-import uuid
-import json
-import phonenumbers
-import time
-from gevent import spawn
+
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
@@ -16,11 +17,12 @@ def handle(request):
     if request['REQUEST_METHOD'] == 'DELETE':
         return {}
 
+
 def new(request):
     data_to_db = {
-        "kids":[],
-        "adults":[]
-        }
+        "kids": [],
+        "adults": []
+    }
     status = "ansökt"
     formdata = read_post_data(request)
     if request["BESK_login"]["user"]:
@@ -40,9 +42,9 @@ def new(request):
         (kodstuga, kodstuga_typ) = db.cursor.execute("""
             SELECT namn, typ
             FROM kodstugor WHERE id = ?;
-        """,(kodstugaid,)).fetchone()
-    except:
-         raise Error400("Välj en kodstuga.")
+        """, (kodstugaid,)).fetchone()
+    except:  # noqa: E772
+        raise Error400("Välj en kodstuga.")
     now = int(time.time())
 
     for i, value in enumerate(formdata["barn_efternamn"]):
@@ -62,23 +64,23 @@ def new(request):
             raise Error400("Fyll i skola för samtliga barn.")
         data_to_db["kids"].append(
             (
-            uuid.uuid4().hex,
-            kodstugaid,
-            formdata["barn_fornamn"][i],
-            formdata["barn_efternamn"][i],
-            formdata["kon"][i],
-            formdata["klass"][i],
-            formdata["skola"][i],
-            foto,
-            now,
-            status
+                uuid.uuid4().hex,
+                kodstugaid,
+                formdata["barn_fornamn"][i],
+                formdata["barn_efternamn"][i],
+                formdata["kon"][i],
+                formdata["klass"][i],
+                formdata["skola"][i],
+                foto,
+                now,
+                status
             )
         )
 
     for i, value in enumerate(formdata["vuxen_efternamn"]):
         try:
-            phone_number= phonenumbers.parse(formdata["telefon"][i], "SE")
-        except:
+            phone_number = phonenumbers.parse(formdata["telefon"][i], "SE")
+        except:  # noqa: E772
             raise Error400("Fyll i ett giltigt telefonummer för alla målsmän.")
         if not phonenumbers.is_valid_number(phone_number):
             raise Error400("Fyll i ett giltigt telefonummer för alla målsmän.")
@@ -90,31 +92,34 @@ def new(request):
             raise Error400("Fyll i en email för alla målsmän.")
         data_to_db["adults"].append(
             (
-            uuid.uuid4().hex,
-            formdata["vuxen_fornamn"][i],
-            formdata["vuxen_efternamn"][i],
-            formdata["email"][i],
-            phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
+                uuid.uuid4().hex,
+                formdata["vuxen_fornamn"][i],
+                formdata["vuxen_efternamn"][i],
+                formdata["email"][i],
+                phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
             )
         )
 
     for kid in data_to_db["kids"]:
-        db.cursor.execute("INSERT INTO deltagare (id,kodstugor_id,fornamn,efternamn,kon,klass,skola,foto,datum,status) VALUES (?,?,?,?,?,?,?,?,?,?)",kid)
+        db.cursor.execute("INSERT INTO deltagare (id,kodstugor_id,fornamn,efternamn,kon,klass,skola,foto,datum,status) VALUES (?,?,?,?,?,?,?,?,?,?)", kid)  # noqa: E501
 
     for adult in data_to_db["adults"]:
-        db.cursor.execute("INSERT INTO kontaktpersoner (id,fornamn,efternamn,epost,telefon) VALUES (?,?,?,?,?)",adult)
+        db.cursor.execute("INSERT INTO kontaktpersoner (id,fornamn,efternamn,epost,telefon) VALUES (?,?,?,?,?)", adult)
 
     for adult in data_to_db["adults"]:
         for kid in data_to_db["kids"]:
-            db.cursor.execute("INSERT INTO kontaktpersoner_deltagare (kontaktpersoner_id, deltagare_id) VALUES (?,?)",(adult[0], kid[0]))
+            db.cursor.execute(
+                "INSERT INTO kontaktpersoner_deltagare (kontaktpersoner_id, deltagare_id) VALUES (?,?)",
+                (adult[0], kid[0])
+            )
 
     hittade = (formdata["hittade"][0],)
     db.cursor.execute("INSERT INTO hittade (hittade) VALUES (?)", hittade)
     db.commit()
     if status == "ansökt":
-        mailmessage = texter.get_one("Intresseanmälan " + kodstuga_typ)["text"].replace("%kodstuga%",kodstuga)
+        mailmessage = texter.get_one("Intresseanmälan " + kodstuga_typ)["text"].replace("%kodstuga%", kodstuga)
         mailsubject = "Tack för din intresseanmälan"
         for email in formdata["email"]:
             send_email(email, mailsubject, mailmessage)
 
-    return {"applied":data_to_db}
+    return {"applied": data_to_db}
