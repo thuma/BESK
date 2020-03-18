@@ -142,6 +142,13 @@ Du kan själv testa deras
 
 * [PEP 8](https://www.python.org/dev/peps/pep-0008/)
 
+## Supporting the project
+
+* Avoid distractions focus on function.
+* Do changes, git rollback on error.
+* If it does not work on your machine do not push to prod.
+* Add your name to Authors in README.md.
+
 ## Authors
 
 * **Martin Harari Thuresson**
