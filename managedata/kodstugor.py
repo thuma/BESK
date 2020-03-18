@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import logging
+
 from managedata import db, login, kontaktpersoner, texter
 from tools import read_post_data
-import json
-import logging
+
 logger = logging.getLogger("kodstugor")
+
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
@@ -14,6 +16,7 @@ def handle(request):
     if request['REQUEST_METHOD'] == 'DELETE':
         return delete(request)
 
+
 def delete(request):
     post_data = read_post_data(request)
     if request["BESK_admin"] and len(kontaktpersoner.for_kodstuga(post_data['id'][0])) == 0:
@@ -22,38 +25,39 @@ def delete(request):
                 utskick
             WHERE
                 kodstugor_id = ?
-         """,(post_data['id'][0],))
+         """, (post_data['id'][0],))
         db.cursor.execute("""
             DELETE FROM
                 kodstugor_datum
             WHERE
                 kodstugor_id = ?
-         """,(post_data['id'][0],))
+         """, (post_data['id'][0],))
         db.cursor.execute("""
             DELETE FROM
                 volontarer_plannering
             WHERE
                 kodstugor_id = ?
-         """,(post_data['id'][0],))
+         """, (post_data['id'][0],))
         db.cursor.execute("""
             DELETE FROM
                 volontarer_roller
             WHERE
                 kodstugor_id = ?
-         """,(post_data['id'][0],))
+         """, (post_data['id'][0],))
         db.cursor.execute("""
             DELETE FROM
                 kodstugor
             WHERE
                 id = ?
-         """,(post_data['id'][0],))
+         """, (post_data['id'][0],))
         db.commit()
     return all(request)
+
 
 def active(request):
     if request["BESK_login"]["user"] and login.is_admin(request["BESK_login"]["user"]["user"]["email"]):
         all = db.cursor.execute("""
-            SELECT 
+            SELECT
                 id,
                 namn,
                 sms_text,
@@ -64,11 +68,11 @@ def active(request):
                 typ,
                 open
             FROM kodstugor;
-         """);
-        admin = True;
+         """)
+        admin = True
     else:
         all = db.cursor.execute("""
-            SELECT 
+            SELECT
                 id,
                 namn,
                 sms_text,
@@ -79,8 +83,8 @@ def active(request):
                 typ,
                 open
             FROM kodstugor WHERE open ='Ja';
-         """);
-        admin = False;
+         """)
+        admin = False
 
     def to_headers(row):
         ut = {}
@@ -89,14 +93,15 @@ def active(request):
         return ut
     alla_kodstugor = list(map(to_headers, all.fetchall()))
     return {
-        "admin":admin,
-        "AnsökanInfo":texter.get_one("Info Vid Ansökan")["text"],
-        "kodstugor":alla_kodstugor
-        }
+        "admin": admin,
+        "AnsökanInfo": texter.get_one("Info Vid Ansökan")["text"],
+        "kodstugor": alla_kodstugor
+    }
+
 
 def get_kodstuga(kodstua_id):
     all = db.cursor.execute("""
-        SELECT 
+        SELECT
             id,
             namn,
             sms_text,
@@ -110,7 +115,8 @@ def get_kodstuga(kodstua_id):
             kodstugor
         WHERE
             id = ?
-     """, (kodstua_id,));
+     """, (kodstua_id,))
+
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
@@ -118,23 +124,24 @@ def get_kodstuga(kodstua_id):
         return ut
     return list(map(to_headers, all.fetchall()))[0]
 
+
 def all(request):
     if request["BESK_admin"]:
         where = ""
     else:
         where = """
-            WHERE 
+            WHERE
                 id
             IN (
-                SELECT 
-                    kodstugor_id 
-                FROM 
+                SELECT
+                    kodstugor_id
+                FROM
                     volontarer_roller
-                WHERE 
+                WHERE
                     volontarer_id = %s
             );""" % request["BESK_volontarer_id"]
     all = db.cursor.execute("""
-        SELECT 
+        SELECT
             id,
             namn,
             sms_text,
@@ -145,14 +152,16 @@ def all(request):
             typ,
             open
         FROM kodstugor
-     """ + where);
+     """ + where)
+
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return {"kodstugor":list(map(to_headers, all.fetchall()))}
-    
+    return {"kodstugor": list(map(to_headers, all.fetchall()))}
+
+
 def add_or_uppdate(request):
     if request["BESK_admin"]:
         post_data = read_post_data(request)
@@ -194,10 +203,10 @@ def add_or_uppdate(request):
                 post_data["open"][0],
             )
             db.cursor.execute("""
-                INSERT 
-                    INTO kodstugor 
-                        (namn, sms_text, epost_text, epost_rubrik, epost_text_ja, epost_rubrik_ja, typ, open) 
-                    VALUES 
+                INSERT
+                    INTO kodstugor
+                        (namn, sms_text, epost_text, epost_rubrik, epost_text_ja, epost_rubrik_ja, typ, open)
+                    VALUES
                         (?,?,?,?,?,?,?,?)
                 """, data)
         db.commit()

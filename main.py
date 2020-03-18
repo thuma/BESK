@@ -2,16 +2,15 @@
 # -*- coding: utf-8 -*-
 from gevent import monkey
 monkey.patch_all()
-from gevent.pywsgi import WSGIServer
-from gevent import sleep, spawn, signal, pool
-import requests
-import random
-import json
-import base64
-import traceback
-import logging
-from logging.handlers import TimedRotatingFileHandler, RotatingFileHandler
-from tools import ( 
+
+import json # noqa: 402
+import logging # noqa: 402
+from logging.handlers import TimedRotatingFileHandler # noqa: 402
+
+from gevent.pywsgi import WSGIServer # noqa: 402
+from gevent import spawn, signal, pool # noqa: 402
+
+from tools import (
     Error302,
     Error400,
     Error403,
@@ -19,9 +18,8 @@ from tools import (
     static_file,
     send_email_queue,
     send_sms_queue
-    )
+    ) # noqa: 402
 from managedata import (
-    db,
     kodstugor,
     kontaktpersoner,
     applied,
@@ -34,26 +32,31 @@ from managedata import (
     deltagare,
     narvaro,
     texter,
-    loggar
-    )
+    loggar,
+    ) # noqa: 402
 
 rotation_handler = TimedRotatingFileHandler('../BESK.log',
-                                       when="D",
-                                       interval=1,
-                                       backupCount=28)
+                                            when="D",
+                                            interval=1,
+                                            backupCount=28)
 logging.basicConfig(handlers=[rotation_handler], level=logging.INFO)
 logger = logging.getLogger('server')
 
+
 def generator():
-     yield "string"
+    # TODO: what is this for? It does not seem to be used
+    yield "string"
+
 
 def convert(data):
-    if type(data) == type({}):
+    if isinstance(data, dict):
         return json.dumps(data).encode("utf-8")
-    elif type(data) == type("string"):
+    if isinstance(data, str):
         return data.encode("utf-8")
-    elif type(data) == type([]):
+    if isinstance(data, list):
         return json.dumps(data).encode("utf-8")
+    # TODO: can data be any thing else than dict, str or list?
+
 
 def application(request, response):
     try:
@@ -72,13 +75,14 @@ def application(request, response):
     except Error403 as error:
         response('403 Forbidden', [('Content-Type', 'text/html')])
         return [str(error).encode('utf-8')]
-    except Error404 as error:
+    except Error404:
         response('404 Not Found', [('Content-Type', 'text/html')])
         return [b'<h1>Not Found</h1>']
-    except Exception as error:
+    except Exception:
         logger.error("SERVER FEL:", exc_info=1)
         response('500 Internal Server Error', [('Content-Type', 'text/html')])
         return ["Ett fel inträffade v.g. kontakta: hej@kodcentrum.se".encode('utf-8')]
+
 
 def route(request):
 
@@ -86,23 +90,22 @@ def route(request):
 
     if request['PATH_INFO'] == '/api/apply':
         return applied.handle(request)
-    elif request['PATH_INFO'] == '/apply':
+    if request['PATH_INFO'] == '/apply':
         return static_file('static/apply.html')
-    elif request['PATH_INFO'] == '/reply':
+    if request['PATH_INFO'] == '/reply':
         return invite.reply(request)
-    elif request['PATH_INFO'] == '/apply/kodstugor':
+    if request['PATH_INFO'] == '/apply/kodstugor':
         return kodstugor.active(request)
 
-    if request["BESK_login"]["user"] == False and request['PATH_INFO'] == '/':
+    if not request["BESK_login"]["user"] and request['PATH_INFO'] == '/':
         return login.start(request)
 
     if request['PATH_INFO'] == '/login':
         return login.validate(request)
 
-    if request["BESK_login"]["user"] == False:
+    if not request["BESK_login"]["user"]:
         raise Error403("You need to login at https://besk.kodcentrum.se/")
-    else:
-        request["BESK_admin"] = login.is_admin(request["BESK_login"]["user"]["user"]["email"])
+    request["BESK_admin"] = login.is_admin(request["BESK_login"]["user"]["user"]["email"])
 
     if not request["BESK_admin"]:
         if not login.is_approved(request["BESK_login"]["user"]["user"]["email"]):
@@ -126,52 +129,53 @@ def route(request):
 
     if request['PATH_INFO'] == '/me':
         return {
-            "me":{
-                "epost":request["BESK_login"]["user"]["user"]["email"],
-                "admin":request["BESK_admin"]
+            "me": {
+                "epost": request["BESK_login"]["user"]["user"]["email"],
+                "admin": request["BESK_admin"]
             }
-        } 
-    
+        }
+
     if request['PATH_INFO'] == '/admin':
-        return login.handle_admins(request) 
+        return login.handle_admins(request)
 
     if request['PATH_INFO'] == '/loggar':
-        return loggar.handle(request) 
+        return loggar.handle(request)
 
     if request['PATH_INFO'] == '/deltagare':
-        return deltagare.handle(request) 
+        return deltagare.handle(request)
 
     if request['PATH_INFO'] == '/volontarer/slack':
         return volontarer.from_slack(request)
 
     if request['PATH_INFO'] == '/narvaro':
-        return narvaro.handle(request) 
+        return narvaro.handle(request)
 
     if request['PATH_INFO'] == '/texter':
         return texter.handle(request)
 
-    elif request['PATH_INFO'] == '/invite':
+    if request['PATH_INFO'] == '/invite':
         return invite.new(request)
 
-    elif request['PATH_INFO'] == '/kodstugor':
-        return kodstugor.handle(request) 
+    if request['PATH_INFO'] == '/kodstugor':
+        return kodstugor.handle(request)
 
-    elif request['PATH_INFO'] == '/volontarer':
+    if request['PATH_INFO'] == '/volontarer':
         return volontarer.handle(request)
 
-    elif request['PATH_INFO'] == '/volontarer_plannering':
+    if request['PATH_INFO'] == '/volontarer_plannering':
         return volontarer_plannering.handle(request)
 
-    elif request['PATH_INFO'] == '/utskick':
+    if request['PATH_INFO'] == '/utskick':
         return utskick.handle(request)
 
-    elif request['PATH_INFO'] == '/datum':
-        return datum.handle(request) 
+    if request['PATH_INFO'] == '/datum':
+        return datum.handle(request)
 
-    elif request['PATH_INFO'] == '/kontaktpersoner':
+    if request['PATH_INFO'] == '/kontaktpersoner':
         return kontaktpersoner.handle(request)
 
     raise Error404
+
 
 if __name__ == '__main__':
     print('Serving on 9191...')
@@ -188,14 +192,15 @@ if __name__ == '__main__':
         spawn=green_pool,
         log=logger,
         error_log=logger
-        )
+    )
+
     def shutdown():
         print('Shutting down ...')
         server.close()
         server.stop(timeout=4)
         exit()
     signal(signal.SIGTERM, shutdown)
-    signal(signal.SIGINT, shutdown) #CTRL C
+    signal(signal.SIGINT, shutdown)  # CTRL C
     server.serve_forever(stop_timeout=4)
 else:
     green_pool = pool.Pool()
@@ -208,4 +213,4 @@ else:
         spawn=green_pool,
         log=logger,
         error_log=logger
-        )
+    )

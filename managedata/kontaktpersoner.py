@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import uuid
+
+import phonenumbers
+
 from managedata import db, deltagare
 from tools import read_post_data, Error400
-import uuid
-import json
-import phonenumbers
+
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
@@ -14,14 +16,15 @@ def handle(request):
     if request['REQUEST_METHOD'] == 'DELETE':
         return all(request)
 
+
 def add_or_uppdate(request):
     post_data = read_post_data(request)
     try:
         phone_number = phonenumbers.parse(post_data["telefon"][0], "SE")
-    except:
-         raise Error400("Fyll i ett giltigt telefonummer.")
+    except:  # noqa: E772
+        raise Error400("Fyll i ett giltigt telefonummer.")
     if not phonenumbers.is_valid_number(phone_number):
-         raise Error400("Fyll i ett giltigt telefonummer.")
+        raise Error400("Fyll i ett giltigt telefonummer.")
 
     if request["BESK_admin"]:
         if "deltagare_id" not in post_data:
@@ -45,17 +48,17 @@ def add_or_uppdate(request):
                         id = ?
                 """, data)
             db.cursor.execute("""
-                DELETE FROM 
+                DELETE FROM
                     kontaktpersoner_deltagare
-                WHERE 
+                WHERE
                     kontaktpersoner_id = ?
                 """, (post_data["id"][0], ))
             for deltagare_id in post_data["deltagare_id"]:
                 db.cursor.execute("""
-                INSERT 
+                INSERT
                     INTO kontaktpersoner_deltagare
-                        (deltagare_id, kontaktpersoner_id) 
-                    VALUES 
+                        (deltagare_id, kontaktpersoner_id)
+                    VALUES
                         (?,?)
                 """, (deltagare_id, post_data["id"][0]))
         else:
@@ -67,29 +70,30 @@ def add_or_uppdate(request):
                 phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
             )
             db.cursor.execute("""
-                INSERT 
+                INSERT
                     INTO kontaktpersoner
-                        (id, fornamn, efternamn, epost, telefon) 
-                    VALUES 
+                        (id, fornamn, efternamn, epost, telefon)
+                    VALUES
                         (?,?,?,?,?)
                 """, data)
             for deltagare_id in post_data["deltagare_id"]:
                 db.cursor.execute("""
-                INSERT 
+                INSERT
                     INTO kontaktpersoner_deltagare
-                        (deltagare_id, kontaktpersoner_id) 
-                    VALUES 
+                        (deltagare_id, kontaktpersoner_id)
+                    VALUES
                         (?,?)
                 """, (deltagare_id, data[0]))
         db.commit()
-        
+
     kontaktpersoner = all(request)
     kontaktpersoner.update(deltagare.all(request))
     return kontaktpersoner
 
+
 def for_kodstuga(kodstugor_id):
     all = db.cursor.execute("""
-        SELECT 
+        SELECT
             kontaktpersoner.id AS id,
             kontaktpersoner.fornamn AS fornamn,
             kontaktpersoner.efternamn AS efternamn,
@@ -99,27 +103,28 @@ def for_kodstuga(kodstugor_id):
             deltagare.fornamn AS deltagare_fornamn,
             deltagare.efternamn AS deltagare_efternamn,
             deltagare.id AS deltagare_id
-        FROM 
+        FROM
             deltagare
-        INNER JOIN 
-            kontaktpersoner_deltagare 
-        ON 
-            deltagare.id=kontaktpersoner_deltagare.deltagare_id 
-        INNER JOIN 
+        INNER JOIN
+            kontaktpersoner_deltagare
+        ON
+            deltagare.id=kontaktpersoner_deltagare.deltagare_id
+        INNER JOIN
             kontaktpersoner
-        ON 
+        ON
             kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id
         INNER JOIN
             kodstugor
-        ON 
+        ON
             deltagare.kodstugor_id=kodstugor.id
         WHERE
             kodstugor.id = ?
-        AND 
+        AND
             deltagare.status = "ja"
         GROUP BY
             deltagare.id
      """, (kodstugor_id,))
+
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
@@ -127,9 +132,10 @@ def for_kodstuga(kodstugor_id):
         return ut
     return list(map(to_headers, all.fetchall()))
 
+
 def fordeltagare(deltagar_id):
     all = db.cursor.execute("""
-        SELECT 
+        SELECT
             kontaktpersoner.id AS id,
             kontaktpersoner.fornamn AS fornamn,
             kontaktpersoner.efternamn AS efternamn,
@@ -138,8 +144,8 @@ def fordeltagare(deltagar_id):
             kodstugor.id AS kodstugor_id,
             GROUP_CONCAT(deltagare.id,",") AS deltagare_id
         FROM deltagare
-        INNER JOIN kontaktpersoner_deltagare 
-            ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
+        INNER JOIN kontaktpersoner_deltagare
+            ON deltagare.id=kontaktpersoner_deltagare.deltagare_id
         INNER JOIN kontaktpersoner
            ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id
         INNER JOIN kodstugor
@@ -148,6 +154,7 @@ def fordeltagare(deltagar_id):
         GROUP BY kontaktpersoner.id
         ORDER BY kodstugor.id, deltagare.datum;
      """, (deltagar_id,))
+
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
@@ -157,10 +164,11 @@ def fordeltagare(deltagar_id):
         return ut
     return list(map(to_headers, all.fetchall()))
 
+
 def all(request):
     if request["BESK_admin"]:
         sql_query = """
-        SELECT 
+        SELECT
             kontaktpersoner.id AS id,
             kontaktpersoner.fornamn AS fornamn,
             kontaktpersoner.efternamn AS efternamn,
@@ -180,7 +188,7 @@ def all(request):
         """
     else:
         sql_query = """
-        SELECT 
+        SELECT
             kontaktpersoner.id AS id,
             kontaktpersoner.fornamn AS fornamn,
             kontaktpersoner.efternamn AS efternamn,
@@ -189,36 +197,37 @@ def all(request):
             kodstugor.id AS kodstugor_id,
             GROUP_CONCAT(deltagare.id,",") AS deltagare_id
         FROM deltagare
-        INNER JOIN kontaktpersoner_deltagare 
-            ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
+        INNER JOIN kontaktpersoner_deltagare
+            ON deltagare.id=kontaktpersoner_deltagare.deltagare_id
         INNER JOIN kontaktpersoner
            ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id
         INNER JOIN kodstugor
            ON deltagare.kodstugor_id=kodstugor.id
-        WHERE 
-                deltagare.status = 'ja' 
-            AND 
+        WHERE
+                deltagare.status = 'ja'
+            AND
                 kodstugor.id
             IN (
-                SELECT 
-                    kodstugor_id 
-                FROM 
+                SELECT
+                    kodstugor_id
+                FROM
                     volontarer_roller
-                WHERE 
+                WHERE
                     volontarer_id = %s
             )
         GROUP BY kontaktpersoner.id
         ORDER BY kodstugor.id, deltagare.datum;
      """ % request["BESK_volontarer_id"]
     all = db.cursor.execute(sql_query)
+
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
             if col[0] == "deltagare_id":
-                if row[idx] == None:
+                if row[idx] is None:
                     ut[col[0]] = []
                 else:
                     ut[col[0]] = ut[col[0]].split(',')
         return ut
-    return {"kontaktpersoner":list(map(to_headers, all.fetchall()))}
+    return {"kontaktpersoner": list(map(to_headers, all.fetchall()))}

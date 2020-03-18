@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from managedata import db, kodstugor, kontaktpersoner
-import json
-from tools import read_post_data, send_email, send_sms
-import arrow
 import logging
+
+import arrow
 from gevent import sleep
+
+from managedata import db, kodstugor, kontaktpersoner
+from tools import read_post_data, send_email, send_sms
+
 logger = logging.getLogger("datum")
+
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
@@ -16,6 +19,7 @@ def handle(request):
     if request['REQUEST_METHOD'] == 'DELETE':
         return all(request)
 
+
 def all(request):
     if request["BESK_admin"]:
         where = ""
@@ -24,29 +28,31 @@ def all(request):
             WHERE
                 kodstugor_id
             IN (
-                SELECT 
-                    kodstugor_id 
-                FROM 
+                SELECT
+                    kodstugor_id
+                FROM
                     volontarer_roller
-                WHERE 
+                WHERE
                     volontarer_id = %s
             );""" % request["BESK_volontarer_id"]
 
     all = db.cursor.execute("""
-        SELECT 
+        SELECT
             kodstugor_id,
             datum,
             typ
         FROM
             kodstugor_datum
-     """ + where);
+     """ + where)
+
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
         return ut
-    return {"kodstugor_datum":list(map(to_headers, all.fetchall()))}
-    
+    return {"kodstugor_datum": list(map(to_headers, all.fetchall()))}
+
+
 def set(request):
     if request["BESK_admin"]:
         post_data = read_post_data(request)
@@ -66,7 +72,7 @@ def set(request):
                     """, (data[0][0],))
             for query in data:
                 db.cursor.execute("""
-                    INSERT INTO 
+                    INSERT INTO
                         kodstugor_datum(kodstugor_id,datum,typ)
                     VALUES
                         (?, ?, ?);
@@ -74,22 +80,24 @@ def set(request):
         db.commit()
     return all(request)
 
+
 def send_sms_reminders():
     while True:
         datum = arrow.utcnow().to('Europe/Stockholm').format('YYYY-MM-DD')
         logger.info("Sending SMS reminders for: " + datum)
         found = db.cursor.execute('''
-            SELECT 
+            SELECT
                 id,
                 kodstugor_id,
                 datum
-            FROM 
+            FROM
                 kodstugor_datum
             WHERE
                 datum = ?
             ORDER BY
                 datum;
-            ''',(datum, ))
+            ''', (datum, ))
+
         def to_headers(row):
             ut = {}
             for idx, col in enumerate(found.description):
@@ -110,22 +118,24 @@ def send_sms_reminders():
         then = arrow.utcnow().shift(hours=24).replace(hour=9, minute=00).timestamp
         sleep(then - now)
 
+
 def send_email_reminders():
     while True:
         datum = arrow.utcnow().shift(hours=24).to('Europe/Stockholm').format('YYYY-MM-DD')
         logger.info("Sending Email reminders for: " + datum)
         found = db.cursor.execute('''
-            SELECT 
+            SELECT
                 id,
                 kodstugor_id,
                 datum
-            FROM 
+            FROM
                 kodstugor_datum
             WHERE
                 datum = ?
             ORDER BY
                 datum;
-            ''',(datum, ))
+            ''', (datum, ))
+
         def to_headers(row):
             ut = {}
             for idx, col in enumerate(found.description):
@@ -134,7 +144,7 @@ def send_email_reminders():
         for utskick in list(map(to_headers, found.fetchall())):
             kodstuga = kodstugor.get_kodstuga(utskick["kodstugor_id"])
             for mottagare in kontaktpersoner.for_kodstuga(utskick["kodstugor_id"]):
-                link = "https://besk.kodcentrum.se/svar?id="+mottagare["deltagare_id"]+"&datum=" + datum
+                link = "https://besk.kodcentrum.se/svar?id=" + mottagare["deltagare_id"] + "&datum=" + datum
                 message = kodstuga["epost_text"].replace(
                     "%namn%", mottagare["deltagare_fornamn"]).replace(
                     "%kodstuga%", mottagare["kodstugor_namn"]).replace(

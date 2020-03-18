@@ -66,7 +66,7 @@ For local testing just leave <FROM_EMAIL> & <O365_PASSWORD> they are not needed 
 Use pytest to run tests on the project:
 
 ```
-pytest
+pytest --flake8
 ```
 
 ## Deploy

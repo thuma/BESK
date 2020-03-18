@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS kodstugor_datum (
   datum TEXT,
   typ TEXT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id)
-  ); 
+  );
 ''',
 '''
 CREATE INDEX IF NOT EXISTS kodstugor_datum_kodstugor_id ON kodstugor_datum(kodstugor_id);
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS deltagare (
   skonto TEXT,
   slosen TEXT,
   FOREIGN KEY(kodstugor_id) REFERENCES kodstugor(id)
-  ); 
+  );
 ''',
 '''
 CREATE TABLE IF NOT EXISTS kontaktpersoner (
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS kontaktpersoner_deltagare (
   deltagare_id INT,
   FOREIGN KEY(kontaktpersoner_id) REFERENCES kontaktpersoner(id),
   FOREIGN KEY(deltagare_id) REFERENCES deltagare(id)
-  ); 
+  );
 ''',
 '''
 CREATE TABLE IF NOT EXISTS deltagande_närvaro (
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS klick_svar (
   svar TEXT,
   datum TEXT,
   FOREIGN KEY(deltagare_id) REFERENCES deltagare(id)
-  ); 
+  );
 ''',
 '''
 CREATE TABLE IF NOT EXISTS sms_svar (
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS sms_svar (
   fran TEXT,
   till TEXT,
   text TEXT,
-  datum TEXT); 
+  datum TEXT);
 ''',
 '''
 CREATE TABLE IF NOT EXISTS utskick (
@@ -153,22 +153,22 @@ CREATE TABLE IF NOT EXISTS keyvalue (
 ''',
 '''
 INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Intresseanmälan Kodstuga", "Vi har mottagit din intresseanmälan till Kodstugan på %kodstuga%.")
-''',
+''',  # noqa 501
 '''
 INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Erbjudande om plats Kodstuga", "Vi kan med glädje meddela att vi har en plats att erbjuda %namn% på %kodstuga%!")
-''',
+''',  # noqa 501
 '''
 INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Intresseanmälan Lärarkodstuga", "Vi har mottagit din intresseanmälan till Lärarkodstuga på %kodstuga%.")
-''',
+''',  # noqa 501
 '''
 INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Erbjudande om plats Lärarkodstuga", "Vi kan med glädje meddela att vi har en plats att erbjuda %namn% på %kodstuga%!")
-''',
+''',  # noqa 501
 '''
 INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Intresseanmälan Digital Labs", "Vi har mottagit din intresseanmälan till Digital Labs på %kodstuga%.")
-''',
+''',  # noqa 501
 '''
 INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Erbjudande om plats Digital Labs", "Vi kan med glädje meddela att vi har en plats att erbjuda %namn% på %kodstuga%!")
-''',
+''',  # noqa 501
 '''
 INSERT OR IGNORE INTO keyvalue(id, text) VALUES("Info Vid Ansökan", "")
 ''',
@@ -201,4 +201,4 @@ CREATE TABLE IF NOT EXISTS sms_queue (
 '''
 CREATE INDEX IF NOT EXISTS sms_queue_status ON sms_queue(status, date);
 '''
-]
+]  # noqa: E128

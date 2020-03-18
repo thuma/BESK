@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from managedata import db, kontaktpersoner
-from tools import read_post_data
-import uuid
-import json
-import phonenumbers
 import logging
+import uuid
+
+from tools import read_post_data
+from managedata import db, kontaktpersoner
+
 logger = logging.getLogger("deltagare")
+
 
 def handle(request):
     if request['REQUEST_METHOD'] == 'GET':
@@ -16,19 +17,20 @@ def handle(request):
     if request['REQUEST_METHOD'] == 'DELETE':
         return delete(request)
 
+
 def delete(request):
     if request["BESK_admin"]:
         post_data = read_post_data(request)
         db.cursor.execute("""
             DELETE FROM
                 klick_svar
-            WHERE 
+            WHERE
                 deltagare_id = ?;
             """, (post_data["id"][0],))
         db.cursor.execute("""
             DELETE FROM
                 deltagande_närvaro
-            WHERE 
+            WHERE
                 deltagare_id = ?;
             """, (post_data["id"][0],))
         db.cursor.execute("""
@@ -49,7 +51,7 @@ def delete(request):
                 id
             FROM
                 kontaktpersoner
-            WHERE  NOT EXISTS 
+            WHERE  NOT EXISTS
                 (SELECT
                     1
                 FROM
@@ -61,9 +63,9 @@ def delete(request):
         for kontakt in o_kontakter.fetchall():
             kontakt = kontakt[0]
             db.cursor.execute("""
-                DELETE FROM 
+                DELETE FROM
                     kontaktpersoner
-                WHERE 
+                WHERE
                     id = ?;
                 """, (kontakt,))
         db.commit()
@@ -71,9 +73,10 @@ def delete(request):
     utdata.update(kontaktpersoner.all(request))
     return utdata
 
+
 def get_kodstuga(id):
     all = db.cursor.execute("""
-        SELECT 
+        SELECT
             kodstugor.id AS id,
             kodstugor.namn AS namn,
             kodstugor.sms_text AS sms_text,
@@ -82,17 +85,17 @@ def get_kodstuga(id):
             kodstugor.epost_text_ja AS epost_text_ja,
             kodstugor.epost_rubrik_ja AS epost_rubrik_ja,
             kodstugor.open AS open
-        FROM 
+        FROM
             deltagare
-        INNER JOIN 
+        INNER JOIN
             kodstugor
-        ON 
+        ON
            deltagare.kodstugor_id=kodstugor.id
-        WHERE 
+        WHERE
             deltagare.id = ?
-        GROUP BY 
+        GROUP BY
             deltagare.id
-        ORDER BY 
+        ORDER BY
             kodstugor.id, deltagare.datum;
      """, (id,))
 
@@ -106,7 +109,7 @@ def get_kodstuga(id):
 
 def get_one(id):
     all = db.cursor.execute("""
-        SELECT 
+        SELECT
             kodstugor.id AS kodstuga_id,
             deltagare.id AS deltagare_id,
             deltagare.datum AS datum,
@@ -121,8 +124,8 @@ def get_one(id):
             deltagare.foto AS foto,
             GROUP_CONCAT(kontaktpersoner.id,",") AS kontaktperson_id
         FROM deltagare
-        LEFT OUTER JOIN kontaktpersoner_deltagare 
-            ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
+        LEFT OUTER JOIN kontaktpersoner_deltagare
+            ON deltagare.id=kontaktpersoner_deltagare.deltagare_id
         LEFT OUTER JOIN kontaktpersoner
            ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id
         LEFT OUTER JOIN kodstugor
@@ -131,20 +134,22 @@ def get_one(id):
         GROUP BY deltagare.id
         ORDER BY kodstugor.id, deltagare.datum;
      """, (id,))
+
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
             if col[0] == "kontaktperson_id":
-                if ut[col[0]] == None:
+                if ut[col[0]] is None:
                     ut[col[0]] = []
                 else:
                     ut[col[0]] = ut[col[0]].split(',')
-            if ut[col[0]] == None:
+            if ut[col[0]] is None:
                 ut[col[0]] = ""
         return ut
     return list(map(to_headers, all.fetchall()))[0]
-    
+
+
 def add_or_uppdate(request):
     if request["BESK_admin"]:
         post_data = read_post_data(request)
@@ -181,17 +186,17 @@ def add_or_uppdate(request):
                         id = ?
                 """, data)
             db.cursor.execute("""
-                DELETE FROM 
+                DELETE FROM
                     kontaktpersoner_deltagare
-                WHERE 
+                WHERE
                     deltagare_id = ?
                 """, (post_data["id"][0], ))
             for kontaktperson_id in post_data["kontaktperson_id"]:
                 db.cursor.execute("""
-                INSERT 
+                INSERT
                     INTO kontaktpersoner_deltagare
-                        (deltagare_id, kontaktpersoner_id) 
-                    VALUES 
+                        (deltagare_id, kontaktpersoner_id)
+                    VALUES
                         (?,?)
                 """, (post_data["id"][0], kontaktperson_id))
         else:
@@ -208,18 +213,18 @@ def add_or_uppdate(request):
                 post_data["slosen"][0],
             )
             db.cursor.execute("""
-                INSERT 
-                    INTO deltagare 
-                        (id, fornamn, efternamn, status, kon, klass, skola, kodstugor_id, skonto, slosen) 
-                    VALUES 
+                INSERT
+                    INTO deltagare
+                        (id, fornamn, efternamn, status, kon, klass, skola, kodstugor_id, skonto, slosen)
+                    VALUES
                         (?,?,?,?,?,?,?,?,?,?)
                 """, data)
             for kontaktperson_id in post_data["kontaktperson_id"]:
                 db.cursor.execute("""
-                INSERT 
+                INSERT
                     INTO kontaktpersoner_deltagare
-                        (deltagare_id, kontaktpersoner_id) 
-                    VALUES 
+                        (deltagare_id, kontaktpersoner_id)
+                    VALUES
                         (?,?)
                 """, (data[0], kontaktperson_id))
         db.commit()
@@ -227,26 +232,27 @@ def add_or_uppdate(request):
     deltagare.update(kontaktpersoner.all(request))
     return deltagare
 
+
 def all(request):
     if request["BESK_admin"]:
         where = ""
     else:
         where = """
-            WHERE 
+            WHERE
                 deltagare.status = 'ja'
             AND
                 kodstugor.id
             IN (
-                SELECT 
-                    kodstugor_id 
-                FROM 
+                SELECT
+                    kodstugor_id
+                FROM
                     volontarer_roller
-                WHERE 
+                WHERE
                     volontarer_id = %s
             )""" % request["BESK_volontarer_id"]
 
     all = db.cursor.execute("""
-        SELECT 
+        SELECT
             kodstugor.id AS kodstuga_id,
             deltagare.id AS deltagare_id,
             deltagare.datum AS datum,
@@ -261,8 +267,8 @@ def all(request):
             deltagare.klass AS klass,
             GROUP_CONCAT(kontaktpersoner.id,",") AS kontaktperson_id
         FROM deltagare
-        LEFT OUTER JOIN kontaktpersoner_deltagare 
-            ON deltagare.id=kontaktpersoner_deltagare.deltagare_id 
+        LEFT OUTER JOIN kontaktpersoner_deltagare
+            ON deltagare.id=kontaktpersoner_deltagare.deltagare_id
         LEFT OUTER JOIN kontaktpersoner
            ON kontaktpersoner.id=kontaktpersoner_deltagare.kontaktpersoner_id
         LEFT OUTER JOIN kodstugor
@@ -271,17 +277,18 @@ def all(request):
         GROUP BY deltagare.id
         ORDER BY kodstugor.id, deltagare.datum;
      """ % where)
+
     def to_headers(row):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
             if col[0] == "kontaktperson_id":
-                if ut[col[0]] == None:
+                if ut[col[0]] is None:
                     ut[col[0]] = []
                 else:
                     ut[col[0]] = ut[col[0]].split(',')
-            if ut[col[0]] == None:
+            if ut[col[0]] is None:
                 ut[col[0]] = ""
         return ut
 
-    return {"deltagare":list(map(to_headers, all.fetchall()))}
+    return {"deltagare": list(map(to_headers, all.fetchall()))}

@@ -4,3 +4,4 @@ phonenumbers
 markdown
 arrow
 pytest
+pytest-flake8
