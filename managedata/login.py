@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import json
-import base64
 import configparser
 import uuid
 from time import time
@@ -153,4 +152,3 @@ def validate(request):
         raise err
     except Exception:
         return start(request)
-
