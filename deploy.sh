@@ -1,5 +1,5 @@
 #!/bin/sh
-pytest
+pytest --flake8
 if [ $? -eq 1 ]
 then
     echo "Ingen deploy p.g.a. fallerade tester"
