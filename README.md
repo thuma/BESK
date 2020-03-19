@@ -129,12 +129,11 @@ Du kan själv testa deras
 * [Showdown](http://showdownjs.com/) - A Markdown to HTML bidirectional converter.
 * [Vue.js](http://www.vuejs.org/) - Reactive render engine.
 
-## Code info
+## Data flow
 
-* 4 spaces indentation
 * POST/DELETE/GET data format application/x-www-form-urlencoded
-* Response format 200 OK JSON
-* Response format !200 OK plain/text with error message.
+* Response format for 200 OK is JSON
+* Response format for !200 OK is plain/text with error message.
 * GUI get full list from server on every update.
 * Login with slack account.
 
@@ -144,7 +143,8 @@ Du kan själv testa deras
 
 ## Supporting the project
 
-* Avoid distractions focus on function.
+* The project is specific to Kodcentrum, do not generalize unless usefull to Kodcentrum.
+* Avoid distractions, focus on function.
 * Do changes, git rollback on error.
 * If it does not work on your machine do not push to prod.
 * Add your name to Authors in README.md.
