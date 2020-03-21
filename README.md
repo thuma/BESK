@@ -145,7 +145,7 @@ Du kan själv testa deras
 
 * The project is specific to Kodcentrum, do not generalize unless usefull to Kodcentrum.
 * Avoid distractions, focus on function.
-* Do changes, git rollback on error.
+* Do changes if not in README.md, git rollback on error.
 * If it does not work on your machine do not push to prod.
 * Add your name to Authors in README.md.
 
