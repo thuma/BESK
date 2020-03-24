@@ -14,6 +14,8 @@ cd BESK
 python main.py
 ```
 
+Open http://localhost:9191 in your browser.
+
 ### Prerequisites
 
 You need to get the python modules in the requirements.txt file:
