@@ -6,6 +6,7 @@ import uuid
 from time import time
 
 import requests
+import logging
 
 from managedata import db
 from tools import read_get_data, read_post_data, url_encode, Error302, Error400
@@ -13,6 +14,7 @@ from tools import read_get_data, read_post_data, url_encode, Error302, Error400
 config = configparser.RawConfigParser()
 config.read('../BESK.ini')
 
+logger = logging.getLogger("login")
 
 def set_auth(session_id, userdata):
     if not session_id or len(session_id) < 31:
@@ -151,4 +153,5 @@ def validate(request):
     except Error302 as err:
         raise err
     except Exception:
+        logger.error("Login error", exc_info=1)
         return start(request)
