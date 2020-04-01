@@ -150,10 +150,12 @@ Du kan själv testa deras
 * Do changes if not in README.md, git rollback on error.
 * If it does not work on your machine do not push to prod.
 * Add your name to Authors in README.md.
+* When possible use Pull request, anyone in the project may review and merge.
 
 ## Authors
 
 * **Martin Harari Thuresson**
+* **Samuel Genheden**
 
 ## License
 
