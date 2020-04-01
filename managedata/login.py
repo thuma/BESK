@@ -16,6 +16,7 @@ config.read('../BESK.ini')
 
 logger = logging.getLogger("login")
 
+
 def set_auth(session_id, userdata):
     if not session_id or len(session_id) < 31:
         return
@@ -92,7 +93,7 @@ def get_session_token(request):
     if 'HTTP_COOKIE' in request:
         for cookie in request['HTTP_COOKIE'].split(";"):
             (key, data) = cookie.split("=")
-            if key == "session_token":
+            if key == "session_token" and len(data) > 31:
                 return data
     return False
 
