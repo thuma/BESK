@@ -80,10 +80,13 @@ def get_kodstuga(id):
             kodstugor.id AS id,
             kodstugor.namn AS namn,
             kodstugor.sms_text AS sms_text,
+            kodstugor.sms_status AS sms_status,
             kodstugor.epost_rubrik AS epost_rubrik,
             kodstugor.epost_text AS epost_text,
+            kodstugor.epost_status AS epost_status,
             kodstugor.epost_text_ja AS epost_text_ja,
             kodstugor.epost_rubrik_ja AS epost_rubrik_ja,
+            kodstugor.epost_status_ja AS epost_status_ja,
             kodstugor.open AS open
         FROM
             deltagare

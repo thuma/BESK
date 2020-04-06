@@ -105,6 +105,8 @@ def send_sms_reminders():
             return ut
         for utskick in list(map(to_headers, found.fetchall())):
             kodstuga = kodstugor.get_kodstuga(utskick["kodstugor_id"])
+            if kodstuga["sms_status"] == "inaktiv":
+                continue
             for mottagare in kontaktpersoner.for_kodstuga(utskick["kodstugor_id"]):
                 link = "https://besk.kodcentrum.se/svar?id=" + mottagare["deltagare_id"] + "&datum=" + datum
                 message = kodstuga["sms_text"].replace(
@@ -143,6 +145,8 @@ def send_email_reminders():
             return ut
         for utskick in list(map(to_headers, found.fetchall())):
             kodstuga = kodstugor.get_kodstuga(utskick["kodstugor_id"])
+            if kodstuga["epost_status"] == "inaktiv":
+                continue
             for mottagare in kontaktpersoner.for_kodstuga(utskick["kodstugor_id"]):
                 link = "https://besk.kodcentrum.se/svar?id=" + mottagare["deltagare_id"] + "&datum=" + datum
                 message = kodstuga["epost_text"].replace(

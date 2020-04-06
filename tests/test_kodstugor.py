@@ -6,10 +6,13 @@ def test_add(as_admin, as_volontär):
     data = {
         "namn": "Test_Kodstuga_Att_Radera",
         "sms_text": "",
+        "sms_status": "",
         "epost_text": "",
         "epost_rubrik": "",
+        "epost_status": "",
         "epost_text_ja": "",
         "epost_rubrik_ja": "",
+        "epost_status_ja": "",
         "typ": "Kodstuga",
         "open": "Nej"
     }
@@ -33,10 +36,13 @@ def test_update(as_admin):
         "id": kodstuga['id'],
         "namn": kodstuga['namn'],
         "sms_text": kodstuga['sms_text'],
+        "sms_status": kodstuga['sms_status'],
         "epost_text": kodstuga['epost_text'],
         "epost_rubrik": kodstuga['epost_rubrik'],
+        "epost_status": kodstuga['epost_status'],
         "epost_text_ja": kodstuga['epost_text_ja'],
         "epost_rubrik_ja": kodstuga['epost_rubrik_ja'],
+        "epost_status_ja": kodstuga['epost_status_ja'],
         "typ": kodstuga['typ'],
         "open": "Ja"
     }

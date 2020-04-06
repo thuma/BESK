@@ -24,7 +24,7 @@
             <td></td>
             <td><pre>{{kodstuga.sms_text}}</pre></td>
             <td>09:00 samma dag som varje tillfälle.</td>
-            <td></td>
+            <td>{{kodstuga.sms_status}}</td>
             <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
                 v-on:click="edit={'type':'utskick_sms_reminder','data':copy(kodstuga)}">🖊</button>
             </td>
@@ -35,7 +35,7 @@
             <td>{{kodstuga.epost_rubrik}}</td>
             <td v-html="markdown_to_html.makeHtml(kodstuga.epost_text)"></td>
             <td>09:00 dagen före varje tillfälle.</td>
-            <td></td>
+            <td>{{kodstuga.epost_status}}</td>
             <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
                 v-on:click="edit={'type':'utskick_epost_reminder','data':copy(kodstuga)}">🖊</button>
             </td>
@@ -46,7 +46,7 @@
             <td>{{kodstuga.epost_rubrik_ja}}</td>
             <td v-html="markdown_to_html.makeHtml(kodstuga.epost_text_ja)"></td>
             <td>När deltagaren tackar ja.</td>
-            <td></td>
+            <td>{{kodstuga.epost_status_ja}}</td>
             <td v-if="me.admin"><button class="btn btn-sm btn-outline-secondary"
                 v-on:click="edit={'type':'utskick_valkommen','data':copy(kodstuga)}">🖊</button>
             </td>
@@ -145,8 +145,10 @@
             <input type="hidden" v-bind:value="edit.data.namn" name="namn">
             <input type="hidden" v-bind:value="edit.data.epost_text" name="epost_text">
             <input type="hidden" v-bind:value="edit.data.epost_rubrik" name="epost_rubrik">
+            <input type="hidden" v-bind:value="edit.data.epost_status" name="epost_status">
             <input type="hidden" v-bind:value="edit.data.epost_text_ja" name="epost_text_ja">
             <input type="hidden" v-bind:value="edit.data.epost_rubrik_ja" name="epost_rubrik_ja">
+            <input type="hidden" v-bind:value="edit.data.epost_status_ja" name="epost_status_ja">
             <input type="hidden" v-bind:value="edit.data.typ" name="typ">
             <input type="hidden" v-bind:value="edit.data.open" name="open">
             
@@ -161,6 +163,13 @@
             <div class="form-group">
                 <label>Typ</label>
                 SMS
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select name="sms_status" v-model:value="edit.data.sms_status" class="form-control">
+                    <option value="aktiv">Aktiv</option>
+                    <option value="inaktiv">Inaktiv</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>Meddelande</label>
@@ -190,8 +199,10 @@
             <input type="hidden" v-bind:value="edit.data.id" name="id" >
             <input type="hidden" v-bind:value="edit.data.namn" name="namn">
             <input type="hidden" v-bind:value="edit.data.sms_text" name="sms_text">
+            <input type="hidden" v-bind:value="edit.data.sms_status" name="sms_status">
             <input type="hidden" v-bind:value="edit.data.epost_text_ja" name="epost_text_ja">
             <input type="hidden" v-bind:value="edit.data.epost_rubrik_ja" name="epost_rubrik_ja">
+            <input type="hidden" v-bind:value="edit.data.epost_status_ja" name="epost_status_ja">
             <input type="hidden" v-bind:value="edit.data.typ" name="typ">
             <input type="hidden" v-bind:value="edit.data.open" name="open">
             
@@ -206,6 +217,13 @@
             <div class="form-group">
                 <label>Typ</label>
                 e-post
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select name="epost_status" v-model:value="edit.data.epost_status" class="form-control">
+                    <option value="aktiv">Aktiv</option>
+                    <option value="inaktiv">Inaktiv</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>Ämne</label>
@@ -243,10 +261,13 @@
             <input type="hidden" v-bind:value="edit.data.id" name="id" >
             <input type="hidden" v-bind:value="edit.data.namn" name="namn">
             <input type="hidden" v-bind:value="edit.data.sms_text" name="sms_text">
+            <input type="hidden" v-bind:value="edit.data.sms_status" name="sms_status">
             <input type="hidden" v-bind:value="edit.data.epost_text" name="epost_text">
             <input type="hidden" v-bind:value="edit.data.epost_rubrik" name="epost_rubrik">
+            <input type="hidden" v-bind:value="edit.data.epost_status" name="epost_status">
             <input type="hidden" v-bind:value="edit.data.typ" name="typ">
             <input type="hidden" v-bind:value="edit.data.open" name="open">
+            
             <div class="form-group">
                 <label>Kodstuga</label>
                 {{ edit.data.namn }}
@@ -258,6 +279,13 @@
             <div class="form-group">
                 <label>Typ</label>
                 e-post
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select name="epost_status_ja" v-model:value="edit.data.epost_status_ja" class="form-control">
+                    <option value="aktiv">Aktiv</option>
+                    <option value="inaktiv">Inaktiv</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>Ämne</label>

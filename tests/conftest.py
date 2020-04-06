@@ -59,10 +59,13 @@ def as_volontär(as_admin):
             data = {
                 "namn": "Test_Kodstuga",
                 "sms_text": "Påminnelse %namn% %datum%",
+                "sms_status": "aktiv",
                 "epost_text": "Påminnelse %namn% %datum% %kodstuga%",
                 "epost_rubrik": "Påminnelse",
+                "epost_status": "aktiv",
                 "epost_text_ja": "Välkommen %namn% address etc.",
                 "epost_rubrik_ja": "Välkommen",
+                "epost_status_ja": "aktiv",
                 "typ": "Kodstuga",
                 "open": "Ja"
             }

@@ -47,9 +47,9 @@ def reply(request):
                 status = "inbjuden";
             ''', (status, foto, deltagar_id))
     db.commit()
-    if status == "ja":
+    kodstuga = deltagare.get_kodstuga(deltagar_id)
+    if status == "ja" and kodstuga["epost_status_ja"] != "inaktiv":
         kontakter = kontaktpersoner.fordeltagare(deltagar_id)
-        kodstuga = deltagare.get_kodstuga(deltagar_id)
         this_deltagare = deltagare.get_one(deltagar_id)
         meddelande = kodstuga["epost_text_ja"]
         meddelande = meddelande.replace(

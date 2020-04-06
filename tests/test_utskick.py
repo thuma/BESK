@@ -10,10 +10,13 @@ def test_add(as_admin, as_volontär):
     data = {
         "namn": "Test_Kodstuga_Att_Radera_Vanlig",
         "sms_text": "NEJ",
+        "sms_status": "aktiv",
         "epost_text": "Påminnelse Vanlig %kodstuga% %namn%",
         "epost_rubrik": "Påminnelse Vanlig",
+        "epost_status": "aktiv",
         "epost_text_ja": "Tack för JA %kodstuga%",
         "epost_rubrik_ja": "Tack för JA",
+        "epost_status_ja": "aktiv",
         "typ": "Kodstuga",
         "open": "Ja"
     }
@@ -22,10 +25,13 @@ def test_add(as_admin, as_volontär):
     data = {
         "namn": "Test_Kodstuga_Att_Radera_Lärare",
         "sms_text": "NEJ",
+        "sms_status": "aktiv",
         "epost_text": "Påminnelse Lärare %kodstuga% %namn%",
         "epost_rubrik": "Påminnelse Lärare",
         "epost_text_ja": "Tack för JA",
+        "epost_status": "aktiv",
         "epost_rubrik_ja": "Tack för JA",
+        "epost_status_ja": "aktiv",
         "typ": "Lärarkodstuga",
         "open": "Ja"
     }
