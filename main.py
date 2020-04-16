@@ -196,8 +196,6 @@ if __name__ == '__main__':
 else:
     green_pool = pool.Pool()
     send_pool = pool.Pool()
-    send_pool.spawn(invite.send_invites)
-    send_pool.spawn(utskick.send_utskick)
     server = WSGIServer(
         ('127.0.0.1', 9292),
         application,

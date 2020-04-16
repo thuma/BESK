@@ -170,7 +170,7 @@ def all(request):
 
     def to_headers(row):
         ut = {}
-        for idx, col in enumerate(all.description):   
+        for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
             if col[0] in ["sms_status", "epost_status", "epost_status_ja"]:
                 ut[col[0]] = row[idx] or "aktiv"
@@ -229,8 +229,18 @@ def add_or_uppdate(request):
             )
             db.cursor.execute("""
                 INSERT
-                    INTO kodstugor
-                        (namn, sms_text, epost_text, epost_rubrik, epost_text_ja, epost_rubrik_ja, typ, open, sms_status, epost_status, epost_status_ja)
+                    INTO kodstugor (
+                        namn,
+                        sms_text,
+                        epost_text,
+                        epost_rubrik,
+                        epost_text_ja,
+                        epost_rubrik_ja,
+                        typ, open,
+                        sms_status,
+                        epost_status,
+                        epost_status_ja
+                        )
                     VALUES
                         (?,?,?,?,?,?,?,?,?,?,?)
                 """, data)

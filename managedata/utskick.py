@@ -85,6 +85,7 @@ def add_or_uppdate(request):
                 post_data["rubrik"][0],
                 post_data["text"][0],
                 arrow.get(post_data["datum"][0]).timestamp,
+                post_data["status"][0],
                 post_data["id"][0]
             )
             db.cursor.execute("""
@@ -94,7 +95,8 @@ def add_or_uppdate(request):
                         typ = ?,
                         rubrik = ?,
                         text = ?,
-                        datum = ?
+                        datum = ?,
+                        status = ?
                     WHERE
                         id = ?
                 """, data)
@@ -108,59 +110,70 @@ def add_or_uppdate(request):
             )
             db.cursor.execute("""
                 INSERT
-                    INTO utskick
-                        (kodstugor_id, typ, rubrik, text, datum, status)
+                    INTO utskick (
+                        kodstugor_id,
+                        typ,
+                        rubrik,
+                        text,
+                        datum,
+                        status
+                        )
                     VALUES
-                        (?,?,?,?,?,"väntar")
+                        (?,?,?,?,?,"aktiv")
                 """, data)
         db.commit()
     return all(request)
 
 
+def send_utskick_once():
+    found = db.cursor.execute('''
+        SELECT
+            id,
+            kodstugor_id,
+            typ,
+            rubrik,
+            text,
+            datum,
+            status
+        FROM
+            utskick
+        WHERE
+            datum < ?
+        AND
+            status = "aktiv"
+        ORDER BY
+            datum;
+        ''', (int(time.time()),))
+
+    def to_headers(row):
+        ut = {}
+        for idx, col in enumerate(found.description):
+            ut[col[0]] = row[idx]
+        return ut
+
+    for utskick in map(to_headers, found.fetchall()):
+        for mottagare in kontaktpersoner.for_kodstuga(utskick["kodstugor_id"]):
+            message = utskick["text"].replace(
+                "%namn%", mottagare["deltagare_fornamn"]).replace(
+                "%kodstuga%", mottagare["kodstugor_namn"])
+            if utskick["typ"] == "sms":
+                send_sms(mottagare["telefon"], message)
+            elif utskick["typ"] == "e-post":
+                send_email(mottagare["epost"], utskick["rubrik"], message)
+        db.cursor.execute('''
+                UPDATE
+                    utskick
+                SET
+                    status = "skickad"
+                WHERE
+                    id = ?;
+        ''', (utskick["id"],))
+        db.commit()
+
+
 def send_utskick():
     while True:
-        found = db.cursor.execute('''
-            SELECT
-                id,
-                kodstugor_id,
-                typ,
-                rubrik,
-                text,
-                datum,
-                status
-            FROM
-                utskick
-            WHERE
-                datum < ?
-            AND
-                status = "väntar"
-            ORDER BY
-                datum;
-            ''', (int(time.time()),))
-
-        def to_headers(row):
-            ut = {}
-            for idx, col in enumerate(found.description):
-                ut[col[0]] = row[idx]
-            return ut
-        for utskick in map(to_headers, found.fetchall()):
-            for mottagare in kontaktpersoner.for_kodstuga(utskick["kodstugor_id"]):
-                message = utskick["text"].replace(
-                    "%namn%", mottagare["deltagare_fornamn"]).replace(
-                    "%kodstuga%", mottagare["kodstugor_namn"])
-                if utskick["typ"] == "sms":
-                    send_sms(mottagare["telefon"], message)
-                elif utskick["typ"] == "e-post":
-                    send_email(mottagare["epost"], utskick["rubrik"], message)
-            db.cursor.execute('''
-                    UPDATE
-                        utskick
-                    SET
-                        status = "skickad"
-                    WHERE
-                        id = ?;
-            ''', (utskick["id"],))
-            db.commit()
+        send_utskick_once()
         now = arrow.utcnow().timestamp
         then = arrow.utcnow().shift(hours=24).replace(hour=9, minute=30).timestamp
         sleep(then - now)
