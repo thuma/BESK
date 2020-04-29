@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from managedata import db, login, kontaktpersoner, texter
+from managedata import db, login, texter, deltagare
 from tools import read_post_data
 
 logger = logging.getLogger("kodstugor")
@@ -19,7 +19,17 @@ def handle(request):
 
 def delete(request):
     post_data = read_post_data(request)
-    if request["BESK_admin"] and len(kontaktpersoner.for_kodstuga(post_data['id'][0])) == 0:
+    if request["BESK_admin"]:
+        deltagar_ids = db.cursor.execute("""
+            SELECT
+                id
+            FROM
+                deltagare
+            WHERE
+                kodstugor_id == ?
+        """, (post_data['id'][0],)).fetchall()
+        for deltagare_id in deltagar_ids:
+            deltagare.delete_deltagare(deltagare_id[0])
         db.cursor.execute("""
             DELETE FROM
                 utskick

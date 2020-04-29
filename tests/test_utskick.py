@@ -4,14 +4,9 @@ import arrow
 from managedata import utskick
 
 
-def test_add_by_date(as_admin, as_volontär):
-    test_kodstuga = False
-    kodstugor = as_admin.get("http://127.0.0.1:9292/api/kodstugor")
-    for kodstuga in kodstugor.json()["kodstugor"]:
-        if kodstuga["namn"] == "Test_Kodstuga":
-            test_kodstuga = kodstuga
+def test_add_by_date(as_admin, as_volontär, ny_kodstuga):
     data = {
-        "kodstugor_id": test_kodstuga['id'],
+        "kodstugor_id": ny_kodstuga['id'],
         "datum": arrow.utcnow().format('YYYY-MM-DD'),
         "typ": "e-post",
         "status": "aktiv",
