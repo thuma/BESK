@@ -76,7 +76,7 @@ def make_data(namn, extra_data={}):
             "vuxen_fornamn": ["sdfsdf", "jh"],
             "vuxen_efternamn": ["vbhjh", "vbhjh"],
             "email": [uuid4().hex + "@test.com", uuid4().hex + "@test.com"],
-            "telefon": ["07231" + str(randint(10000, 99990)), "07231" + str(randint(1000, 99990))],
+            "telefon": ["07231" + str(randint(10000, 99999)), "07231" + str(randint(10000, 99999))],
             "hittade": "id2",
             "approve": "ja"
         },
@@ -91,7 +91,7 @@ def make_data(namn, extra_data={}):
             "vuxen_fornamn": ["sdfsdf", "jh"],
             "vuxen_efternamn": ["vbhjh", "vbhjh"],
             "email": [uuid4().hex + "@test.com", uuid4().hex + "@test.com"],
-            "telefon": ["07231" + str(randint(10000, 99990)), "07231" + str(randint(1000, 99990))],
+            "telefon": ["07231" + str(randint(10000, 99999)), "07231" + str(randint(10000, 99999))],
             "hittade": "id2",
             "approve": "ja",
             "invite_now": "ja"
