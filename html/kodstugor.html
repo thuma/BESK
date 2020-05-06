@@ -22,7 +22,7 @@
 <button 
     class="btn btn-primary"
     v-if="edit==''"
-    v-on:click="edit={'type':'kodstuga','data':{'id':'','namn':'','sms_text':'','epost_rubrik':'','epost_text':'','epost_rubrik_ja':'','epost_text_ja':''}}"
+    v-on:click="edit={'type':'kodstuga','data':{'id':'','namn':'','sms_text':'','sms_status': 'aktiv','epost_rubrik':'','epost_text':'','epost_status': 'aktiv','epost_rubrik_ja':'aktiv','epost_text_ja':'aktiv','epost_status_ja':'aktiv'}}"
     >
     Skapa ny
 </button>
@@ -41,10 +41,13 @@
             </div>
             <hr>
             <input type="hidden" v-bind:value="edit.data.sms_text" name="sms_text">
+            <input type="hidden" v-bind:value="edit.data.sms_status" name="sms_status">
             <input type="hidden" v-bind:value="edit.data.epost_text" name="epost_text">
             <input type="hidden" v-bind:value="edit.data.epost_rubrik" name="epost_rubrik">
+            <input type="hidden" v-bind:value="edit.data.epost_status" name="epost_status">
             <input type="hidden" v-bind:value="edit.data.epost_text_ja" name="epost_text_ja">
             <input type="hidden" v-bind:value="edit.data.epost_rubrik_ja" name="epost_rubrik_ja">
+            <input type="hidden" v-bind:value="edit.data.epost_status_ja" name="epost_status_ja">
             <div class="form-group">
                 <label>Ansökan öppen</label>
                 <select name="open" v-model:value="edit.data.open" class="form-control">

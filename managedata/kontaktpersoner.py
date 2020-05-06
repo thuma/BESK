@@ -122,7 +122,7 @@ def for_kodstuga(kodstugor_id):
         AND
             deltagare.status = "ja"
         GROUP BY
-            deltagare.id
+            kontaktpersoner.epost
      """, (kodstugor_id,))
 
     def to_headers(row):

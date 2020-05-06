@@ -1,131 +1,37 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import uuid
-
-from gevent import sleep
-import requests
+import arrow
+from managedata import utskick
 
 
-def test_add(as_admin, as_volontär):
+def test_add_by_date(as_admin, as_volontär, ny_kodstuga):
     data = {
-        "namn": "Test_Kodstuga_Att_Radera_Vanlig",
-        "sms_text": "NEJ",
-        "epost_text": "Påminnelse Vanlig %kodstuga% %namn%",
-        "epost_rubrik": "Påminnelse Vanlig",
-        "epost_text_ja": "Tack för JA %kodstuga%",
-        "epost_rubrik_ja": "Tack för JA",
-        "typ": "Kodstuga",
-        "open": "Ja"
+        "kodstugor_id": ny_kodstuga['id'],
+        "datum": arrow.utcnow().format('YYYY-MM-DD'),
+        "typ": "e-post",
+        "status": "aktiv",
+        "rubrik": "TEST_ATT_RADERA",
+        "text": "asdsad"
     }
-    result = as_admin.post("http://127.0.0.1:9292/api/kodstugor", data=data)
-    assert result.status_code == 200
-    data = {
-        "namn": "Test_Kodstuga_Att_Radera_Lärare",
-        "sms_text": "NEJ",
-        "epost_text": "Påminnelse Lärare %kodstuga% %namn%",
-        "epost_rubrik": "Påminnelse Lärare",
-        "epost_text_ja": "Tack för JA",
-        "epost_rubrik_ja": "Tack för JA",
-        "typ": "Lärarkodstuga",
-        "open": "Ja"
-    }
-    kodstugor = as_admin.post("http://127.0.0.1:9292/api/kodstugor", data=data)
-    for kodstuga in kodstugor.json()["kodstugor"]:
-        if kodstuga["namn"] == "Test_Kodstuga_Att_Radera_Vanlig":
-            vanlig = kodstuga
-        elif kodstuga["namn"] == "Test_Kodstuga_Att_Radera_Lärare":
-            lärare = kodstuga
-    data = {
-        "kodstuga": vanlig["id"],
-        "barn_fornamn": ["Test_deltagare_to_be_deleted", "Test2_deltagare_to_be_deleted"],
-        "barn_efternamn": ["Thuresson", "test1a"],
-        "klass": ["åk 5", "åk 4"],
-        "skola": ["Test", "Test"],
-        "kon": ["hon", "hen"],
-        "vuxen_fornamn": ["sdfsdf", "jh"],
-        "vuxen_efternamn": ["vbhjh", "vbhjh"],
-        "email": [uuid.uuid4().hex + "@test.com", uuid.uuid4().hex + "@test.com"],
-        "telefon": ["0723175800", "0723175801"],
-        "hittade": "id2",
-        "approve": "ja"
-    }
-    result = requests.post("http://127.0.0.1:9292/api/apply", data=data)
-    assert result.status_code == 200
-    data_l = {
-        "kodstuga": lärare["id"],
-        "barn_fornamn": ["Test_deltagare_to_be_deleted", "Test2_deltagare_to_be_deleted"],
-        "barn_efternamn": ["Thuresson", "test1a"],
-        "klass": ["åk 5", "åk 4"],
-        "skola": ["Test", "Test"],
-        "kon": ["hon", "hen"],
-        "vuxen_fornamn": ["sdfsdf", "jh"],
-        "vuxen_efternamn": ["vbhjh", "vbhjh"],
-        "email": [uuid.uuid4().hex + "@test.com", uuid.uuid4().hex + "@test.com"],
-        "telefon": ["0723175800", "0723175801"],
-        "hittade": "id2",
-        "approve": "ja"
-    }
-    result = requests.post("http://127.0.0.1:9292/api/apply", data=data_l)
-    assert result.status_code == 200
-    sleep(2)
-    result = as_admin.get("http://127.0.0.1:9292/api/loggar?log=epost")
+    utskick_data = as_admin.post("http://127.0.0.1:9292/api/utskick", data=data)
     found = 0
-    for logrow in result.json()["logdata"]:
-        if data["email"][0] in logrow:
+    for one_utskick in utskick_data.json()["utskick"]:
+        if one_utskick["rubrik"] == data["rubrik"]:
             found = found + 1
-        elif data["email"][1] in logrow:
+    assert found == 1
+    for i in range(0, 20):
+        utskick.send_utskick_once()
+    utskick_data = as_admin.get("http://127.0.0.1:9292/api/utskick")
+    found = 0
+    found_data = {}
+    for one_utskick in utskick_data.json()["utskick"]:
+        if one_utskick["rubrik"] == data["rubrik"] and one_utskick["status"] == 'skickad':
             found = found + 1
-    assert found == 2
-    found_l = 0
-    for logrow in result.json()["logdata"]:
-        if data_l["email"][0] in logrow:
-            found_l = found_l + 1
-        elif data_l["email"][1] in logrow:
-            found_l = found_l + 1
-    assert found_l == 2
-
-    deltagare = as_admin.get("http://127.0.0.1:9292/api/deltagare").json()["deltagare"]
-    invites = []
-    for delt in deltagare:
-        if (delt["fornamn"] == "Test_deltagare_to_be_deleted" or delt["fornamn"] == "Test2_deltagare_to_be_deleted"):
-            invites.append(delt["deltagare_id"])
-    assert len(invites) == 4
-    invite_result = as_admin.post("http://127.0.0.1:9292/api/invite", data={"invite": invites})
-    assert invite_result.status_code == 200
-    sleep(10)
-    emaillist = as_admin.get("http://127.0.0.1:9292/api/loggar?log=epost").json()["logdata"]
-    found_v = 0
-    found_l = 0
-    listinfo = []
-    for logrow in emaillist:
-        if data["email"][0] in logrow and "Erbjudande om plats" in logrow:
-            found_v = found_v + 1
-            listinfo.append(logrow)
-        elif data["email"][1] in logrow and "Erbjudande om plats" in logrow:
-            found_v = found_v + 1
-            listinfo.append(logrow)
-        elif data_l["email"][0] in logrow and "Erbjudande om plats" in logrow:
-            found_l = found_l + 1
-        elif data_l["email"][1] in logrow and "Erbjudande om plats" in logrow:
-            found_l = found_l + 1
-    assert found_v == 4
-    assert found_l == 4
-
-
-def test_delete_deltagare(as_admin):
-    deltagare = as_admin.get("http://127.0.0.1:9292/api/deltagare")
-    deleted_count = 0
-    for deltagare in deltagare.json()["deltagare"]:
-        if deltagare["fornamn"] in ["Test_deltagare_to_be_deleted", "Test2_deltagare_to_be_deleted"]:
-            result = as_admin.delete("http://127.0.0.1:9292/api/deltagare", data={"id": deltagare["deltagare_id"]})
-            assert result.status_code == 200
-            deleted_count = deleted_count + 1
-    assert deleted_count == 4
-
-
-def test_delete(as_admin, as_volontär):
-    result = as_admin.get("http://127.0.0.1:9292/api/kodstugor")
-    for one in result.json()['kodstugor']:
-        if one["namn"] == "Test_Kodstuga_Att_Radera_Lärare" or one["namn"] == "Test_Kodstuga_Att_Radera_Vanlig":
-            result2 = as_admin.delete("http://127.0.0.1:9292/api/kodstugor", data={"id": one["id"]})
-            assert result2.status_code == 200
+            found_data = one_utskick
+    assert found == 1
+    utskick_data = as_admin.delete("http://127.0.0.1:9292/api/utskick", data=found_data)
+    found = 0
+    for one_utskick in utskick_data.json()["utskick"]:
+        if one_utskick["rubrik"] == data["rubrik"]:
+            found = found + 1
+    assert found == 0

@@ -18,57 +18,51 @@ def handle(request):
         return delete(request)
 
 
+def delete_deltagare(deltagare_id):
+    db.cursor.execute("""
+        DELETE FROM
+            klick_svar
+        WHERE
+            deltagare_id = ?;
+        """, (deltagare_id,))
+    db.cursor.execute("""
+        DELETE FROM
+            deltagande_närvaro
+        WHERE
+            deltagare_id = ?;
+        """, (deltagare_id,))
+    db.cursor.execute("""
+        DELETE FROM
+            kontaktpersoner_deltagare
+        WHERE
+            deltagare_id = ?;
+        """, (deltagare_id,))
+    db.cursor.execute("""
+        DELETE FROM
+            deltagare
+        WHERE
+            id = ?;
+        """, (deltagare_id,))
+    db.commit()
+    db.cursor.execute("""
+        DELETE FROM
+            kontaktpersoner
+        WHERE NOT EXISTS
+            (SELECT
+                1
+            FROM
+                kontaktpersoner_deltagare
+            WHERE
+                kontaktpersoner_deltagare.kontaktpersoner_id = kontaktpersoner.id
+            );
+        """)
+    db.commit()
+
+
 def delete(request):
     if request["BESK_admin"]:
         post_data = read_post_data(request)
-        db.cursor.execute("""
-            DELETE FROM
-                klick_svar
-            WHERE
-                deltagare_id = ?;
-            """, (post_data["id"][0],))
-        db.cursor.execute("""
-            DELETE FROM
-                deltagande_närvaro
-            WHERE
-                deltagare_id = ?;
-            """, (post_data["id"][0],))
-        db.cursor.execute("""
-            DELETE FROM
-                kontaktpersoner_deltagare
-            WHERE
-                deltagare_id = ?;
-            """, (post_data["id"][0],))
-        db.cursor.execute("""
-            DELETE FROM
-                deltagare
-            WHERE
-                id = ?;
-            """, (post_data["id"][0],))
-        db.commit()
-        o_kontakter = db.cursor.execute("""
-            SELECT
-                id
-            FROM
-                kontaktpersoner
-            WHERE  NOT EXISTS
-                (SELECT
-                    1
-                FROM
-                    kontaktpersoner_deltagare
-                WHERE
-                    kontaktpersoner_deltagare.kontaktpersoner_id = kontaktpersoner.id
-                );
-            """)
-        for kontakt in o_kontakter.fetchall():
-            kontakt = kontakt[0]
-            db.cursor.execute("""
-                DELETE FROM
-                    kontaktpersoner
-                WHERE
-                    id = ?;
-                """, (kontakt,))
-        db.commit()
+        delete_deltagare(post_data["id"][0])
     utdata = all(request)
     utdata.update(kontaktpersoner.all(request))
     return utdata
@@ -80,10 +74,13 @@ def get_kodstuga(id):
             kodstugor.id AS id,
             kodstugor.namn AS namn,
             kodstugor.sms_text AS sms_text,
+            kodstugor.sms_status AS sms_status,
             kodstugor.epost_rubrik AS epost_rubrik,
             kodstugor.epost_text AS epost_text,
+            kodstugor.epost_status AS epost_status,
             kodstugor.epost_text_ja AS epost_text_ja,
             kodstugor.epost_rubrik_ja AS epost_rubrik_ja,
+            kodstugor.epost_status_ja AS epost_status_ja,
             kodstugor.open AS open
         FROM
             deltagare

@@ -5,6 +5,7 @@ import pytest
 import requests
 import secrets
 from managedata import login
+from tests import api_data
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -19,6 +20,38 @@ def finalizer_function():
 
 
 admin = False
+
+
+@pytest.fixture
+def ny_kodstuga(request):
+    kodstuga = admin.post(
+        "http://127.0.0.1:9292/api/kodstugor",
+        data=api_data.make_data("kodstuga")
+    ).json()["kodstugor"][-1]
+    admin.post(
+        "http://127.0.0.1:9292/api/volontarer",
+        data=api_data.make_data("volontar", {"kodstugor_id": kodstuga["id"]})
+    ).json()
+    admin.post(
+        "http://127.0.0.1:9292/api/apply",
+        data=api_data.make_data("apply_admin", {"kodstuga": kodstuga["id"]})
+    ).json()
+    admin.post(
+        "http://127.0.0.1:9292/api/datum",
+        data=api_data.make_data("datum", {"kodstugor_id": kodstuga["id"]})
+    ).json()
+
+    def radera_kodstuga():
+        volontarer = admin.get(
+            "http://127.0.0.1:9292/api/volontarer"
+        ).json()["volontärer"]
+        for volontar in volontarer:
+            if kodstuga["id"] in volontar["kodstugor_id"]:
+                admin.delete("http://127.0.0.1:9292/api/volontarer", data=volontar).json()
+        admin.delete("http://127.0.0.1:9292/api/kodstugor", data=kodstuga).json()
+
+    request.addfinalizer(radera_kodstuga)
+    return kodstuga
 
 
 @pytest.fixture
@@ -59,10 +92,13 @@ def as_volontär(as_admin):
             data = {
                 "namn": "Test_Kodstuga",
                 "sms_text": "Påminnelse %namn% %datum%",
+                "sms_status": "aktiv",
                 "epost_text": "Påminnelse %namn% %datum% %kodstuga%",
                 "epost_rubrik": "Påminnelse",
+                "epost_status": "aktiv",
                 "epost_text_ja": "Välkommen %namn% address etc.",
                 "epost_rubrik_ja": "Välkommen",
+                "epost_status_ja": "aktiv",
                 "typ": "Kodstuga",
                 "open": "Ja"
             }

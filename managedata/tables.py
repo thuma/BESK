@@ -11,7 +11,10 @@ tables = ['''
   epost_rubrik TEXT,
   epost_text_ja TEXT,
   epost_rubrik_ja TEXT,
-  open TEXT
+  open TEXT,
+  sms_status TEXT,
+  epost_status TEXT,
+  epost_status_ja TEXT
    );
 ''',
 '''

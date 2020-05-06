@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from managedata import db, login, kontaktpersoner, texter
+from managedata import db, login, texter, deltagare
 from tools import read_post_data
 
 logger = logging.getLogger("kodstugor")
@@ -19,7 +19,17 @@ def handle(request):
 
 def delete(request):
     post_data = read_post_data(request)
-    if request["BESK_admin"] and len(kontaktpersoner.for_kodstuga(post_data['id'][0])) == 0:
+    if request["BESK_admin"]:
+        deltagar_ids = db.cursor.execute("""
+            SELECT
+                id
+            FROM
+                deltagare
+            WHERE
+                kodstugor_id == ?
+        """, (post_data['id'][0],)).fetchall()
+        for deltagare_id in deltagar_ids:
+            deltagare.delete_deltagare(deltagare_id[0])
         db.cursor.execute("""
             DELETE FROM
                 utskick
@@ -66,7 +76,10 @@ def active(request):
                 epost_text_ja,
                 epost_rubrik_ja,
                 typ,
-                open
+                open,
+                sms_status,
+                epost_status,
+                epost_status_ja
             FROM kodstugor;
          """)
         admin = True
@@ -81,7 +94,10 @@ def active(request):
                 epost_text_ja,
                 epost_rubrik_ja,
                 typ,
-                open
+                open,
+                sms_status,
+                epost_status,
+                epost_status_ja
             FROM kodstugor WHERE open ='Ja';
          """)
         admin = False
@@ -110,7 +126,10 @@ def get_kodstuga(kodstua_id):
             epost_text_ja,
             epost_rubrik_ja,
             typ,
-            open
+            open,
+            sms_status,
+            epost_status,
+            epost_status_ja
         FROM
             kodstugor
         WHERE
@@ -121,6 +140,8 @@ def get_kodstuga(kodstua_id):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
+            if col[0] in ["sms_status", "epost_status", "epost_status_ja"]:
+                ut[col[0]] = row[idx] or "aktiv"
         return ut
     return list(map(to_headers, all.fetchall()))[0]
 
@@ -150,7 +171,10 @@ def all(request):
             epost_text_ja,
             epost_rubrik_ja,
             typ,
-            open
+            open,
+            sms_status,
+            epost_status,
+            epost_status_ja
         FROM kodstugor
      """ + where)
 
@@ -158,6 +182,8 @@ def all(request):
         ut = {}
         for idx, col in enumerate(all.description):
             ut[col[0]] = row[idx]
+            if col[0] in ["sms_status", "epost_status", "epost_status_ja"]:
+                ut[col[0]] = row[idx] or "aktiv"
         return ut
     return {"kodstugor": list(map(to_headers, all.fetchall()))}
 
@@ -175,6 +201,9 @@ def add_or_uppdate(request):
                 post_data["epost_rubrik_ja"][0],
                 post_data["typ"][0],
                 post_data["open"][0],
+                post_data["sms_status"][0],
+                post_data["epost_status"][0],
+                post_data["epost_status_ja"][0],
                 post_data["id"][0]
             )
             db.cursor.execute("""
@@ -187,7 +216,10 @@ def add_or_uppdate(request):
                         epost_text_ja = ?,
                         epost_rubrik_ja = ?,
                         typ = ?,
-                        open = ?
+                        open = ?,
+                        sms_status = ?,
+                        epost_status = ?,
+                        epost_status_ja = ?
                     WHERE
                         id = ?
                 """, data)
@@ -201,13 +233,26 @@ def add_or_uppdate(request):
                 post_data["epost_rubrik_ja"][0],
                 post_data["typ"][0],
                 post_data["open"][0],
+                post_data["sms_status"][0],
+                post_data["epost_status"][0],
+                post_data["epost_status_ja"][0],
             )
             db.cursor.execute("""
                 INSERT
-                    INTO kodstugor
-                        (namn, sms_text, epost_text, epost_rubrik, epost_text_ja, epost_rubrik_ja, typ, open)
+                    INTO kodstugor (
+                        namn,
+                        sms_text,
+                        epost_text,
+                        epost_rubrik,
+                        epost_text_ja,
+                        epost_rubrik_ja,
+                        typ, open,
+                        sms_status,
+                        epost_status,
+                        epost_status_ja
+                        )
                     VALUES
-                        (?,?,?,?,?,?,?,?)
+                        (?,?,?,?,?,?,?,?,?,?,?)
                 """, data)
         db.commit()
     return all(request)
