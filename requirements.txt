@@ -1,7 +1,7 @@
-requests
-gevent
-phonenumbers
-markdown
-arrow
-pytest
-pytest-flake8
+requests==2.25.1
+gevent==21.1.2
+phonenumbers==8.12.19
+Markdown==3.3.4
+arrow==1.0.2
+pytest==6.2.2
+pytest-flake8==1.0.7

@@ -54,7 +54,7 @@ config.read('../BESK.ini')
 def read_post_data(request):
     try:
         body_size = int(request.get('CONTENT_LENGTH', 0))
-    except:  # noqa: E772
+    except Exception:
         body_size = 0
     request_body = request['wsgi.input'].read(body_size)
     return parse_qs(request_body.decode(), keep_blank_values=True)
@@ -82,7 +82,7 @@ def get_value(key):
     result = db.cursor.execute('''SELECT value FROM key_value WHERE key=?;''', (key,))
     try:
         return result.fetchall()[0][0]
-    except:  # noqa: E772
+    except Exception:
         return ""
 
 
@@ -102,7 +102,7 @@ def send_sms(receiver, message):
         db.commit()
     except db.sqlite3.IntegrityError:
         logger.info("SMS redan i kö")
-    except:  # noqa: E772
+    except Exception:
         logger.error("SMS kunde inte skickas till: " + receiver, exc_info=1)
 
 
@@ -137,7 +137,7 @@ def send_sms_queue():
             )
             try:
                 sms_id = result.json()["id"]
-            except:  # noqa: E772
+            except Exception:
                 sms_id = "error"
             db.cursor.execute("""
                 UPDATE
@@ -150,7 +150,7 @@ def send_sms_queue():
                 """,
                               (sms_id, id))
             db.commit()
-        except:   # noqa: E772
+        except Exception:
             logger.error("Epost kunde inte skickas från kön.", exc_info=1)
             sleep(3600)
 
@@ -171,7 +171,7 @@ def send_email(to, subject, message):
         db.commit()
     except db.sqlite3.IntegrityError:
         logger.info("Epost redan i kö.")
-    except:  # noqa: E772
+    except Exception:
         logger.error("Epost kunde inte skickas till: " + to, exc_info=1)
 
 
@@ -203,7 +203,7 @@ def send_mail_to_office365(to, subject, message):
     except smtplib.SMTPSenderRefused:
         logger.error("SMTPSenderRefused to: " + to, exc_info=1)
         return False
-    except:   # noqa: E772
+    except Exception:
         logger.error("SMTP send failed to: " + to, exc_info=1)
         return "retry"
 
@@ -252,6 +252,6 @@ def send_email_queue():
                               (id,)
                               )
             db.commit()
-        except:   # noqa: E772
+        except Exception:
             logger.error("Epost kunde inte skickas från kön.", exc_info=1)
             sleep(3600)
