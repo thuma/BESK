@@ -84,7 +84,7 @@ def add_or_uppdate(request):
                 post_data["typ"][0],
                 post_data["rubrik"][0],
                 post_data["text"][0],
-                arrow.get(post_data["datum"][0]).timestamp,
+                arrow.get(post_data["datum"][0]).timestamp(),
                 post_data["status"][0],
                 post_data["id"][0]
             )
@@ -106,7 +106,7 @@ def add_or_uppdate(request):
                 post_data["typ"][0],
                 post_data["rubrik"][0],
                 post_data["text"][0],
-                arrow.get(post_data["datum"][0]).timestamp,
+                arrow.get(post_data["datum"][0]).timestamp(),
             )
             db.cursor.execute("""
                 INSERT
@@ -174,6 +174,6 @@ def send_utskick_once():
 def send_utskick():
     while True:
         send_utskick_once()
-        now = arrow.utcnow().timestamp
-        then = arrow.utcnow().shift(hours=24).replace(hour=9, minute=30).timestamp
+        now = arrow.utcnow().timestamp()
+        then = arrow.utcnow().shift(hours=24).replace(hour=9, minute=30).timestamp()
         sleep(then - now)

@@ -112,12 +112,12 @@ def all(request):
             elif col[0] == "kodstugor_id":
                 try:
                     ut[col[0]] = list(map(int, row[idx].split(",")))
-                except:  # noqa: F821
+                except Exception:
                     ut[col[0]] = []
             elif col[0] == "roller":
                 try:
                     ut[col[0]] = row[idx].split(",")
-                except:  # noqa: F821
+                except Exception:
                     ut[col[0]] = []
             else:
                 ut[col[0]] = row[idx]
@@ -178,7 +178,7 @@ def phonenumber_to_format(number):
     try:
         phone_number = phonenumbers.parse(number, "SE")
         return phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
-    except:  # noqa: F821
+    except Exception:
         return "+46700000000"
 
 
@@ -237,7 +237,7 @@ def add_or_update_admin(request):
                 post_data["namn"][i],
                 post_data["epost"][i],
                 phonenumber_to_format(post_data["telefon"][i]),
-                arrow.get("2090-01-01").timestamp,
+                arrow.get("2090-01-01").timestamp(),
             )
             try:
                 db.cursor.execute("""
@@ -265,7 +265,7 @@ def add_or_update_admin(request):
         try:
             phone_number = phonenumbers.parse(post_data["telefon"][0], "SE")
             phone_number_str = phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
-        except:  # noqa: F821
+        except Exception:
             raise Error400("Fyll i ett giltigt telefonummer.")
         if not phonenumbers.is_valid_number(phone_number):
             raise Error400("Fyll i ett giltigt telefonummer.")
@@ -274,7 +274,7 @@ def add_or_update_admin(request):
                 post_data["namn"][0],
                 post_data["epost"][0],
                 phone_number_str,
-                arrow.get("2090-01-01").timestamp,
+                arrow.get("2090-01-01").timestamp(),
                 post_data["id"][0]
             )
             db.cursor.execute("""
@@ -305,7 +305,7 @@ def add_or_update_admin(request):
                 post_data["namn"][0],
                 post_data["epost"][0],
                 phone_number_str,
-                arrow.get("2090-01-01").timestamp,
+                arrow.get("2090-01-01").timestamp(),
             )
             try:
                 db.cursor.execute("""
@@ -342,7 +342,7 @@ def update_as_vol(request):
     try:
         phone_number = phonenumbers.parse(post_data["telefon"][0], "SE")
         phone_number_str = phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
-    except:  # noqa: F821
+    except Exception:
         raise Error400("Fyll i ett giltigt telefonummer.")
     if not phonenumbers.is_valid_number(phone_number):
         raise Error400("Fyll i ett giltigt telefonummer.")
