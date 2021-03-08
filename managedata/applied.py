@@ -44,7 +44,7 @@ def new(request):
             SELECT namn, typ
             FROM kodstugor WHERE id = ?;
         """, (kodstugaid,)).fetchone()
-    except:  # noqa: E772
+    except Exception:
         raise Error400("Välj en aktivitet.")
     now = int(time.time())
 
@@ -81,7 +81,7 @@ def new(request):
     for i, value in enumerate(formdata["vuxen_efternamn"]):
         try:
             phone_number = phonenumbers.parse(formdata["telefon"][i], "SE")
-        except:  # noqa: E772
+        except Exception:
             raise Error400("Fyll i ett giltigt telefonummer för alla målsmän.")
         if not phonenumbers.is_valid_number(phone_number):
             raise Error400("Fyll i ett giltigt telefonummer för alla målsmän.")
