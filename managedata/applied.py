@@ -45,7 +45,7 @@ def new(request):
             FROM kodstugor WHERE id = ?;
         """, (kodstugaid,)).fetchone()
     except:  # noqa: E772
-        raise Error400("Välj en kodstuga.")
+        raise Error400("Välj en aktivitet.")
     now = int(time.time())
 
     for i, _ in enumerate(formdata["barn_efternamn"]):

@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <title>BESK - Kodcentrum</title>
     <style>
@@ -16,222 +17,235 @@
 </head>
 
 <body>
-<div class="container" id="applyform">
-    <div class="card" v-if="success==false">
-        <div class="card-body">
-            <h1 v-if="admin==false" class="card-title">Formulär intresseanmälan kodstuga</h1>
-            <h1 v-if="admin" class="card-title">Lägg till deltagare och målsman i kodstuga</h1>
-            <span v-if="admin==false" v-html="markdown_to_html.makeHtml(AnsökanInfo)">
-            </span>
-            <form method="POST" id="formrequest">
-                <div class="form-group">
-                    <label>Mitt barn är ny till programmering och är intresserad av denna kodstuga
-                        <select class="form-control" name="kodstuga" required>
-                            <option value="">Välj kodstuga...</option>
-                            <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}</option>
-                        </select>
-                    </label>
-                </div>
-                <div v-if="admin==true" class="form-group">
-                    <label>Ska deltagaren/deltagarna bjudas in till kodstugan direkt?
-                    <select class="form-control" name="invite_now">
-                        <option value="nej">Nej</option>
-                        <option value="inbjudan">Ja</option>
-                        <option value="ja">Ja - Utan epost bekräftelse</option>
-                        </select>
-                    </label>
-                </div>
-                <div v-for="kid in Array(kids)">
+    <div class="container" id="applyform">
+        <div class="card" v-if="success==false">
+            <div class="card-body">
+                <h1 v-if="admin==false" class="card-title">Formulär intresseanmälan</h1>
+                <h1 v-if="admin" class="card-title">Lägg till deltagare och målsman i aktiviteten</h1>
+                <span v-if="admin==false" v-html="markdown_to_html.makeHtml(AnsökanInfo)">
+                </span>
+                <form method="POST" id="formrequest">
                     <div class="form-group">
-                        <label>Barnets förnamn
-                            <input name="barn_fornamn" type="text" class="form-control" required>
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Barnets efternamn
-                            <input name="barn_efternamn" type="text" class="form-control" required>
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Vilken årskurs går barnet i under denna termin?
-                        <select class="form-control" name="klass" id="klass" required>
-                            <option value="">Välj klass...</option>
-                            <option value="åk 4">åk 4</option>
-                            <option value="åk 5">åk 5</option>
-                            <option value="åk 6">åk 6</option>
-                        </select>
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Vilken skola går barnet på?
-                            <input name="skola" type="text" required class="form-control">
-                            <small class="form-text text-muted">Skriv in namnet på ditt barns skola.</small>
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Kön
-                            <select class="form-control" name="kon" required>
-                                <option value="">Välj kön...</option>
-                                <option value="hon">hon</option>
-                                <option value="han">han</option>
-                                <option value="hen">hen</option>
+                        <label>Mitt barn är ny till programmering och är intresserad
+                            <select class="form-control" name="kodstuga" required>
+                                <option value="">Välj aktivitet...</option>
+                                <option v-for="kodstuga in kodstugor" v-bind:value="kodstuga.id">{{kodstuga.namn}}
+                                </option>
                             </select>
                         </label>
                     </div>
-                    <div class="form-group" v-if="admin==true">
-                        <small class="form-text text-muted">
-                            Då Kodcentrum kontinuerligt dokumenterar, kommunicerar och
-                            informerar om sin verksamhet behöver du ange om det är ok 
-                            att ditt barn syns på stillbilder och/eller filmat 
-                            material. Kodcentrum och/eller tredje part får använda 
-                            materialet för marknadsförings- och informationsändamål om
-                            Kodcentrum.
-                        </small>
-                        <label>Foto
-                            <select class="form-control" name="foto" required>
-                                <option value="">Välj...</option>
-                                <option value="nej">Jag accepterar inte</option>
-                                <option value="ja">Jag accepterar</option>
+                    <div v-if="admin==true" class="form-group">
+                        <label>Ska deltagaren/deltagarna bjudas in till aktiviteten direkt?
+                            <select class="form-control" name="invite_now">
+                                <option value="nej">Nej</option>
+                                <option value="inbjudan">Ja</option>
+                                <option value="ja">Ja - Utan epost bekräftelse</option>
                             </select>
                         </label>
                     </div>
+                    <div v-for="kid in Array(kids)">
+                        <div class="form-group">
+                            <label>Barnets förnamn
+                                <input name="barn_fornamn" type="text" class="form-control" required>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>Barnets efternamn
+                                <input name="barn_efternamn" type="text" class="form-control" required>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>Vilken årskurs går barnet i under denna termin?
+                                <select class="form-control" name="klass" id="klass" required>
+                                    <option value="">Välj klass...</option>
+                                    <option value="åk 4">åk 4</option>
+                                    <option value="åk 5">åk 5</option>
+                                    <option value="åk 6">åk 6</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>Vilken skola går barnet på?
+                                <input name="skola" type="text" required class="form-control">
+                                <small class="form-text text-muted">Skriv in namnet på ditt barns skola.</small>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>Kön
+                                <select class="form-control" name="kon" required>
+                                    <option value="">Välj kön...</option>
+                                    <option value="hon">hon</option>
+                                    <option value="han">han</option>
+                                    <option value="hen">hen</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="form-group" v-if="admin==true">
+                            <small class="form-text text-muted">
+                                Då Kodcentrum kontinuerligt dokumenterar, kommunicerar och
+                                informerar om sin verksamhet behöver du ange om det är ok
+                                att ditt barn syns på stillbilder och/eller filmat
+                                material. Kodcentrum och/eller tredje part får använda
+                                materialet för marknadsförings- och informationsändamål om
+                                Kodcentrum.
+                            </small>
+                            <label>Foto
+                                <select class="form-control" name="foto" required>
+                                    <option value="">Välj...</option>
+                                    <option value="nej">Jag accepterar inte</option>
+                                    <option value="ja">Jag accepterar</option>
+                                </select>
+                            </label>
+                        </div>
+                        <hr>
+                    </div>
+                    <div class="form-group">
+                        <label>För att anmäla ytterligare barn:</label>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="kids++">Lägg till ett
+                            barn</button>
+                        <button v-on:click="kids--" v-if="kids>1" type="button"
+                            class="btn btn-sm btn-outline-secondary">Miska antalet barn</button>
+                    </div>
                     <hr>
-                </div>
-                <div class="form-group">
-                    <label>För att anmäla ytterligare barn:</label>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="kids++">Lägg till ett barn</button>
-                    <button v-on:click="kids--" v-if="kids>1" type="button" class="btn btn-sm btn-outline-secondary">Miska antalet barn</button>
-                </div>
-                <hr>
-                <div v-for="adult in Array(adults)">
-                    <div class="form-group">
-                        <label>Målsmans förnamn
-                            <input type="text" class="form-control" name="vuxen_fornamn" required>
-                        </label>
+                    <div v-for="adult in Array(adults)">
+                        <div class="form-group">
+                            <label>Målsmans förnamn
+                                <input type="text" class="form-control" name="vuxen_fornamn" required>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>Målsmans efternamn
+                                <input type="text" class="form-control" name="vuxen_efternamn" required>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>Målsmans e-postadress
+                                <input type="email" class="form-control" name="email" required>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>Målsmans telefonnummer
+                                <input type="text" class="form-control" name="telefon" required>
+                            </label>
+                        </div>
+                        <hr>
                     </div>
                     <div class="form-group">
-                        <label>Målsmans efternamn
-                            <input type="text" class="form-control" name="vuxen_efternamn" required>
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Målsmans e-postadress
-                            <input type="email" class="form-control" name="email" required>
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Målsmans telefonnummer
-                            <input type="text" class="form-control" name="telefon" required>
-                        </label>
+                        <label>För att anmäla ytterligare målsman:</label>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="adults++">Lägg till
+                            en målsman</button>
+                        <button v-on:click="adults--" v-if="adults>1" type="button"
+                            class="btn btn-sm btn-outline-secondary">Miska antalet målsmän</button>
                     </div>
                     <hr>
-                </div>
-                <div class="form-group">
-                    <label>För att anmäla ytterligare målsman:</label>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" v-on:click="adults++">Lägg till en målsman</button>
-                    <button v-on:click="adults--" v-if="adults>1" type="button" class="btn btn-sm btn-outline-secondary">Miska antalet målsmän</button>
-                </div>
-                <hr>
-                <div class="form-group">
-                    <label>Hur hörde du talas om att Kodcentrum har kodstugor?
-                    <select class="form-control" v-model:value="hittade">
-                        <option value="id1" selected>Genom skolan</option>
-                        <option value="id2">Tips från en vän</option>
-                        <option value="id3">På sociala medier</option>
-                        <option value="id4">Har tidigare deltagit i ett av Kodcentrums barnhack</option>
-                        <option value="id5">Hittade information Kodcentrums hemsida</option>
-                        <option value="id6">Annat</option>
-                    </select>
-                    <input v-if="hittade !== 'id6'" type="hidden" name="hittade" v-model:value="hittade">
-                    </label>
-                    <label v-if="hittade=='id6'">Beskriv med egna ord:
-                        <input type="text" class="form-control" name="hittade" required>
-                    </label>
-                </div>
-                <div class="form-group">
-                    Genom att fylla i detta formulär samtycker du behandling av dina personuppgifter i enlighet med Kodcentrums Integritetspolicy.
-                    <a target="_blank" href="https://www.kodcentrum.se/om-webbplatsen/integritetspolicy">https://www.kodcentrum.se/om-webbplatsen/integritetspolicy</a>
-                </div>
-                <div class="form-check">
-                    <label class="form-check-label">
-                    <input type="checkbox" class="form-check-input" name="approve" value="ja" required>
-                    Jag samtycker du till ovanstående.</label>
-                </div>
-                <br>
-                <button type="button" v-on:click="check_send()" class="btn btn-primary">Skicka ansökan</button>
-            </form>
+                    <div class="form-group">
+                        <label>Hur hörde du talas om att Kodcentrums aktiviteter?
+                            <select class="form-control" v-model:value="hittade">
+                                <option value="id1" selected>Genom skolan</option>
+                                <option value="id2">Tips från en vän</option>
+                                <option value="id3">På sociala medier</option>
+                                <option value="id4">Har tidigare deltagit i ett av Kodcentrums barnhack</option>
+                                <option value="id5">Hittade information Kodcentrums hemsida</option>
+                                <option value="id6">Annat</option>
+                            </select>
+                            <input v-if="hittade !== 'id6'" type="hidden" name="hittade" v-model:value="hittade">
+                        </label>
+                        <label v-if="hittade=='id6'">Beskriv med egna ord:
+                            <input type="text" class="form-control" name="hittade" required>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        Genom att fylla i detta formulär samtycker du behandling av dina personuppgifter i enlighet med
+                        Kodcentrums Integritetspolicy.
+                        <a target="_blank"
+                            href="https://www.kodcentrum.se/om-webbplatsen/integritetspolicy">https://www.kodcentrum.se/om-webbplatsen/integritetspolicy</a>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" name="approve" value="ja" required>
+                            Jag samtycker du till ovanstående.</label>
+                    </div>
+                    <br>
+                    <button type="button" v-on:click="check_send()" class="btn btn-primary">Skicka ansökan</button>
+                </form>
+            </div>
+        </div>
+        <div class="card" v-if="success">
+            <div class="card-body">
+                <p class="card-text">
+                    Tack! Vi har mottagit din intresseanmälan.<br>
+                    Inom kort får du ett e-post med bekräftelse på din intresseanmälan.
+                </p>
+            </div>
         </div>
     </div>
-    <div class="card" v-if="success">
-        <div class="card-body">
-            <p class="card-text">
-            Tack! Vi har mottagit din intresseanmälan.<br>
-            Inom kort får du ett e-post med bekräftelse på din intresseanmälan.
-            </p>
-        </div>
-    </div>
-</div>
     <script>
-    var applyform = new Vue({
-      el: '#applyform',
-      created: function(){
-        var main = this
-        fetch('/apply/kodstugor').then(
-            function(response) {
-                response.json().then(
-                    function(data) {
-                        main.kodstugor = data.kodstugor;
-                        main.admin = data.admin;
-                        main.AnsökanInfo = data.AnsökanInfo;
+        var applyform = new Vue({
+            el: '#applyform',
+            created: function () {
+                var main = this
+                fetch('/apply/kodstugor').then(
+                    function (response) {
+                        response.json().then(
+                            function (data) {
+                                main.kodstugor = data.kodstugor;
+                                main.admin = data.admin;
+                                main.AnsökanInfo = data.AnsökanInfo;
+                            });
                     });
-                });
-      },
-      methods: {
-        check_send: function (){
-            if(this.loading){return ""}
-            this.loading = true
-            var main = this
-            fetch('/api/apply', {
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
-            credentials: 'same-origin', // include, *same-origin, omit
-            headers: {
-                //'Content-Type': 'application/json'
-                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            methods: {
+                check_send: function () {
+                    if (this.loading) { return "" }
+                    this.loading = true
+                    var main = this
+                    fetch('/api/apply', {
+                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                        credentials: 'same-origin', // include, *same-origin, omit
+                        headers: {
+                            //'Content-Type': 'application/json'
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: $('#formrequest').serialize() // body data type must match "Content-Type" header
+                    }).then(function (response) {
+                        main.loading = false
+                        if (response.status == 200) {
+                            response.json().then(
+                                function (jsondata) {
+                                    console.log(jsondata)
+                                    main.success = true
+                                })
+                        } else {
+                            response.text().then(
+                                function (text) {
+                                    window.alert(text)
+                                })
+                        }
+                    });
                 },
-            body: $('#formrequest').serialize() // body data type must match "Content-Type" header
-            }).then(function(response){
-                main.loading = false
-                if(response.status==200){
-                    response.json().then(
-                        function(jsondata){
-                        console.log(jsondata)
-                        main.success = true
-                    })
-                } else {
-                    response.text().then(
-                        function(text){
-                        window.alert(text)
-                    })
-                }
-            });
-        },
-      },
-      data: {
-        markdown_to_html: new showdown.Converter(),
-        kids: 1,
-        adults: 1,
-        hittade:"id1",
-        admin: false,
-        kodstugor: [],
-        loading: false,
-        success: false,
-        AnsökanInfo: ""
-      }
-    })
+            },
+            data: {
+                markdown_to_html: new showdown.Converter(),
+                kids: 1,
+                adults: 1,
+                hittade: "id1",
+                admin: false,
+                kodstugor: [],
+                loading: false,
+                success: false,
+                AnsökanInfo: ""
+            }
+        })
     </script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
