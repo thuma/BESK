@@ -211,8 +211,18 @@ def add_or_uppdate(request):
             )
             db.cursor.execute("""
                 INSERT
-                    INTO deltagare
-                        (id, fornamn, efternamn, status, kon, klass, skola, kodstugor_id, skonto, slosen)
+                    INTO deltagare (
+                        id,
+                        fornamn,
+                        efternamn,
+                        status,
+                        kon,
+                        klass,
+                        skola,
+                        kodstugor_id,
+                        skonto,
+                        slosen
+                        )
                     VALUES
                         (?,?,?,?,?,?,?,?,?,?)
                 """, data)
@@ -228,6 +238,29 @@ def add_or_uppdate(request):
     deltagare = all(request)
     deltagare.update(kontaktpersoner.all(request))
     return deltagare
+
+
+def scratch(request):
+    deltagare = all(request)["deltagare"]
+    for one in deltagare:
+        if one["skonto"] == "":
+            username = "kc%s%s" % (one["kodstuga_id"], one["deltagare_id"][-4:])
+            password = one["deltagare_id"][:6]
+            data = (
+                username,
+                password,
+                one["deltagare_id"]
+                )
+            db.cursor.execute("""
+                UPDATE deltagare
+                    SET
+                        skonto = ?,
+                        slosen = ?
+                    WHERE
+                        id = ?
+                """, data)
+    db.commit()
+    return all(request)
 
 
 def all(request):

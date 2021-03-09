@@ -12,7 +12,7 @@
             </th>
             <th scope="col">Förnamn</th>
             <th scope="col">Efternamn</th>
-            <th scope="col">Scratchkonto</th>
+            <th scope="col">Scratch</th>
             <th scope="col">Kön</th>
             <th scope="col">Foto</th>
             <th scope="col" v-if="me.admin">Skola</th>
@@ -30,9 +30,12 @@
             <td>{{kid.fornamn}}</td>
             <td>{{kid.efternamn}}</td>
             <td>
-                <button type="button" v-on:click="show_skonto(kid.skonto, kid.slosen)" class="btn btn-outline-secondary btn-sm">
+                <button type="button" v-on:click="show_skonto(kid.skonto, kid.slosen)" v-if="kid.skonto" class="btn btn-outline-secondary btn-sm">
                     Visa
                 </button>
+                <div v-else="">
+                    Inget konto
+                </div>
             </td>
             <td>{{kid.kon}}</td>
             <td>{{kid.foto}}</td>
@@ -59,6 +62,9 @@
 <button type="submit" class="btn btn-primary" v-if="me.admin">Skicka inbjudan till valda deltagare</button>
 <a target="_blank" href="/apply" class="btn btn-secondary" v-if="me.admin">Formulär intresseanmälan kodstuga</a>
 <button type="button" class="btn btn-secondary" v-if="me.admin" v-on:click="edit={'type':'deltagare','data':{'kodstuga_id':'','id':'','fornamn':'','efternamn':'','skonto':'','slosen':'','kon':'han','skola':'','klass':'åk 4','status':'ansökt','foto':'','kontaktperson_id':[]}}">Skapa ny</button>
+<button class="btn btn-secondary" type="button" v-on:click="make_scratch" v-if="me.admin">Generera scratch login</button>
+<a download="scratch_logins.csv" v-bind:href="scratch_csv" class="btn btn-secondary">Scratch login CSV</a>
+
 
 </form>
 <div v-if="edit.type=='deltagare'" class="card">

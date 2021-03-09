@@ -163,6 +163,10 @@ var admin = new Vue({
         är_nej: function(data, volontär, date, kodstuga){
             return this.get_data_volontar_at_date(volontär, date, kodstuga)['status'].toUpperCase().includes("NEJ")
         },
+        make_scratch: function(){
+            this.get_data('/api/scratch');
+            swal('För alla deltagare som inte hade konto sedan tidigare genereras nu användarnamn och lösenord.');
+        },
         button_color_volontär: function(data, volontär, date, kodstuga){
             if (this.är_nej(data, volontär, date, kodstuga)){
                 return {'btn-outline-danger':true}
@@ -245,6 +249,14 @@ var admin = new Vue({
         '/api/loggar'].forEach(this.get_data)
     },
     computed: {
+        scratch_csv: function(){
+            return "data:text/plain;base64,"+
+                btoa(
+                    this.valda_deltagare.map(
+                        konto=>konto.skonto+","+konto.slosen
+                    ).join("\n")
+                );
+        },
         valda_deltagare: function(){
             if (this.val_kodstuga == 'alla'){
                 return this.deltagare
