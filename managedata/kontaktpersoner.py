@@ -21,7 +21,7 @@ def add_or_uppdate(request):
     post_data = read_post_data(request)
     try:
         phone_number = phonenumbers.parse(post_data["telefon"][0], "SE")
-    except:  # noqa: E772
+    except Exception:
         raise Error400("Fyll i ett giltigt telefonummer.")
     if not phonenumbers.is_valid_number(phone_number):
         raise Error400("Fyll i ett giltigt telefonummer.")
@@ -174,7 +174,7 @@ def all(request):
             kontaktpersoner.efternamn AS efternamn,
             kontaktpersoner.epost AS epost,
             kontaktpersoner.telefon AS telefon,
-            kodstugor.id AS kodstugor_id,
+            GROUP_CONCAT(kodstugor.id, ",") AS kodstugor_id,
             GROUP_CONCAT(deltagare.id,",") AS deltagare_id
         FROM kontaktpersoner
         LEFT OUTER JOIN kontaktpersoner_deltagare
@@ -194,8 +194,8 @@ def all(request):
             kontaktpersoner.efternamn AS efternamn,
             kontaktpersoner.epost AS epost,
             kontaktpersoner.telefon AS telefon,
-            kodstugor.id AS kodstugor_id,
-            GROUP_CONCAT(deltagare.id,",") AS deltagare_id
+            GROUP_CONCAT(kodstugor.id, ",") AS kodstugor_id,
+            GROUP_CONCAT(deltagare.id, ",") AS deltagare_id
         FROM deltagare
         INNER JOIN kontaktpersoner_deltagare
             ON deltagare.id=kontaktpersoner_deltagare.deltagare_id
@@ -229,5 +229,10 @@ def all(request):
                     ut[col[0]] = []
                 else:
                     ut[col[0]] = ut[col[0]].split(',')
+            elif col[0] == "kodstugor_id":
+                if row[idx] is None:
+                    ut[col[0]] = []
+                else:
+                    ut[col[0]] = list(map(int, ut[col[0]].split(',')))
         return ut
     return {"kontaktpersoner": list(map(to_headers, all.fetchall()))}

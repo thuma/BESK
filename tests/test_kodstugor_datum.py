@@ -14,7 +14,7 @@ def test_send_email_reminder(as_admin, ny_kodstuga):
     ).json()["logdata"]
     found = False
     for kontakperson in kontakptersoner:
-        if kontakperson["kodstugor_id"] == id_:
+        if id_ in kontakperson["kodstugor_id"]:
             assert len([row for row in emails if kontakperson["epost"] in row]) == 1
             found = True
             break
@@ -52,7 +52,7 @@ def test_send_email_not_activate(as_admin, ny_kodstuga):
     ).json()["logdata"]
     found = False
     for kontakperson in kontakptersoner:
-        if kontakperson["kodstugor_id"] == id_:
+        if id_ in kontakperson["kodstugor_id"]:
             assert len([row for row in emails if kontakperson["epost"] in row]) == 0
             found = True
             break
@@ -72,7 +72,7 @@ def test_sms_reminder(as_admin, ny_kodstuga):
     ).json()["logdata"]
     found = False
     for kontakperson in kontakptersoner:
-        if kontakperson["kodstugor_id"] == id_:
+        if id_ in kontakperson["kodstugor_id"]:
             assert len([row for row in sms if kontakperson["telefon"] in row]) == 1
             found = True
             break
@@ -110,7 +110,7 @@ def test_sms_reminder_not_activate(as_admin, ny_kodstuga):
     ).json()["logdata"]
     found = False
     for kontakperson in kontakptersoner:
-        if kontakperson["kodstugor_id"] == id_:
+        if id_ in kontakperson["kodstugor_id"]:
             assert len([row for row in sms if kontakperson["telefon"] in row]) == 0
             found = True
             break
