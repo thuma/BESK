@@ -6,16 +6,18 @@
       <th scope="col">Typ av Kodstuga</th>
       <th scope="col">Anmälan öppen</th>
       <th scope="col">Redigera</th>
+      <th scope="col">Ladda ner</th>
     </tr>
   </thead>
   <tbody>
-    <tr v-for="kodstuga in kodstugor">
+    <tr v-for="kodstuga in kodstugaor_komplett">
         <td>{{kodstuga.namn}}</td>
         <td>{{kodstuga.typ}}</td>
         <td>{{kodstuga.open}}</td>
         <td><button class="btn btn-sm btn-outline-secondary"
             v-on:click="edit={'type':'kodstuga','data':copy(kodstuga)}">🖊</button>
         </td>
+        <td><a v-bind:href="kodstuga.download" download="kodstuga.csv" class="btn btn-sm btn-outline-secondary" type="button">Hämta</a></td>
     </tr>
   </tbody>
 </table>

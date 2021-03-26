@@ -56,3 +56,16 @@ def test_delete_deltagare(as_admin):
             assert result.status_code == 200
             deleted_count = deleted_count + 1
     assert deleted_count == 4
+
+
+def test_make_scratch(as_admin):
+    deltagare = as_admin.get("http://127.0.0.1:9292/api/deltagare")
+    for deltagare in deltagare.json()["deltagare"]:
+        if deltagare["fornamn"] in ["Test_deltagare_to_be_deleted", "Test2_deltagare_to_be_deleted"]:
+            assert deltagare["skonto"] == ""
+            assert deltagare["slosen"] == ""
+    deltagare = as_admin.get("http://127.0.0.1:9292/api/scratch")
+    for deltagare in deltagare.json()["deltagare"]:
+        if deltagare["fornamn"] in ["Test_deltagare_to_be_deleted", "Test2_deltagare_to_be_deleted"]:
+            assert not deltagare["skonto"] == ""
+            assert not deltagare["slosen"] == ""

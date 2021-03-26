@@ -135,6 +135,9 @@ def route(request):
     if request['PATH_INFO'] == '/deltagare':
         return deltagare.handle(request)
 
+    if request['PATH_INFO'] == '/scratch':
+        return deltagare.scratch(request)
+
     if request['PATH_INFO'] == '/volontarer/slack':
         return volontarer.from_slack(request)
 

@@ -163,6 +163,10 @@ var admin = new Vue({
         är_nej: function(data, volontär, date, kodstuga){
             return this.get_data_volontar_at_date(volontär, date, kodstuga)['status'].toUpperCase().includes("NEJ")
         },
+        make_scratch: function(){
+            this.get_data('/api/scratch');
+            swal('För alla deltagare som inte hade konto sedan tidigare genereras nu användarnamn och lösenord.');
+        },
         button_color_volontär: function(data, volontär, date, kodstuga){
             if (this.är_nej(data, volontär, date, kodstuga)){
                 return {'btn-outline-danger':true}
@@ -245,6 +249,14 @@ var admin = new Vue({
         '/api/loggar'].forEach(this.get_data)
     },
     computed: {
+        scratch_csv: function(){
+            return "data:text/plain;base64,"+
+                btoa(
+                    this.valda_deltagare.map(
+                        konto=>konto.skonto+","+konto.slosen
+                    ).join("\n")
+                );
+        },
         valda_deltagare: function(){
             if (this.val_kodstuga == 'alla'){
                 return this.deltagare
@@ -280,6 +292,118 @@ var admin = new Vue({
                 }
             });
             return kodstuga_data 
+        },
+        kodstugaor_komplett: function(){
+            var appdata = this;
+            
+            function name_key_export(data, keys){
+              var onedata = data;
+              var text = [];
+              keys.forEach(function(key){
+                if(key in onedata){
+                  text.push(
+                    onedata[key].toString().split(
+                      "\n").join(
+                      "<br>").split(
+                      "\r").join(
+                      "").split(
+                      ";").join(
+                      ","))}
+                else {text.push("")}
+              });
+              return text.join(";")+"\n";
+            }
+            
+            function add_download(kodstuga){
+                var csvdata = "";
+                csvdata = csvdata + "Kodstuga\n";
+                csvdata = csvdata + name_key_export(
+                        kodstuga,
+                        [
+                          "namn",
+                        ]);
+
+                csvdata = csvdata + "\nVolontärer\n";
+                csvdata = csvdata + appdata.volontärer.filter(
+                    volontär => volontär.kodstugor_id.indexOf(kodstuga.id) > -1
+                    ).map(volontär => name_key_export(
+                        volontär,
+                        [
+                          "namn",
+                          "epost",
+                          "telefon"
+                        ])
+                    );
+                    
+                csvdata = csvdata + "\nDeltagare\n";
+                csvdata = csvdata + appdata.deltagare.filter(
+                    deltagare => deltagare.kodstuga_id == kodstuga.id
+                    ).map(
+                      deltagare => name_key_export(
+                        deltagare,
+                        [
+                          "deltagare_id",
+                          "datum",
+                          "status",
+                          "fornamn",
+                          "efternamn",
+                          "skonto",
+                          "slosen",
+                          "foto",
+                          "kon",
+                          "skola",
+                          "klass",
+                        ])
+                      );
+                    
+                csvdata = csvdata + "\nKontaktpersoner\n";
+                csvdata = csvdata + appdata.kontaktpersoner.filter(
+                    kontaktperson => kontaktperson.kodstugor_id.indexOf(kodstuga.id)
+                    ).map(kontaktperson => name_key_export(
+                        kontaktperson,
+                        [
+                          "fornamn",
+                          "efternamn",
+                          "epost",
+                          "telefon",
+                          "id",
+                          "deltagare_id"
+                        ]));
+                    
+                csvdata = csvdata + "\nUtskick\n";
+                csvdata = csvdata + name_key_export(
+                        kodstuga,
+                        [
+                          "epost_rubrik",
+                          "epost_rubrik_ja",
+                          "epost_text",
+                          "epost_text_ja",
+                          "sms_text"
+                        ]);
+                csvdata = csvdata + appdata.utskick.filter(
+                    utskick => utskick.kodstugor_id == kodstuga.id
+                    ).map(utskick => name_key_export(
+                        utskick,
+                        [
+                          "datum",
+                          "typ",
+                          "rubrik",
+                          "text",
+                          "epost_text_ja",
+                          "sms_text"
+                        ])
+                      );
+
+                var utf8 = encodeURIComponent(csvdata).replace(
+                  /%([0-9A-F]{2})/g,
+                  function toSolidBytes( $0, hex ) {
+                    return( String.fromCharCode( "0x" + hex ));
+                  }
+                );
+                kodstuga.download = "data:text/plain;charset=utf-8;base64,"+btoa(utf8)
+                return kodstuga
+            }
+            return this.kodstugor.map(add_download);
         },
         statistik: function(){
             var kodstug_stats = []
