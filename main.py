@@ -10,7 +10,7 @@ from logging.handlers import TimedRotatingFileHandler # noqa: 402
 from gevent.pywsgi import WSGIServer # noqa: 402
 from gevent import spawn, signal, pool # noqa: 402
 
-from tools import (
+from tools import ( # noqa: 402
     Error302,
     Error400,
     Error403,
@@ -19,7 +19,7 @@ from tools import (
     send_email_queue,
     send_sms_queue
     ) # noqa: 402
-from managedata import (
+from managedata import ( # noqa: 402
     kodstugor,
     kontaktpersoner,
     applied,
@@ -190,8 +190,8 @@ if __name__ == '__main__':
         server.close()
         server.stop(timeout=4)
         exit()
-    signal(signal.SIGTERM, shutdown)
-    signal(signal.SIGINT, shutdown)  # CTRL C
+    signal.signal(signal.SIGTERM, shutdown)
+    signal.signal(signal.SIGINT, shutdown)  # CTRL C
     server.serve_forever(stop_timeout=4)
 else:
     green_pool = pool.Pool()

@@ -120,8 +120,8 @@ def send_sms_reminders_once():
 def send_sms_reminders():
     while True:
         send_sms_reminders_once()
-        now = arrow.utcnow().timestamp
-        then = arrow.utcnow().shift(hours=24).replace(hour=9, minute=00).timestamp
+        now = arrow.utcnow().timestamp()
+        then = arrow.utcnow().shift(hours=24).replace(hour=9, minute=00).timestamp()
         sleep(then - now)
 
 
@@ -163,6 +163,6 @@ def send_email_reminders_once():
 def send_email_reminders():
     while True:
         send_email_reminders_once()
-        now = arrow.utcnow().timestamp
-        then = arrow.utcnow().shift(hours=24).replace(hour=9, minute=00).timestamp
+        now = arrow.utcnow().timestamp()
+        then = arrow.utcnow().shift(hours=24).replace(hour=9, minute=00).timestamp()
         sleep(then - now)

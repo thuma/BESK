@@ -18,6 +18,8 @@ Open http://localhost:9191 in your browser.
 
 ### Prerequisites
 
+Python at least version **3.7.3**.
+
 You need to get the python modules in the requirements.txt file:
 
 ```

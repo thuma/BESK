@@ -3,6 +3,7 @@
 import json
 import configparser
 import uuid
+from http import cookies
 from time import time
 
 import requests
@@ -38,7 +39,7 @@ def get_auth(session_id):
     result = db.cursor.execute('''SELECT user_data FROM auth WHERE session_id=? AND vailid > ?;''', (session_id, now))
     try:
         return json.loads(result.fetchone()[0])
-    except:  # noqa: E772
+    except Exception:
         return False
 
 
@@ -91,10 +92,9 @@ def get_login_status(request):
 
 def get_session_token(request):
     if 'HTTP_COOKIE' in request:
-        for cookie in request['HTTP_COOKIE'].split(";"):
-            (key, data) = cookie.split("=")
-            if key == "session_token" and len(data) > 31:
-                return data
+        kakor = cookies.BaseCookie(request['HTTP_COOKIE'])
+        if "session_token" in kakor:
+            return kakor["session_token"].value
     return False
 
 
