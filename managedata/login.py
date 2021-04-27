@@ -114,7 +114,7 @@ def start(request):
         raise Error302(
             "302 Found",
             [
-                ("Set-Cookie", "session_token=" + session_token + "; HttpOnly" + is_secure),
+                ("Set-Cookie", "session_token=" + session_token + "; HttpOnly" + is_secure + "; SameSite=lax"),
                 ("Location", auth_start_url)
             ]
         )

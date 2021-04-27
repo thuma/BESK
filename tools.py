@@ -31,6 +31,11 @@ def static_file(filename):
         return out
 
 
+def static_files(filename):
+    with open(filename, 'r') as content_file:
+        return content_file.read()
+
+
 class Error400(Exception):
     pass
 

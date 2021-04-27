@@ -16,6 +16,7 @@ from tools import ( # noqa: 402
     Error403,
     Error404,
     static_file,
+    static_files,
     send_email_queue,
     send_sms_queue
     ) # noqa: 402
@@ -54,6 +55,10 @@ def application(request, response):
         resultdata = convert(route(request))
         if resultdata[0:1] == b"<":
             response('200 OK', [('Content-Type', 'text/html')])
+        elif request['PATH_INFO'][-4:] == ".css":
+            response('200 OK', [('Content-Type', 'text/css')])
+        elif request['PATH_INFO'][-3:] == ".js":
+            response('200 OK', [('Content-Type', 'application/x-javascript')])
         else:
             response('200 OK', [('Content-Type', 'application/json')])
         return [resultdata]
@@ -87,6 +92,20 @@ def route(request):
         return invite.reply(request)
     if request['PATH_INFO'] == '/apply/kodstugor':
         return kodstugor.active(request)
+    if request['PATH_INFO'] == '/js/bootstrap.min.js':
+        return static_files('static/js/bootstrap.min.js')
+    if request['PATH_INFO'] == '/js/jquery-3.3.1.slim.min.js':
+        return static_files('static/js/jquery-3.3.1.slim.min.js')
+    if request['PATH_INFO'] == '/js/popper.min.js':
+        return static_files('static/js/popper.min.js')
+    if request['PATH_INFO'] == '/js/showdown.min.js':
+        return static_files('static/js/showdown.min.js')
+    if request['PATH_INFO'] == '/js/sweetalert.min.js':
+        return static_files('static/js/sweetalert.min.js')
+    if request['PATH_INFO'] == '/js/vue.js':
+        return static_files('static/js/vue.js')
+    if request['PATH_INFO'] == '/css/bootstrap.min.css':
+        return static_files('static/css/bootstrap.min.css')
 
     if not request["BESK_login"]["user"] and request['PATH_INFO'] == '/':
         return login.start(request)
@@ -106,8 +125,8 @@ def route(request):
     if request['PATH_INFO'] == '/':
         return static_file('static/start.html')
 
-    if request['PATH_INFO'] == '/index.js':
-        return static_file('static/index.js')
+    if request['PATH_INFO'] == '/js/index.js':
+        return static_files('static/js/index.js')
 
     if request['PATH_INFO'].startswith("/api"):
         request['PATH_INFO'] = request['PATH_INFO'][4:]
@@ -188,7 +207,7 @@ if __name__ == '__main__':
         error_log=logger
     )
 
-    def shutdown():
+    def shutdown(a, b):
         print('Shutting down ...')
         server.close()
         server.stop(timeout=4)
