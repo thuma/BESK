@@ -15,3 +15,4 @@ def commit():
 
 for table in tables.tables:
     db.execute(table)
+    db.commit()

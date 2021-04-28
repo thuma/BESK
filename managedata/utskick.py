@@ -126,6 +126,7 @@ def add_or_uppdate(request):
 
 
 def send_utskick_once():
+    logger.info("Datumspecifika utskick genomförs.")
     found = db.cursor.execute('''
         SELECT
             id,
@@ -151,24 +152,28 @@ def send_utskick_once():
             ut[col[0]] = row[idx]
         return ut
 
-    for utskick in map(to_headers, found.fetchall()):
-        for mottagare in kontaktpersoner.for_kodstuga(utskick["kodstugor_id"]):
-            message = utskick["text"].replace(
-                "%namn%", mottagare["deltagare_fornamn"]).replace(
-                "%kodstuga%", mottagare["kodstugor_namn"])
-            if utskick["typ"] == "sms":
-                send_sms(mottagare["telefon"], message)
-            elif utskick["typ"] == "e-post":
-                send_email(mottagare["epost"], utskick["rubrik"], message)
-        db.cursor.execute('''
-                UPDATE
-                    utskick
-                SET
-                    status = "skickad"
-                WHERE
-                    id = ?;
-        ''', (utskick["id"],))
-        db.commit()
+    up_for_sending = found.fetchall()
+    if len(up_for_sending) > 0:
+        for utskick in list(map(to_headers, up_for_sending)):
+            logger.info("Utskick för kostuga %s genomförs.", utskick["kodstugor_id"])
+            for mottagare in kontaktpersoner.for_kodstuga(utskick["kodstugor_id"]):
+                message = utskick["text"].replace(
+                    "%namn%", mottagare["deltagare_fornamn"]).replace(
+                    "%kodstuga%", mottagare["kodstugor_namn"])
+                if utskick["typ"] == "sms":
+                    send_sms(mottagare["telefon"], message)
+                elif utskick["typ"] == "e-post":
+                    send_email(mottagare["epost"], utskick["rubrik"], message)
+            db.cursor.execute('''
+                    UPDATE
+                        utskick
+                    SET
+                        status = "skickad"
+                    WHERE
+                        id = ?;
+            ''', (utskick["id"],))
+            db.commit()
+    logger.info("Datumspecifika utskick genomförda.")
 
 
 def send_utskick():
