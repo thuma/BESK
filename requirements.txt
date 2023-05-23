@@ -1,4 +1,4 @@
-requests==2.25.1
+requests==2.31.0
 gevent==21.1.2
 phonenumbers==8.12.19
 Markdown==3.3.4
